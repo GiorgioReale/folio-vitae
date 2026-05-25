@@ -10,8 +10,8 @@
 //! If you are new to Rust, start by reading:
 //!
 //! 1. `main()`
-//! 2. `run_build()`
-//! 3. `run_servers()`
+//! 2. `run_servers()`
+//! 3. `run_servers_with_watch()`
 //! 4. `prepare_application_state()`
 
 pub mod app;
@@ -26,25 +26,18 @@ use std::{
     env,
     io::ErrorKind,
     net::{IpAddr, SocketAddr},
+    path::Path,
+    time::{Duration, SystemTime},
 };
-#[cfg(feature = "build")]
-use std::{fs, path::Path};
 
-#[cfg(feature = "build")]
-use ::http::StatusCode;
 use app::{
-    cache::{self, BuildCache, InputSnapshot, latest_modification},
+    cache::{BuildCache, latest_modification},
     environment::Environment,
     localization::{detect_languages_with_last_change, load_language_names, load_localizations},
     setup::{build_app_states, load_templates},
-    state::{AppState, SiteKind},
+    state::AppState,
 };
-#[cfg(feature = "build")]
-use app::{
-    compression, images,
-    render::{render_cv_curriculum, render_cv_homepage, render_cv_menu, render_main_homepage},
-    scripts, styles,
-};
+use app::{compression, images, scripts, styles};
 use config::{TEMPLATES_PATTERN, data_dir};
 use dotenvy::from_path_override;
 #[cfg(feature = "serve")]
@@ -52,19 +45,14 @@ use http::build_router;
 #[cfg(feature = "serve")]
 use tokio::sync::broadcast;
 use tracing::debug;
-#[cfg(any(feature = "build", feature = "serve"))]
 use tracing::info;
-#[cfg(feature = "build")]
-use walkdir::WalkDir;
 
 pub use error::{AppError, AppResult, ResultExt};
 
-#[cfg(feature = "build")]
 pub struct PreparedApplication {
     pub main_state: AppState,
     pub cv_state: AppState,
     pub build_cache: BuildCache,
-    pub snapshot: InputSnapshot,
 }
 
 pub fn initialize_project(force: bool) -> AppResult<()> {
@@ -82,7 +70,6 @@ pub fn load_env_file(path: &str) -> AppResult<()> {
     }
 }
 
-#[cfg(feature = "build")]
 pub fn prepare_application_state(environment: Environment) -> AppResult<PreparedApplication> {
     let mut build_cache = BuildCache::load()?;
     let data_directory = data_dir();
@@ -125,34 +112,7 @@ pub fn prepare_application_state(environment: Environment) -> AppResult<Prepared
         main_state: states.0,
         cv_state: states.1,
         build_cache,
-        snapshot: InputSnapshot {
-            data: cache::system_time_to_timestamp(data_last_modified),
-            assets: cache::system_time_to_timestamp(assets_last_modified),
-            templates: cache::system_time_to_timestamp(templates_last_modified),
-            images: cache::system_time_to_timestamp(images_last_modified),
-            minify_assets,
-        },
     })
-}
-
-#[cfg(feature = "build")]
-pub fn run_build(environment: Environment) -> AppResult<()> {
-    let PreparedApplication { main_state, cv_state, mut build_cache, snapshot } =
-        prepare_application_state(environment)?;
-
-    let dist_root = Path::new("dist");
-
-    if build_cache.last_build_matches(&snapshot) && dist_root.exists() {
-        info!("Skipping build; no changes detected since last run.");
-        return Ok(());
-    }
-
-    build_static_sites(&main_state, &cv_state, dist_root)?;
-
-    build_cache.record_build(&snapshot);
-    build_cache.save()?;
-
-    Ok(())
 }
 
 #[cfg(feature = "serve")]
@@ -224,40 +184,6 @@ pub async fn run_servers<T>(
     Ok(shutdown_value)
 }
 
-#[cfg(feature = "build")]
-pub fn build_static_sites(
-    main_state: &AppState,
-    cv_state: &AppState,
-    dist_root: impl AsRef<Path>,
-) -> AppResult<()> {
-    let dist_root = dist_root.as_ref();
-
-    if dist_root.exists() {
-        fs::remove_dir_all(dist_root).with_context(|| "clearing existing dist directory")?;
-    }
-
-    fs::create_dir_all(dist_root).with_context(|| "creating dist directory")?;
-
-    if main_state.site_available(SiteKind::Main) {
-        build_site(main_state, SiteKind::Main, &dist_root.join("main"))?;
-    }
-
-    if cv_state.site_available(SiteKind::Cv) {
-        build_site(cv_state, SiteKind::Cv, &dist_root.join("cv"))?;
-    }
-
-    Ok(())
-}
-
-#[cfg(feature = "build")]
-pub fn build_site(state: &AppState, site: SiteKind, output_root: &Path) -> AppResult<()> {
-    fs::create_dir_all(output_root).with_context(|| format!("creating {output_root:?}"))?;
-
-    copy_assets(output_root)?;
-    write_static_files(state, site, output_root)?;
-    render_site_pages(state, site, output_root)
-}
-
 pub fn read_port_from_env(name: &str, default: u16) -> AppResult<u16> {
     read_port_from_source(name, default, |var_name| env::var(var_name))
 }
@@ -276,147 +202,83 @@ fn read_port_from_source(
     }
 }
 
-#[cfg(feature = "build")]
-fn copy_assets(target_root: &Path) -> AppResult<()> {
-    copy_directory(Path::new("assets"), &target_root.join("assets"))
+#[cfg(feature = "serve")]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum ServerLifecycle {
+    Restart,
+    Stop,
 }
 
-#[cfg(feature = "build")]
-fn copy_directory(source: &Path, destination: &Path) -> AppResult<()> {
-    for entry in WalkDir::new(source) {
-        let entry = entry
-            .map_err(|error| AppError::msg(format!("walking assets in {source:?}: {error}")))?;
-        let relative_path = entry.path().strip_prefix(source).map_err(|error| {
-            AppError::msg(format!("computing relative path for {:?}: {error}", entry.path()))
-        })?;
-        let target_path = destination.join(relative_path);
-
-        if entry.file_type().is_dir() {
-            fs::create_dir_all(&target_path)
-                .with_context(|| format!("creating directory {target_path:?}"))?;
-            continue;
-        }
-
-        if let Some(parent) = target_path.parent() {
-            fs::create_dir_all(parent)
-                .with_context(|| format!("creating parent directory {parent:?}"))?;
-        }
-
-        fs::copy(entry.path(), &target_path)
-            .with_context(|| format!("copying {:?} to {:?}", entry.path(), target_path))?;
-    }
-
-    Ok(())
+#[cfg(feature = "serve")]
+#[derive(Clone, Debug, PartialEq, Eq)]
+struct WatchSnapshot {
+    assets: Option<SystemTime>,
+    config: Option<SystemTime>,
+    data: Option<SystemTime>,
+    env_file: Option<SystemTime>,
+    i18n: Option<SystemTime>,
+    static_files: Option<SystemTime>,
+    templates: Option<SystemTime>,
 }
 
-#[cfg(feature = "build")]
-fn write_static_files(state: &AppState, site: SiteKind, output_root: &Path) -> AppResult<()> {
-    let assets = match site {
-        SiteKind::Main => &state.main_static,
-        SiteKind::Cv => &state.cv_static,
-    };
+#[cfg(feature = "serve")]
+pub async fn run_servers_with_watch(
+    environment: Environment,
+    host: IpAddr,
+    main_port: u16,
+    cv_port: u16,
+    env_file: impl AsRef<Path>,
+) -> AppResult<()> {
+    let env_file = env_file.as_ref().to_path_buf();
 
-    write_text_file(&output_root.join("robots.txt"), &assets.robots)?;
-    write_text_file(&output_root.join("sitemap.xml"), &assets.sitemap)?;
-    write_text_file(&output_root.join("site.webmanifest"), &assets.manifest)?;
-    write_text_file(&output_root.join(".well-known").join("security.txt"), &assets.security_txt)
-}
+    loop {
+        let watch_snapshot = read_watch_snapshot(&env_file)?;
+        let lifecycle = run_servers(environment, host, main_port, cv_port, async {
+            tokio::select! {
+                result = tokio::signal::ctrl_c() => {
+                    result.with_context(|| "listening for shutdown signal")?;
+                    Ok(ServerLifecycle::Stop)
+                }
+                result = wait_for_project_change(&env_file, watch_snapshot) => {
+                    result?;
+                    Ok(ServerLifecycle::Restart)
+                }
+            }
+        })
+        .await?;
 
-#[cfg(feature = "build")]
-fn render_site_pages(state: &AppState, site: SiteKind, output_root: &Path) -> AppResult<()> {
-    let snapshot = state.localization_snapshot();
-    let is_multilingual = snapshot.supported_languages.len() > 1;
-    let default_language = snapshot.default_language.clone();
-
-    for language in &snapshot.supported_languages {
-        if !snapshot
-            .localizations
-            .get(language)
-            .map(|resources| match site {
-                SiteKind::Main => resources.data.sites.has_main(),
-                SiteKind::Cv => resources.data.sites.has_cv(),
-            })
-            .unwrap_or(false)
-        {
-            continue;
-        }
-
-        let language_prefix = language.url_prefix(&default_language, is_multilingual);
-        let homepage_path = if language_prefix.is_empty() {
-            "/".to_string()
-        } else {
-            format!("{language_prefix}/")
-        };
-
-        match site {
-            SiteKind::Main => {
-                let homepage = html_content(
-                    render_main_homepage(state, language, &homepage_path),
-                    &homepage_path,
-                )?;
-
-                write_page(output_root, &homepage_path, &homepage)?;
+        match lifecycle {
+            ServerLifecycle::Restart => {
+                info!("Project files changed. Restarting development servers...");
+                load_env_file(&env_file.to_string_lossy())?;
             },
-            SiteKind::Cv => {
-                let homepage = html_content(
-                    render_cv_homepage(state, language, &homepage_path),
-                    &homepage_path,
-                )?;
-                write_page(output_root, &homepage_path, &homepage)?;
-
-                let curriculum_path = build_page_path(&language_prefix, "/curriculum");
-                let curriculum = html_content(
-                    render_cv_curriculum(state, None, language, &curriculum_path),
-                    &curriculum_path,
-                )?;
-                write_page(output_root, &curriculum_path, &curriculum)?;
-
-                let menu_path = build_page_path(&language_prefix, "/menu");
-                let menu = html_content(render_cv_menu(state, language, &menu_path), &menu_path)?;
-                write_page(output_root, &menu_path, &menu)?;
-            },
+            ServerLifecycle::Stop => return Ok(()),
         }
     }
-
-    Ok(())
 }
 
-#[cfg(feature = "build")]
-fn html_content(result: Result<String, StatusCode>, page: &str) -> AppResult<String> {
-    result.map_err(|status| AppError::msg(format!("failed to render {page}: {status}")))
+#[cfg(feature = "serve")]
+fn read_watch_snapshot(env_file: &Path) -> AppResult<WatchSnapshot> {
+    Ok(WatchSnapshot {
+        assets: latest_modification(&[Path::new("assets")])?,
+        config: latest_modification(&[Path::new("config.yml")])?,
+        data: latest_modification(&[data_dir()])?,
+        env_file: latest_modification(&[env_file])?,
+        i18n: latest_modification(&[Path::new("i18n")])?,
+        static_files: latest_modification(&[Path::new("static")])?,
+        templates: latest_modification(&[Path::new("templates")])?,
+    })
 }
 
-#[cfg(feature = "build")]
-fn write_page(output_root: &Path, request_path: &str, contents: &str) -> AppResult<()> {
-    let trimmed = request_path.trim_start_matches('/');
-    let normalized = trimmed.trim_end_matches('/');
-    let target_dir = if normalized.is_empty() {
-        output_root.to_path_buf()
-    } else {
-        output_root.join(normalized)
-    };
+#[cfg(feature = "serve")]
+async fn wait_for_project_change(env_file: &Path, baseline: WatchSnapshot) -> AppResult<()> {
+    loop {
+        tokio::time::sleep(Duration::from_millis(750)).await;
 
-    fs::create_dir_all(&target_dir)
-        .with_context(|| format!("creating directory {target_dir:?}"))?;
-
-    let target_file = target_dir.join("index.html");
-
-    fs::write(&target_file, contents)
-        .with_context(|| format!("writing rendered page to {target_file:?}"))
-}
-
-#[cfg(feature = "build")]
-fn write_text_file(path: &Path, contents: &str) -> AppResult<()> {
-    if let Some(parent) = path.parent() {
-        fs::create_dir_all(parent).with_context(|| format!("creating directory {parent:?}"))?;
+        if read_watch_snapshot(env_file)? != baseline {
+            return Ok(());
+        }
     }
-
-    fs::write(path, contents).with_context(|| format!("writing {path:?}"))
-}
-
-#[cfg(feature = "build")]
-fn build_page_path(prefix: &str, suffix: &str) -> String {
-    if prefix.is_empty() { suffix.to_string() } else { format!("{prefix}{suffix}") }
 }
 
 #[cfg(test)]

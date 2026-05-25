@@ -45,17 +45,14 @@ expect_used = "deny"
 unwrap_used = "deny"
 
 [features]
-default = ["build", "serve"]
-build = [
+default = ["serve"]
+serve = [
   "dep:fast_image_resize",
   "dep:grass",
   "dep:ico",
   "dep:image",
   "dep:minifier",
   "dep:resvg",
-]
-serve = [
-  "build",
   "dep:axum",
   "dep:hyper",
   "dep:tower",

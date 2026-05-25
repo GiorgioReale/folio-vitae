@@ -21,9 +21,9 @@ fn init_creates_scaffold_files() {
 }
 
 #[test]
-fn start_help_lists_port_options() {
+fn dev_help_lists_port_options() {
     Command::new(assert_cmd::cargo::cargo_bin!("folio-vitae"))
-        .arg("start")
+        .arg("dev")
         .arg("--help")
         .assert()
         .success()
@@ -33,11 +33,12 @@ fn start_help_lists_port_options() {
 }
 
 #[test]
-fn root_help_mentions_start_command() {
+fn root_help_mentions_runtime_commands() {
     Command::new(assert_cmd::cargo::cargo_bin!("folio-vitae"))
         .arg("--help")
         .assert()
         .success()
-        .stdout(predicate::str::contains("start"))
+        .stdout(predicate::str::contains("dev"))
+        .stdout(predicate::str::contains("prod"))
         .stdout(predicate::str::contains("init"));
 }
