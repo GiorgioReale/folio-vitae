@@ -1,0 +1,121 @@
+{
+  "language": {
+    "code": "zh",
+    "tag": "zh-CN",
+    "meta_language": "ZH",
+    "dc_language": "zho",
+    "direction": "ltr"
+  },
+  "accessibility": {
+    "skip_to_content": "跳到主要内容"
+  },
+  "nav": {
+    "home": "主页",
+    "menu": "菜单",
+    "theme_switch": "明暗模式切换",
+    "language_selector_label": "语言",
+    "current_language": "当前语言"
+  },
+  "main_page": {
+    "websites": "网站",
+    "contacts": "联系方式",
+    "social": "社交媒体"
+  },
+  "cv_homepage": {
+    "curriculum_label": "简历",
+    "curriculum_action": "查看简历"
+  },
+  "cv_curriculum": {
+    "page_title": "简历",
+    "city_label": "城市：",
+    "birth_date_label": "出生日期：",
+    "website_label": "网站：",
+    "email_label": "电子邮件：",
+    "about_heading": "关于我",
+    "experience_heading": "工作经验",
+    "more_experiences": "完整的工作经验列表可在 {domain} 查看。",
+    "other_projects_heading": "其他项目",
+    "education_heading": "教育背景",
+    "skills_heading": "技能",
+    "courses_heading": "课程与认证",
+    "courses_more_info": "完整的课程与认证列表可在 {domain} 查看。",
+    "course_released_by": "颁发机构",
+    "course_released_on": "颁发日期",
+    "certificate_link": "证书",
+    "legal_notice": "根据意大利法令第196/2003号第13条及欧盟 GDPR（2016/679）第13条，本人授权处理本简历中包含的个人数据，仅用于招聘目的。",
+    "contact_heading": "联系我",
+    "contact_description": "填写表单向我发送直接消息。",
+    "contact_submit": "发送消息",
+    "contact_labels": {
+      "full_name": "姓名",
+      "company": "公司",
+      "email": "电子邮箱",
+      "message": "消息内容"
+    },
+    "curriculum_link": "简历",
+    "vote": "成绩",
+    "project_link": "链接"
+  },
+  "cv_menu": {
+    "title": "菜单",
+    "about": "关于我",
+    "experiences": "工作经验",
+    "education": "教育背景",
+    "skills": "技能",
+    "courses": "课程与认证",
+    "contact": "联系我"
+  },
+  "contact": {
+    "feedback_success": "消息已成功发送。",
+    "feedback_error": "发送消息时发生错误，请稍后重试。"
+  },
+  "validation": {
+    "required_fields": "请在提交前填写所有字段。",
+    "full_name_length": "姓名长度需为 3 至 120 个字符。",
+    "company_length": "公司名称长度需为 2 至 120 个字符。",
+    "email": "请输入有效的电子邮箱地址。",
+    "message_length": "消息内容需为 10 至 2000 个字符。"
+  },
+  "errors": {
+    "title": "错误",
+    "default_message": "发生了某些问题",
+    "back_home": "返回主页",
+    "client_error": "请求错误",
+    "server_error": "服务器内部错误",
+    "status_messages": {
+      "400": "无效的请求",
+      "401": "需要身份验证",
+      "403": "拒绝访问",
+      "404": "页面未找到",
+      "405": "方法不允许",
+      "410": "页面已不存在",
+      "429": "请求过多",
+      "501": "功能未实现",
+      "502": "无效的网关",
+      "503": "服务不可用",
+      "504": "响应超时",
+      "505": "不支持的 HTTP 版本"
+    }
+  },
+  "dates": {
+    "month_names": [
+      "一月",
+      "二月",
+      "三月",
+      "四月",
+      "五月",
+      "六月",
+      "七月",
+      "八月",
+      "九月",
+      "十月",
+      "十一月",
+      "十二月"
+    ],
+    "ongoing": "至今",
+    "year": "年",
+    "years": "年",
+    "month": "月",
+    "months": "个月"
+  }
+}

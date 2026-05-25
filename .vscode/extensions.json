@@ -1,0 +1,3 @@
+{
+  "recommendations": ["esbenp.prettier-vscode", "editorconfig.editorconfig", "rust-lang.rust-analyzer", "tamasfe.even-better-toml", "bungcip.better-toml", "streetsidesoftware.code-spell-checker"]
+}

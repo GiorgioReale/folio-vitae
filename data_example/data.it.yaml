@@ -1,0 +1,129 @@
+person:
+  # Informazioni personali di base mostrate nel sito.
+  first_name: Alex
+  last_name: Carter
+  role: Sviluppatore Full Stack
+  # Le date usano il formato YYYY-MM-DD.
+  date_of_birth: '1992-04-18'
+  position:
+    # Dati di posizione usati nei metadati e nel CV.
+    locale: it_IT
+    locality: Milano
+    region: Lombardia
+    postal_code: '20121'
+    country_name: Italia
+    # Questi valori sono opzionali.
+    latitude: ''
+    longitude: ''
+
+sites:
+  main:
+    # Portfolio o homepage principale.
+    domain: alexcarter.dev
+    title: 'Alex Carter | Sviluppatore Full Stack'
+    description: 'Portfolio e sito personale di Alex Carter.'
+    keywords:
+      - sviluppatore
+      - portfolio
+      - web
+      - software
+  cv:
+    # Sito dedicato al CV.
+    domain: cv.alexcarter.dev
+    title: 'Alex Carter | Curriculum Vitae'
+    description: 'Esperienza, progetti, formazione e competenze di Alex Carter.'
+    keywords:
+      - cv
+      - curriculum
+      - esperienza
+      - competenze
+    profile:
+      # Breve introduzione mostrata nella homepage del CV.
+      summary: |
+        Sviluppatore Full Stack orientato a creare prodotti web chiari, utili e facili da mantenere.
+        Mi piace lavorare tra frontend e backend, migliorare l'esperienza di sviluppo e trasformare
+        requisiti complessi in soluzioni semplici.
+      work_experiences:
+        # Aggiungi le esperienze dalla più recente alla più vecchia.
+        - company:
+            name: BrightForge
+            location: Remoto
+          roles:
+            - title: Senior Full Stack Developer
+              start_date: '2022-01-10'
+              end_date: null
+              description: |
+                Sviluppo strumenti interni e funzionalità per i clienti con Rust, TypeScript e PostgreSQL.
+                Collaboro con design e prodotto, faccio code review e aiuto a mantenere il codice semplice
+                e affidabile.
+        - company:
+            name: North Bay Studio
+            location: Milano, Italia
+          roles:
+            - title: Full Stack Developer
+              start_date: '2018-06-01'
+              end_date: '2021-12-20'
+              description: |
+                Ho sviluppato applicazioni web per piccole imprese, migliorato le performance delle pagine
+                e mantenuto componenti UI condivisi usati in più progetti clienti.
+      other_projects:
+        # Progetti personali o open-source facoltativi.
+        - title: 'Starter Notes'
+          start_date: '2023-03-01'
+          end_date: null
+          description: |
+            Una semplice app per prendere appunti, creata per sperimentare supporto offline e pattern UI puliti.
+          link: https://github.com/alexcarter/starter-notes
+      educations:
+        - institute: Universita degli Studi di Milano
+          educational_qualification: Laurea Triennale
+          course_of_study: Informatica
+          date_start: '2010-09-01'
+          date_end: '2014-05-30'
+          vote: 'Laureato con lode'
+          description: "Percorso focalizzato su ingegneria del software, basi di dati e interazione uomo-macchina."
+      skills:
+        # Mantieni la lista corta per un layout piu pulito.
+        # Le icone usano i nomi di simpleicons.org.
+        - name: Rust
+          icon: rust
+        - name: TypeScript
+          icon: typescript
+        - name: React
+          icon: react
+        - name: PostgreSQL
+          icon: postgresql
+      courses_certifications:
+        - title: 'Fondamenti di accessibilita web'
+          released_by: W3C
+          released_on: '2023-09-01'
+          link: https://www.w3.org/WAI/fundamentals/
+  additional:
+    # Siti extra opzionali.
+    - domain: blog.alexcarter.dev
+      title: 'Appunti di Alex Carter'
+      description: 'Brevi articoli su sviluppo web e software manutenibile.'
+      keywords:
+        - blog
+        - sviluppo
+        - software
+
+contact:
+  emails:
+    # Email principale usata nella homepage.
+    main: hello@alexcarter.dev
+    # Email usata nell'area CV.
+    cv: work@alexcarter.dev
+    # Indirizzi extra opzionali.
+    other:
+      - speaking@alexcarter.dev
+  socials:
+    # `social_name` viene usato anche per caricare l'icona.
+    - social_name: github
+      social_full_name: GitHub
+      link: https://github.com/alexcarter
+      profile_nickname: alexcarter
+    - social_name: linkedin
+      social_full_name: LinkedIn
+      link: https://www.linkedin.com/in/alexcarter
+      profile_nickname: alexcarter

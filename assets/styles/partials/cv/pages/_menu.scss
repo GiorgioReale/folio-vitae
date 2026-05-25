@@ -1,0 +1,33 @@
+#menu {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-content: center;
+  justify-content: space-between;
+  align-items: stretch;
+
+  > section {
+    > main {
+      display: flex;
+      flex-direction: column;
+      flex-wrap: nowrap;
+      align-content: center;
+      justify-content: center;
+      align-items: center;
+
+      > a {
+        display: block;
+        width: 576px;
+        max-width: -webkit-fill-available;
+        max-width: -moz-available;
+        max-width: stretch;
+        border-top: 1px solid #bbb;
+        padding: 1rem 2rem 1rem 2rem;
+
+        &:last-child {
+          border-bottom: 1px solid #bbb;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html dir="{{ language_direction }}" lang="{{ language_tag }}">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="generator" content="{{ generator }}" />
+  {% set resolved_page_title = page_title | default(value="") %}
+  {% set resolved_page_url = page_url | default(value="/") %}
+  {% set robots_value = robots | default(value="index,follow") %}
+  {% set site_title = website_cv.title | default(value="") %}
+  {% set has_site_title = site_title | trim | length > 0 %}
+  {% set site_description = website_cv.description | default(value="") %}
+  {% set has_site_description = site_description | trim | length > 0 %}
+  {% set site_domain = website_cv.domain | default(value="") %}
+  {% set has_site_domain = site_domain | trim | length > 0 %}
+  {% set has_email_main = email_main | trim | length > 0 %}
+  {% set has_email_cv = email_cv | trim | length > 0 %}
+  {% set page_title_content = "" %}
+  {% if resolved_page_title != "" and has_site_title %}
+  {% set page_title_content = resolved_page_title ~ " · " ~ site_title %}
+  {% elif resolved_page_title != "" %}
+  {% set page_title_content = resolved_page_title %}
+  {% elif has_site_title %}
+  {% set page_title_content = site_title %}
+  {% endif %}
+  {% if page_title_content != "" %}
+  <meta name="title" content="{{ page_title_content }}" />
+  {% endif %}
+  {% if has_site_description %}
+  <meta name="description" content="{{ site_description }}" />
+  {% endif %}
+  <meta name="keywords" content="{{ first_name }} {{ last_name }}, {% for keyword in website_cv.keywords %}{{ keyword }}{% if not loop.last %}, {% endif %}{% endfor %}" />
+  <meta name="copyright" content="{{ first_name }} {{ last_name }}" />
+  <meta name="language" content="{{ meta_language }}" />
+  <meta name="dc.language" content="{{ dc_language }}" />
+  <meta http-equiv="content-language" content="{{ meta_language }}" />
+  <meta name="robots" content="{{ robots_value }}" />
+  <meta name="author" content="Giorgio Reale, info@giorgioreale.xyz" />
+  <meta name="designer" content="Giorgio Reale, info@giorgioreale.xyz" />
+  <meta name="reply-to" content="{{ email_cv }}" />
+  <meta name="owner" content="{{ first_name }} {{ last_name }}" />
+  {% if has_site_domain %}
+  <meta name="url" content="https://{{ site_domain }}{{ resolved_page_url }}" />
+  <meta name="identifier-URL" content="https://{{ site_domain }}{{ resolved_page_url }}" />
+  {% endif %}
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  {% if page_title_content != "" %}
+  <meta property="og:title" content="{{ page_title_content }}" />
+  {% endif %}
+  <meta property="og:type" content="website" />
+  {% if has_site_domain %}
+  <meta property="og:url" content="https://{{ site_domain }}{{ resolved_page_url }}" />
+  <meta property="og:image" content="https://{{ site_domain }}/assets/images/cv/social-card/social-card.png" />
+  <meta property="og:image:url" content="https://{{ site_domain }}/assets/images/cv/social-card/social-card.png" />
+  <meta property="og:image:secure_url" content="https://{{ site_domain }}/assets/images/cv/social-card/social-card.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1920" />
+  <meta property="og:image:height" content="1080" />
+  <meta property="og:image:alt" content="Social card del sito di {{ first_name }} {{ last_name }}" />
+  {% endif %}
+  {% if has_site_title %}
+  <meta property="og:site_name" content="{{ site_title }}" />
+  {% endif %}
+  {% if has_site_description %}
+  <meta property="og:description" content="{{ site_description }}" />
+  {% endif %}
+  {% if has_email_cv %}
+  <meta property="og:email" content="{{ email_cv }}" />
+  {% endif %}
+  {% if position.locale | trim | length > 0 %}
+  <meta property="og:locale" content="{{ position.locale }}" />
+  {% endif %}
+  {% if position.locality | trim | length > 0 %}
+  <meta property="og:locality" content="{{ position.locality }}" />
+  {% endif %}
+  {% if position.region | trim | length > 0 %}
+  <meta property="og:region" content="{{ position.region }}" />
+  {% endif %}
+  {% if position.postal_code | trim | length > 0 %}
+  <meta property="og:postal-code" content="{{ position.postal_code }}" />
+  {% endif %}
+  {% if position.country_name | trim | length > 0 %}
+  <meta property="og:country-name" content="{{ position.country_name }}" />
+  {% endif %}
+  {% if position.latitude | trim | length > 0 %}
+  <meta property="og:latitude" content="{{ position.latitude }}" />
+  {% endif %}
+  {% if position.longitude | trim | length > 0 %}
+  <meta property="og:longitude" content="{{ position.longitude }}" />
+  {% endif %}
+  <meta name="twitter:card" content="summary" />
+  {% if has_site_domain %}
+  <meta name="twitter:url" content="https://{{ site_domain }}{{ resolved_page_url }}" />
+  <meta name="twitter:image" content="https://{{ site_domain }}/assets/images/cv/social-card/social-card.png" />
+  <meta name="twitter:image:alt" content="Social card del sito di {{ first_name }} {{ last_name }}" />
+  {% endif %}
+  {% if page_title_content != "" %}
+  <meta name="twitter:title" content="{{ page_title_content }}" />
+  {% endif %}
+  {% if has_site_description %}
+  <meta name="twitter:description" content="{{ site_description }}" />
+  {% endif %}
+  {% set twitter_handle = "" %}
+  {% set twitter_site_nickname = "" %}
+  {% for social in socials %}
+  {% if social.social_name == 'twitter' or social.social_name == 'x' %}
+  {% set_global twitter_handle = social.profile_nickname | replace(from='@', to='') %}
+  {% if twitter_site_nickname == "" %}
+  {% set_global twitter_site_nickname = social.profile_nickname %}
+  {% endif %}
+  {% endif %}
+  {% endfor %}
+  {% if twitter_handle != "" %}
+  <meta name="twitter:creator" content="@{{ twitter_handle }}" />
+  {% endif %}
+  {% if twitter_site_nickname != "" %}
+  <meta name="twitter:site" content="{{ twitter_site_nickname }}" />
+  {% endif %}
+  {% if page_title_content != "" %}
+  <title>{{ page_title_content }}</title>
+  {% endif %}
+  {% if has_site_domain %}
+  <link rel="canonical" href="https://{{ site_domain }}{{ resolved_page_url }}" />
+  {% endif %}
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/cv/logos/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/cv/logos/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/cv/logos/favicon-16x16.png" />
+  <link rel="icon" type="image/svg+xml" href="/assets/icons/cv/logos/favicon.svg" />
+  <link rel="manifest" href="/site.webmanifest" />
+  {% if has_site_title %}
+  <meta name="apple-mobile-web-app-title" content="{{ site_title }}" />
+  {% endif %}
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#000000" />
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000" />
+  <meta name="view-transition" content="same-origin" />
+  <link rel="preload" href="/assets/styles/cv.css?v={{ asset_version }}" as="style" />
+  <link rel="stylesheet" href="/assets/styles/cv.css?v={{ asset_version }}" type="text/css" fetchpriority="high" />
+  {% if minify_assets %}
+  <script src="/assets/scripts/light-dark-mode.min.js?v={{ asset_version }}" charset="utf-8" defer data-sprite-prefix="/assets/icons/cv/website/sprites.svg#"></script>
+  <script src="/assets/scripts/cv/open-close-menu.min.js?v={{ asset_version }}" charset="utf-8" defer></script>
+  <script src="/assets/scripts/cv/contact-form.min.js?v={{ asset_version }}" charset="utf-8" de></script>
+  {% else %}
+  <script src="/assets/scripts/light-dark-mode.js?v={{ asset_version }}" charset="utf-8" defer data-sprite-prefix="/assets/icons/cv/website/sprites.svg#"></script>
+  <script src="/assets/scripts/cv/open-close-menu.js?v={{ asset_version }}" charset="utf-8" defer></script>
+  <script src="/assets/scripts/cv/contact-form.js?v={{ asset_version }}" charset="utf-8" defer></script>
+  {% endif %}
+</head>
+
+<body id="{% block body_id %}{% endblock body_id %}">
+  <a class="skip-link" href="#main-content">{{ translations.accessibility.skip_to_content }}</a>
+  {% block aside %}{% endblock aside %}
+  <section>
+    <header>
+      <nav>
+        {% if languages | length > 1 %}
+        <div class="language-switcher" role="navigation" aria-label="{{ translations.nav.language_selector_label }}">
+          {% for language in languages %}
+          {% set language_label = translations.nav.language_selector_label ~ ': ' ~ language.label %}
+          {% if language.is_current %}
+          <span class="language-switcher__current" lang="{{ language.code }}" aria-current="page">
+            <span aria-hidden="true">{{ language.code }}</span>
+            <span class="sr-only">{{ language_label }} ({{ translations.nav.current_language }})</span>
+          </span>
+          {% else %}
+          <a href="{{ language.url }}" lang="{{ language.code }}" aria-label="{{ language_label }}" title="{{ language_label }}">
+            <span aria-hidden="true">{{ language.code }}</span>
+            <span class="sr-only">{{ language_label }}</span>
+          </a>
+          {% endif %}
+          {% endfor %}
+        </div>
+        {% endif %}
+        <a href="{{ language_prefix ~ '/' }}" aria-label="{{ translations.nav.home }}" title="{{ translations.nav.home }}">
+          <svg aria-hidden="true" focusable="false">
+            <use xlink:href="/assets/icons/cv/website/sprites.svg#home" />
+          </svg>
+        </a>
+        <button type="button" id="theme-switch" aria-label="{{ translations.nav.theme_switch }}"
+          title="{{ translations.nav.theme_switch }}">
+          <svg aria-hidden="true" focusable="false">
+            <use xlink:href="/assets/icons/cv/website/sprites.svg#moon-auto" />
+          </svg>
+        </button>
+        <a href="{{ language_prefix ~ '/menu' }}" id="menu" aria-label="{{ translations.nav.menu }}" title="{{ translations.nav.menu }}">
+          <svg aria-hidden="true" focusable="false">
+            <use xlink:href="/assets/icons/cv/website/sprites.svg#menu" />
+          </svg>
+        </a>
+      </nav>
+    </header>
+    {% block content %}{% endblock content %}
+    <footer>
+      <p>
+        <svg aria-hidden="true" focusable="false">
+          <use xlink:href="/assets/icons/cv/website/sprites.svg#copyright" />
+        </svg>
+        {% if has_website_main %}
+        {{ current_year }} - <a href="https://{{ website_main.domain }}" target="_blank" rel="noopener noreferrer">{{ first_name }} {{ last_name }}</a>
+        {% else %}
+        {{ current_year }} - {{ first_name }} {{ last_name }}
+        {% endif %}
+      </p>
+      {% if show_credits %}
+      <p>
+        &#60;&#47;&#62; with
+        <svg aria-hidden="true" focusable="false">
+          <use xlink:href="/assets/icons/cv/website/sprites.svg#love" />
+        </svg>
+        by <a href="https://github.com/GiorgioReale/folio-vitae" target="_blank" rel="noopener noreferrer">Giorgio Reale</a>
+      </p>
+      {% endif %}
+    </footer>
+  </section>
+</body>
+
+</html>

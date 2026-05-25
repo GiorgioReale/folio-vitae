@@ -1,0 +1,60 @@
+@use '../variables' as *;
+
+body#errors {
+  > section {
+    > main {
+      text-align: center;
+
+      > h1 {
+        font-family: var(--font-family-monospace);
+        font-variation-settings: 'wght' 400;
+        font-weight: 400;
+        line-height: 0.8;
+
+        &:nth-child(1) {
+          text-transform: uppercase;
+          font-size: 3.23rem;
+        }
+
+        &:nth-child(2) {
+          font-size: 6.45rem;
+        }
+
+        > span {
+          color: var(--color-text-primary-reverse);
+        }
+      }
+
+      > p {
+        font-size: 1.392rem;
+        margin: -0.75rem 0 0 0;
+      }
+
+      > a {
+        color: var(--color-buttons-primary);
+        background-color: var(--background-buttons-primary);
+        border: none;
+        padding: 0.75rem 1.5rem 0.75rem 1.5rem;
+        margin: 0.5rem 0 0 0;
+        font-size: 0.9rem;
+
+        &:hover {
+          color: var(--color-buttons-primary-hover);
+          background-color: var(--background-buttons-primary-hover);
+        }
+      }
+    }
+  }
+
+  @media (prefers-contrast: more) {
+    > section {
+      > main {
+        > h1 {
+          > span {
+            color: var(--color-text-primary);
+          }
+        }
+      }
+    }
+  }
+}

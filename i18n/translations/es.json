@@ -1,0 +1,121 @@
+{
+  "language": {
+    "code": "es",
+    "tag": "es-ES",
+    "meta_language": "ES",
+    "dc_language": "spa",
+    "direction": "ltr"
+  },
+  "accessibility": {
+    "skip_to_content": "Saltar al contenido principal"
+  },
+  "nav": {
+    "home": "Inicio",
+    "menu": "Menú",
+    "theme_switch": "Modo claro/oscuro",
+    "language_selector_label": "Idioma",
+    "current_language": "Idioma actual"
+  },
+  "main_page": {
+    "websites": "Sitios web",
+    "contacts": "Contactos",
+    "social": "Redes sociales"
+  },
+  "cv_homepage": {
+    "curriculum_label": "Currículum",
+    "curriculum_action": "Ir al currículum"
+  },
+  "cv_curriculum": {
+    "page_title": "Currículum",
+    "city_label": "Ciudad:",
+    "birth_date_label": "Fecha de nacimiento:",
+    "website_label": "Sitio web:",
+    "email_label": "Correo electrónico:",
+    "about_heading": "Sobre mí",
+    "experience_heading": "Experiencia",
+    "more_experiences": "La lista completa de experiencias laborales está disponible en {domain}.",
+    "other_projects_heading": "Otros proyectos",
+    "education_heading": "Formación",
+    "skills_heading": "Skills",
+    "courses_heading": "Cursos y certificaciones",
+    "courses_more_info": "La lista completa de cursos y certificaciones está disponible en {domain}.",
+    "course_released_by": "Emitido por",
+    "course_released_on": "Emitido el",
+    "certificate_link": "Certificado",
+    "legal_notice": "Autorizo el tratamiento de los datos personales contenidos en mi currículum vitae de conformidad con el art. 13 del Decreto Legislativo 196/2003 y el art. 13 del RGPD (Reglamento (UE) 2016/679) únicamente a efectos de selección de personal.",
+    "contact_heading": "Contáctame",
+    "contact_description": "Rellena el formulario para enviarme un mensaje directo.",
+    "contact_submit": "Enviar mensaje",
+    "contact_labels": {
+      "full_name": "Nombre y apellidos",
+      "company": "Empresa",
+      "email": "Correo electrónico",
+      "message": "Mensaje"
+    },
+    "curriculum_link": "Currículum",
+    "vote": "Nota",
+    "project_link": "Enlace"
+  },
+  "cv_menu": {
+    "title": "Menú",
+    "about": "Sobre mí",
+    "experiences": "Experiencia",
+    "education": "Formación",
+    "skills": "Skills",
+    "courses": "Cursos y certificaciones",
+    "contact": "Contáctame"
+  },
+  "contact": {
+    "feedback_success": "Mensaje enviado correctamente.",
+    "feedback_error": "Se ha producido un error al enviar el mensaje. Inténtalo de nuevo más tarde."
+  },
+  "validation": {
+    "required_fields": "Rellena todos los campos antes de enviar.",
+    "full_name_length": "El nombre y los apellidos deben tener entre 3 y 120 caracteres.",
+    "company_length": "El nombre de la empresa debe tener entre 2 y 120 caracteres.",
+    "email": "Introduce una dirección de correo electrónico válida.",
+    "message_length": "El mensaje debe tener entre 10 y 2000 caracteres."
+  },
+  "errors": {
+    "title": "Error",
+    "default_message": "Algo ha salido mal",
+    "back_home": "Volver a la página de inicio",
+    "client_error": "Error en la solicitud",
+    "server_error": "Error interno del servidor",
+    "status_messages": {
+      "400": "Solicitud no válida",
+      "401": "Autenticación requerida",
+      "403": "Acceso denegado",
+      "404": "Página no encontrada",
+      "405": "Método no permitido",
+      "410": "Página ya no disponible",
+      "429": "Demasiadas solicitudes",
+      "501": "Funcionalidad no implementada",
+      "502": "Puerta de enlace no válida",
+      "503": "Servicio no disponible",
+      "504": "Tiempo de respuesta agotado",
+      "505": "Versión de HTTP no compatible"
+    }
+  },
+  "dates": {
+    "month_names": [
+      "enero",
+      "febrero",
+      "marzo",
+      "abril",
+      "mayo",
+      "junio",
+      "julio",
+      "agosto",
+      "septiembre",
+      "octubre",
+      "noviembre",
+      "diciembre"
+    ],
+    "ongoing": "Presente",
+    "year": "año",
+    "years": "años",
+    "month": "mes",
+    "months": "meses"
+  }
+}

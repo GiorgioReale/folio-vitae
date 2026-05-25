@@ -1,0 +1,121 @@
+{
+  "language": {
+    "code": "de",
+    "tag": "de-DE",
+    "meta_language": "DE",
+    "dc_language": "deu",
+    "direction": "ltr"
+  },
+  "accessibility": {
+    "skip_to_content": "Zum Hauptinhalt springen"
+  },
+  "nav": {
+    "home": "Startseite",
+    "menu": "Menü",
+    "theme_switch": "Hell/Dunkel-Modus",
+    "language_selector_label": "Sprache",
+    "current_language": "Aktuelle Sprache"
+  },
+  "main_page": {
+    "websites": "Webseiten",
+    "contacts": "Kontakte",
+    "social": "Soziale Netzwerke"
+  },
+  "cv_homepage": {
+    "curriculum_label": "Lebenslauf",
+    "curriculum_action": "Zum Lebenslauf gehen"
+  },
+  "cv_curriculum": {
+    "page_title": "Lebenslauf",
+    "city_label": "Stadt:",
+    "birth_date_label": "Geburtsdatum:",
+    "website_label": "Website:",
+    "email_label": "E-Mail:",
+    "about_heading": "Über mich",
+    "experience_heading": "Berufserfahrung",
+    "more_experiences": "Die vollständige Liste der Berufserfahrungen ist auf {domain} verfügbar.",
+    "other_projects_heading": "Weitere Projekte",
+    "education_heading": "Ausbildung",
+    "skills_heading": "Fähigkeiten",
+    "courses_heading": "Kurse & Zertifikate",
+    "courses_more_info": "Die vollständige Liste der Kurse und Zertifikate ist auf {domain} verfügbar.",
+    "course_released_by": "Ausgestellt von",
+    "course_released_on": "Ausgestellt am",
+    "certificate_link": "Zertifikat",
+    "legal_notice": "Ich ermächtige die Verarbeitung der in meinem Lebenslauf enthaltenen personenbezogenen Daten gemäß Art. 13 des Gesetzesdekrets 196/2003 und Art. 13 der DSGVO (EU-Verordnung 2016/679) ausschließlich zu Zwecken der Personalsuche und -auswahl.",
+    "contact_heading": "Kontakt aufnehmen",
+    "contact_description": "Füllen Sie das Formular aus, um mir eine direkte Nachricht zu senden.",
+    "contact_submit": "Nachricht senden",
+    "contact_labels": {
+      "full_name": "Vor- und Nachname",
+      "company": "Unternehmen",
+      "email": "E-Mail",
+      "message": "Nachricht"
+    },
+    "curriculum_link": "Lebenslauf",
+    "vote": "Note",
+    "project_link": "Link"
+  },
+  "cv_menu": {
+    "title": "Menü",
+    "about": "Über mich",
+    "experiences": "Berufserfahrung",
+    "education": "Ausbildung",
+    "skills": "Fähigkeiten",
+    "courses": "Kurse & Zertifikate",
+    "contact": "Kontakt aufnehmen"
+  },
+  "contact": {
+    "feedback_success": "Nachricht erfolgreich gesendet.",
+    "feedback_error": "Beim Senden der Nachricht ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut."
+  },
+  "validation": {
+    "required_fields": "Bitte füllen Sie alle Felder aus, bevor Sie absenden.",
+    "full_name_length": "Der Vor- und Nachname muss zwischen 3 und 120 Zeichen lang sein.",
+    "company_length": "Der Firmenname muss zwischen 2 und 120 Zeichen lang sein.",
+    "email": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+    "message_length": "Die Nachricht muss zwischen 10 und 2000 Zeichen lang sein."
+  },
+  "errors": {
+    "title": "Fehler",
+    "default_message": "Es ist ein Fehler aufgetreten",
+    "back_home": "Zur Startseite zurückkehren",
+    "client_error": "Fehler in der Anfrage",
+    "server_error": "Interner Serverfehler",
+    "status_messages": {
+      "400": "Ungültige Anfrage",
+      "401": "Authentifizierung erforderlich",
+      "403": "Zugriff verweigert",
+      "404": "Seite nicht gefunden",
+      "405": "Methode nicht erlaubt",
+      "410": "Seite nicht mehr verfügbar",
+      "429": "Zu viele Anfragen",
+      "501": "Funktion nicht implementiert",
+      "502": "Ungültiges Gateway",
+      "503": "Dienst nicht verfügbar",
+      "504": "Zeitüberschreitung bei der Antwort",
+      "505": "HTTP-Version wird nicht unterstützt"
+    }
+  },
+  "dates": {
+    "month_names": [
+      "Januar",
+      "Februar",
+      "März",
+      "April",
+      "Mai",
+      "Juni",
+      "Juli",
+      "August",
+      "September",
+      "Oktober",
+      "November",
+      "Dezember"
+    ],
+    "ongoing": "Gegenwärtig",
+    "year": "Jahr",
+    "years": "Jahre",
+    "month": "Monat",
+    "months": "Monate"
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "language": {
+    "code": "it",
+    "tag": "it-IT",
+    "meta_language": "IT",
+    "dc_language": "ita",
+    "direction": "ltr"
+  },
+  "accessibility": {
+    "skip_to_content": "Salta al contenuto principale"
+  },
+  "nav": {
+    "home": "Home",
+    "menu": "Menu",
+    "theme_switch": "Modalità Chiaro/Scuro",
+    "language_selector_label": "Lingua",
+    "current_language": "Lingua corrente"
+  },
+  "main_page": {
+    "websites": "Siti Web",
+    "contacts": "Contatti",
+    "social": "Social"
+  },
+  "cv_homepage": {
+    "curriculum_label": "Curriculum",
+    "curriculum_action": "Vai al curriculum"
+  },
+  "cv_curriculum": {
+    "page_title": "Curriculum",
+    "city_label": "Città:",
+    "birth_date_label": "Data di nascita:",
+    "website_label": "Sito Web:",
+    "email_label": "E-Mail:",
+    "about_heading": "Informazioni su di me",
+    "experience_heading": "Esperienze",
+    "more_experiences": "L'elenco completo delle esperienze lavorative è disponibile su {domain}.",
+    "other_projects_heading": "Altri Progetti",
+    "education_heading": "Formazione",
+    "skills_heading": "Skills",
+    "courses_heading": "Corsi & Certificazioni",
+    "courses_more_info": "L'elenco completo dei corsi e delle certificazioni è disponibile su {domain}.",
+    "course_released_by": "Rilasciato da",
+    "course_released_on": "Rilasciato in data",
+    "certificate_link": "Certificato",
+    "legal_notice": "Autorizzo il trattamento dei dati personali contenuti nel mio curriculum vitae in base all'art. 13 del D. Lgs. 196/2003 e all'art. 13 GDPR (Regolamento UE 2016/679) ai soli fini della ricerca e selezione del personale.",
+    "contact_heading": "Contattami",
+    "contact_description": "Compila il form per inviarmi un messaggio diretto.",
+    "contact_submit": "Invia messaggio",
+    "contact_labels": {
+      "full_name": "Nome e cognome",
+      "company": "Azienda",
+      "email": "Email",
+      "message": "Messaggio"
+    },
+    "curriculum_link": "Curriculum",
+    "vote": "Voto",
+    "project_link": "Link"
+  },
+  "cv_menu": {
+    "title": "Menu",
+    "about": "Informazioni su di me",
+    "experiences": "Esperienze",
+    "education": "Formazione",
+    "skills": "Skills",
+    "courses": "Corsi & Certificazioni",
+    "contact": "Contattami"
+  },
+  "contact": {
+    "feedback_success": "Messaggio inviato con successo.",
+    "feedback_error": "Si è verificato un errore durante l'invio del messaggio. Riprova più tardi."
+  },
+  "validation": {
+    "required_fields": "Compila tutti i campi prima di inviare.",
+    "full_name_length": "Il nome e cognome deve contenere tra 3 e 120 caratteri.",
+    "company_length": "Il nome dell'azienda deve contenere tra 2 e 120 caratteri.",
+    "email": "Inserisci un indirizzo email valido.",
+    "message_length": "Il messaggio deve contenere tra 10 e 2000 caratteri."
+  },
+  "errors": {
+    "title": "Errore",
+    "default_message": "Qualcosa è andato storto",
+    "back_home": "Torna alla HomePage",
+    "client_error": "Errore nella richiesta",
+    "server_error": "Errore interno del server",
+    "status_messages": {
+      "400": "Richiesta non valida",
+      "401": "Autenticazione richiesta",
+      "403": "Accesso negato",
+      "404": "Pagina non trovata",
+      "405": "Metodo non consentito",
+      "410": "Pagina non più disponibile",
+      "429": "Troppe richieste",
+      "501": "Funzionalità non implementata",
+      "502": "Gateway non valido",
+      "503": "Servizio non disponibile",
+      "504": "Tempo di risposta scaduto",
+      "505": "Versione HTTP non supportata"
+    }
+  },
+  "dates": {
+    "month_names": [
+      "gennaio",
+      "febbraio",
+      "marzo",
+      "aprile",
+      "maggio",
+      "giugno",
+      "luglio",
+      "agosto",
+      "settembre",
+      "ottobre",
+      "novembre",
+      "dicembre"
+    ],
+    "ongoing": "Presente",
+    "year": "anno",
+    "years": "anni",
+    "month": "mese",
+    "months": "mesi"
+  }
+}

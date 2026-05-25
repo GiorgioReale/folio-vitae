@@ -1,0 +1,241 @@
+---
+source: tests/cli_integration.rs
+expression: main_homepage
+---
+<!DOCTYPE html>
+<html dir="ltr" lang="en-US">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="generator" content="folio-vitae v0.1.0" />
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta name="title" content="Alex Carter | Full Stack Developer" />
+  
+  
+  <meta name="description" content="Portfolio and personal website of Alex Carter." />
+  
+  <meta name="keywords" content="Alex Carter" />
+  <meta name="copyright" content="Alex Carter" />
+  <meta name="language" content="EN" />
+  <meta name="dc.language" content="eng" />
+  <meta http-equiv="content-language" content="EN" />
+  <meta name="robots" content="index,follow" />
+  <meta name="author" content="Giorgio Reale, info@giorgioreale.xyz" />
+  <meta name="designer" content="Giorgio Reale, info@giorgioreale.xyz" />
+  <meta name="reply-to" content="hello@alexcarter.dev" />
+  <meta name="owner" content="Alex Carter" />
+  
+  <meta name="url" content="https://alexcarter.dev&#x2F;en&#x2F;" />
+  <meta name="identifier-URL" content="https://alexcarter.dev&#x2F;en&#x2F;" />
+  
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  
+  <meta property="og:title" content="Alex Carter | Full Stack Developer" />
+  
+  <meta property="og:type" content="website" />
+  
+  <meta property="og:url" content="https://alexcarter.dev&#x2F;en&#x2F;" />
+  <meta property="og:image" content="https://alexcarter.dev/assets/images/main/social-card/social-card.png" />
+  <meta property="og:image:url" content="https://alexcarter.dev/assets/images/main/social-card/social-card.png" />
+  <meta property="og:image:secure_url" content="https://alexcarter.dev/assets/images/main/social-card/social-card.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1920" />
+  <meta property="og:image:height" content="1080" />
+  <meta property="og:image:alt" content="Social card del sito di Alex Carter" />
+  
+  
+  <meta property="og:site_name" content="Alex Carter | Full Stack Developer" />
+  
+  
+  <meta property="og:description" content="Portfolio and personal website of Alex Carter." />
+  
+  
+  <meta property="og:email" content="hello@alexcarter.dev" />
+  
+  
+  <meta property="og:locale" content="en_US" />
+  
+  
+  <meta property="og:locality" content="Austin" />
+  
+  
+  <meta property="og:region" content="Texas" />
+  
+  
+  <meta property="og:postal-code" content="78701" />
+  
+  
+  <meta property="og:country-name" content="United States" />
+  
+  
+  
+  <meta name="twitter:card" content="summary" />
+  
+  <meta name="twitter:url" content="https://alexcarter.dev&#x2F;en&#x2F;" />
+  <meta name="twitter:image" content="https://alexcarter.dev/assets/images/main/social-card/social-card.png" />
+  <meta name="twitter:image:alt" content="Social card del sito di Alex Carter" />
+  
+  
+  <meta name="twitter:title" content="Alex Carter | Full Stack Developer" />
+  
+  
+  <meta name="twitter:description" content="Portfolio and personal website of Alex Carter." />
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>Alex Carter | Full Stack Developer</title>
+  
+  
+  <link rel="canonical" href="https://alexcarter.dev&#x2F;en&#x2F;" />
+  
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/main/logos/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/main/logos/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/main/logos/favicon-16x16.png" />
+  <link rel="icon" type="image/svg+xml" href="/assets/icons/main/logos/favicon.svg" />
+  <link rel="manifest" href="/site.webmanifest" />
+  
+  <meta name="apple-mobile-web-app-title" content="Alex Carter | Full Stack Developer" />
+  
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#000000" />
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000" />
+  <meta name="view-transition" content="same-origin" />
+  <link rel="preload" href="/assets/styles/main.css?v=ASSET_VERSION" as="style" />
+  <link rel="stylesheet" href="/assets/styles/main.css?v=ASSET_VERSION" type="text/css" fetchpriority="high" />
+  
+  <script src="/assets/scripts/light-dark-mode.js?v=ASSET_VERSION" charset="utf-8" defer data-sprite-prefix="/assets/icons/main/website/sprites.svg#"></script>
+  
+</head>
+
+<body id="homepage">
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+<aside>
+  <picture>
+    <source srcset="/assets/images/main/profile-pictures/profile-picture.avif" type="image/avif"/>
+    <img src="/assets/images/main/profile-pictures/profile-picture.jpg" alt="Alex Carter" width="512" height="512" fetchpriority="high" decoding="async" importance="high"/>
+  </picture>
+  <h1>Alex Carter</h1>
+</aside>
+
+  <section>
+    <header>
+      <nav>
+        
+        <div class="language-switcher" role="navigation" aria-label="Language">
+          
+          
+          
+          <span class="language-switcher__current" lang="en" aria-current="page">
+            <span aria-hidden="true">en</span>
+            <span class="sr-only">Language: English (Current language)</span>
+          </span>
+          
+          
+          
+          
+          <a href="&#x2F;it&#x2F;" lang="it">
+            <span aria-hidden="true">it</span>
+            <span class="sr-only">Language: italiano</span>
+          </a>
+          
+          
+        </div>
+        
+        <button type="button" id="theme-switch" aria-label="Light&#x2F;Dark Mode"
+          title="Light&#x2F;Dark Mode">
+          <svg aria-hidden="true" focusable="false">
+            <use xlink:href="/assets/icons/main/website/sprites.svg#moon-auto" />
+          </svg>
+        </button>
+      </nav>
+    </header>
+    
+<main id="main-content" tabindex="-1">
+  
+  
+  <h4>Websites</h4>
+  
+  <a href="https://cv.alexcarter.dev/" target="_blank" rel="noopener noreferrer">cv.alexcarter.dev</a>, 
+  
+  
+  <a href="https://blog.alexcarter.dev/" target="_blank" rel="noopener noreferrer">blog.alexcarter.dev</a>
+  
+  
+  <h4>Contacts</h4>
+  <a href="mailto:hello@alexcarter.dev">hello@alexcarter.dev</a>, <a href="mailto:work@alexcarter.dev">work@alexcarter.dev</a>, 
+  
+  <a href="mailto:speaking@alexcarter.dev">speaking@alexcarter.dev</a>
+  
+  <h4>Social</h4>
+  <div class="social">
+    
+    <a href="https:&#x2F;&#x2F;github.com&#x2F;alexcarter" target="_blank" rel="noopener noreferrer" aria-label="GitHub" title="GitHub" class="github">
+      
+      <svg role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>GitHub</title><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+      
+      alexcarter
+    </a>
+    
+    <a href="https:&#x2F;&#x2F;www.linkedin.com&#x2F;in&#x2F;alexcarter" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" title="LinkedIn" class="linkedin">
+      
+      <svg aria-hidden="true" focusable="false">
+        <use href="/assets/icons/main/website/sprites.svg#linkedin"></use>
+      </svg>
+      
+      alexcarter
+    </a>
+    
+  </div>
+</main>
+
+    <footer>
+      <p>
+        <svg aria-hidden="true" focusable="false">
+          <use xlink:href="/assets/icons/cv/website/sprites.svg#copyright" />
+        </svg>
+        
+        CURRENT_YEAR - <a href="https://alexcarter.dev" target="_blank" rel="noopener noreferrer">Alex Carter</a>
+        
+      </p>
+      
+      <p>
+        &#60;&#47;&#62; with
+        <svg aria-hidden="true" focusable="false">
+          <use xlink:href="/assets/icons/cv/website/sprites.svg#love" />
+        </svg>
+        by <a href="https://github.com/GiorgioReale/folio-vitae" target="_blank" rel="noopener noreferrer">Giorgio
+          Reale</a>
+      </p>
+      
+    </footer>
+  </section>
+</body>
+
+</html>

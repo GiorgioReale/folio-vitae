@@ -1,0 +1,24 @@
+{% extends "cv/base.html" %}
+{% block body_id %}menu{% endblock body_id %}
+{% block content %}
+<main id="main-content" tabindex="-1">
+  {% if has_about_section %}
+  <a href="{{ language_prefix ~ '/curriculum#info' }}">{{ translations.cv_menu.about }}</a>
+  {% endif %}
+  {% if has_experience_section %}
+  <a href="{{ language_prefix ~ '/curriculum#experience' }}">{{ translations.cv_menu.experiences }}</a>
+  {% endif %}
+  {% if has_education_section %}
+  <a href="{{ language_prefix ~ '/curriculum#education' }}">{{ translations.cv_menu.education }}</a>
+  {% endif %}
+  {% if has_skills_section %}
+  <a href="{{ language_prefix ~ '/curriculum#skills' }}">{{ translations.cv_menu.skills }}</a>
+  {% endif %}
+  {% if has_courses_section %}
+  <a href="{{ language_prefix ~ '/curriculum#courses-certifications' }}">{{ translations.cv_menu.courses }}</a>
+  {% endif %}
+  {% if has_contact_section %}
+  <a href="{{ language_prefix ~ '/curriculum#contact' }}">{{ translations.cv_menu.contact }}</a>
+  {% endif %}
+</main>
+{% endblock content %}

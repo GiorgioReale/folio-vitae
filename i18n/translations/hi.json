@@ -1,0 +1,121 @@
+{
+  "language": {
+    "code": "hi",
+    "tag": "hi-IN",
+    "meta_language": "HI",
+    "dc_language": "hin",
+    "direction": "ltr"
+  },
+  "accessibility": {
+    "skip_to_content": "मुख्य सामग्री पर जाएँ"
+  },
+  "nav": {
+    "home": "होम",
+    "menu": "मेनू",
+    "theme_sawitch": "लाइट/डार्क मोड",
+    "language_selector_label": "भाषा",
+    "current_language": "वर्तमान भाषा"
+  },
+  "main_page": {
+    "websites": "वेबसाइट्स",
+    "contacts": "संपर्क",
+    "social": "सोशल"
+  },
+  "cv_homepage": {
+    "curriculum_label": "सीवी",
+    "curriculum_action": "सीवी देखें"
+  },
+  "cv_curriculum": {
+    "page_title": "सीवी",
+    "city_label": "शहर:",
+    "birth_date_label": "जन्म तिथि:",
+    "website_label": "वेबसाइट:",
+    "email_label": "ई-मेल:",
+    "about_heading": "मेरे बारे में",
+    "experience_heading": "अनुभव",
+    "more_experiences": "पूरी कार्य-अनुभव सूची {domain} पर उपलब्ध है।",
+    "other_projects_heading": "अन्य प्रोजेक्ट्स",
+    "education_heading": "शिक्षा",
+    "skills_heading": "कौशल",
+    "courses_heading": "कोर्स एवं प्रमाणपत्र",
+    "courses_more_info": "सभी कोर्स और प्रमाणपत्रों की पूरी सूची {domain} पर उपलब्ध है।",
+    "course_released_by": "जारी करने वाला",
+    "course_released_on": "जारी करने की तिथि",
+    "certificate_link": "प्रमाणपत्र",
+    "legal_notice": "मैं घोषणा करता/करती हूँ कि मेरे जीवनवृत्त (सीवी) में दिए गए व्यक्तिगत डेटा को इटली के कानून D. Lgs. 196/2003 की धारा 13 और GDPR (Regolamento UE 2016/679) की धारा 13 के अनुसार केवल भर्ती एवं चयन उद्देश्यों के लिए संसाधित किया जा सकता है।",
+    "contact_heading": "मुझसे संपर्क करें",
+    "contact_description": "मुझे सीधे संदेश भेजने के लिए फ़ॉर्म भरें।",
+    "contact_submit": "संदेश भेजें",
+    "contact_labels": {
+      "full_name": "पूरा नाम",
+      "company": "कंपनी",
+      "email": "ई-मेल",
+      "message": "संदेश"
+    },
+    "curriculum_link": "सीवी",
+    "vote": "अंक",
+    "project_link": "लिंक"
+  },
+  "cv_menu": {
+    "title": "मेनू",
+    "about": "मेरे बारे में",
+    "experiences": "अनुभव",
+    "education": "शिक्षा",
+    "skills": "कौशल",
+    "courses": "कोर्स एवं प्रमाणपत्र",
+    "contact": "संपर्क"
+  },
+  "contact": {
+    "feedback_success": "संदेश सफलतापूर्वक भेजा गया।",
+    "feedback_error": "संदेश भेजने में त्रुटि हुई। बाद में पुनः प्रयास करें।"
+  },
+  "validation": {
+    "required_fields": "सबमिट करने से पहले सभी फ़ील्ड भरें।",
+    "full_name_length": "पूरा नाम 3 से 120 अक्षरों के बीच होना चाहिए।",
+    "company_length": "कंपनी का नाम 2 से 120 अक्षरों के बीच होना चाहिए।",
+    "email": "कृपया एक मान्य ई-मेल दर्ज करें।",
+    "message_length": "संदेश 10 से 2000 अक्षरों के बीच होना चाहिए।"
+  },
+  "errors": {
+    "title": "त्रुटि",
+    "default_message": "कुछ गलत हो गया",
+    "back_home": "होमपेज पर वापस जाएँ",
+    "client_error": "अनुरोध में त्रुटि",
+    "server_error": "सर्वर में आंतरिक त्रुटि",
+    "status_messages": {
+      "400": "अमान्य अनुरोध",
+      "401": "प्रमाणीकरण आवश्यक",
+      "403": "प्रवेश अस्वीकृत",
+      "404": "पृष्ठ नहीं मिला",
+      "405": "अनुमत नहीं की गई विधि",
+      "410": "पृष्ठ अब उपलब्ध नहीं है",
+      "429": "बहुत अधिक अनुरोध",
+      "501": "फ़ीचर लागू नहीं किया गया",
+      "502": "अमान्य गेटवे",
+      "503": "सेवा उपलब्ध नहीं है",
+      "504": "समय समाप्त",
+      "505": "समर्थित नहीं HTTP संस्करण"
+    }
+  },
+  "dates": {
+    "month_names": [
+      "जनवरी",
+      "फ़रवरी",
+      "मार्च",
+      "अप्रैल",
+      "मई",
+      "जून",
+      "जुलाई",
+      "अगस्त",
+      "सितंबर",
+      "अक्टूबर",
+      "नवंबर",
+      "दिसंबर"
+    ],
+    "ongoing": "वर्तमान",
+    "year": "वर्ष",
+    "years": "वर्ष",
+    "month": "महीना",
+    "months": "महीने"
+  }
+}

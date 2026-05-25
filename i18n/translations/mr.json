@@ -1,0 +1,121 @@
+{
+  "language": {
+    "code": "mr",
+    "tag": "mr-IN",
+    "meta_language": "MR",
+    "dc_language": "mar",
+    "direction": "ltr"
+  },
+  "accessibility": {
+    "skip_to_content": "मुख्य सामग्रीकडे जा"
+  },
+  "nav": {
+    "home": "मुख्यपृष्ठ",
+    "menu": "मेनू",
+    "theme_switch": "लाइट/डार्क मोड",
+    "language_selector_label": "भाषा",
+    "current_language": "सध्याची भाषा"
+  },
+  "main_page": {
+    "websites": "वेबसाईट्स",
+    "contacts": "संपर्क",
+    "social": "सोशल"
+  },
+  "cv_homepage": {
+    "curriculum_label": "CV",
+    "curriculum_action": "CV पहा"
+  },
+  "cv_curriculum": {
+    "page_title": "CV",
+    "city_label": "शहर:",
+    "birth_date_label": "जन्मतारीख:",
+    "website_label": "वेबसाईट:",
+    "email_label": "ई-मेल:",
+    "about_heading": "माझ्याबद्दल",
+    "experience_heading": "कामाचा अनुभव",
+    "more_experiences": "कामाचा संपूर्ण अनुभव {domain} येथे उपलब्ध आहे.",
+    "other_projects_heading": "इतर प्रोजेक्ट्स",
+    "education_heading": "शिक्षण",
+    "skills_heading": "कौशल्ये",
+    "courses_heading": "कोर्सेस व सर्टिफिकेशन्स",
+    "courses_more_info": "कोर्सेस आणि सर्टिफिकेशन्सची संपूर्ण यादी {domain} येथे उपलब्ध आहे.",
+    "course_released_by": "प्रमाणपत्र देणारी संस्था",
+    "course_released_on": "प्रमाणपत्राची तारीख",
+    "certificate_link": "प्रमाणपत्र",
+    "legal_notice": "मी माझ्या CV मध्ये नमूद केलेल्या वैयक्तिक माहितीच्या प्रक्रियेला केवळ नोकरीसाठी शोध व निवड या उद्देशाने, इटालियन कायदा D. Lgs. 196/2003 च्या कलम 13 आणि GDPR (EU Regulation 2016/679) च्या कलम 13 नुसार संमती देत आहे.",
+    "contact_heading": "माझ्याशी संपर्क साधा",
+    "contact_description": "मला थेट संदेश पाठवण्यासाठी फॉर्म भरा.",
+    "contact_submit": "संदेश पाठवा",
+    "contact_labels": {
+      "full_name": "पूर्ण नाव",
+      "company": "कंपनी",
+      "email": "ई-मेल",
+      "message": "संदेश"
+    },
+    "curriculum_link": "CV",
+    "vote": "गुण",
+    "project_link": "लिंक"
+  },
+  "cv_menu": {
+    "title": "मेनू",
+    "about": "माझ्याबद्दल",
+    "experiences": "अनुभव",
+    "education": "शिक्षण",
+    "skills": "कौशल्ये",
+    "courses": "कोर्सेस व सर्टिफिकेशन्स",
+    "contact": "संपर्क"
+  },
+  "contact": {
+    "feedback_success": "संदेश यशस्वीपणे पाठवला गेला.",
+    "feedback_error": "संदेश पाठविताना त्रुटी आली. कृपया नंतर पुन्हा प्रयत्न करा."
+  },
+  "validation": {
+    "required_fields": "सबमिट करण्यापूर्वी सर्व फील्ड भरा.",
+    "full_name_length": "पूर्ण नाव 3 ते 120 अक्षरांच्या दरम्यान असावे.",
+    "company_length": "कंपनीचे नाव 2 ते 120 अक्षरांच्या दरम्यान असावे.",
+    "email": "कृपया वैध ई-मेल पत्ता प्रविष्ट करा.",
+    "message_length": "संदेश 10 ते 2000 अक्षरांच्या दरम्यान असावा."
+  },
+  "errors": {
+    "title": "त्रुटी",
+    "default_message": "काहीतरी चुकले आहे",
+    "back_home": "मुख्यपृष्ठावर परत जा",
+    "client_error": "विनंतीमध्ये त्रुटी",
+    "server_error": "सर्व्हर त्रुटी",
+    "status_messages": {
+      "400": "अवैध विनंती",
+      "401": "प्रमाणीकरण आवश्यक",
+      "403": "प्रवेश नाकारला",
+      "404": "पृष्ठ सापडले नाही",
+      "405": "परवानगी नसलेली पद्धत",
+      "410": "पृष्ठ उपलब्ध नाही",
+      "429": "अतिरिक्त विनंत्या",
+      "501": "कार्यवाही अंमलात आणलेली नाही",
+      "502": "अवैध गेटवे",
+      "503": "सेवा उपलब्ध नाही",
+      "504": "प्रतिसाद वेळ संपला",
+      "505": "HTTP आवृत्ती समर्थित नाही"
+    }
+  },
+  "dates": {
+    "month_names": [
+      "जानेवारी",
+      "फेब्रुवारी",
+      "मार्च",
+      "एप्रिल",
+      "मे",
+      "जून",
+      "जुलै",
+      "ऑगस्ट",
+      "सप्टेंबर",
+      "ऑक्टोबर",
+      "नोव्हेंबर",
+      "डिसेंबर"
+    ],
+    "ongoing": "सध्या",
+    "year": "वर्ष",
+    "years": "वर्षे",
+    "month": "महिना",
+    "months": "महिने"
+  }
+}

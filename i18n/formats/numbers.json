@@ -1,0 +1,86 @@
+{
+  "ar": {
+    "decimal": ",",
+    "thousand": "."
+  },
+  "bn": {
+    "decimal": ".",
+    "thousand": ","
+  },
+  "de": {
+    "decimal": ",",
+    "thousand": "."
+  },
+  "en": {
+    "decimal": ".",
+    "thousand": ","
+  },
+  "es": {
+    "decimal": ",",
+    "thousand": "."
+  },
+  "fr": {
+    "decimal": ",",
+    "thousand": "."
+  },
+  "hi": {
+    "decimal": ".",
+    "thousand": ","
+  },
+  "id": {
+    "decimal": ".",
+    "thousand": ","
+  },
+  "it": {
+    "decimal": ",",
+    "thousand": "."
+  },
+  "ja": {
+    "decimal": ".",
+    "thousand": ","
+  },
+  "ko": {
+    "decimal": ".",
+    "thousand": ","
+  },
+  "mr": {
+    "decimal": ".",
+    "thousand": ","
+  },
+  "pt": {
+    "decimal": ",",
+    "thousand": "."
+  },
+  "ru": {
+    "decimal": ",",
+    "thousand": "."
+  },
+  "sw": {
+    "decimal": ".",
+    "thousand": ","
+  },
+  "ta": {
+    "decimal": ".",
+    "thousand": ","
+  },
+  "te": {
+    "decimal": ".",
+    "thousand": ","
+  },
+  "tr": {
+    "decimal": ",",
+    "thousand": "."
+  },
+  "ur": {
+    "decimal": ".",
+    "thousand": ","
+  },
+  "vi": {
+    "decimal": ".",
+    "thousand": ","
+  },
+  "zh": {
+    "decimal": ".",
+    "thousand": ","
+  }
+}

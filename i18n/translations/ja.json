@@ -1,0 +1,121 @@
+{
+  "language": {
+    "code": "ja",
+    "tag": "ja-JP",
+    "meta_language": "JA",
+    "dc_language": "jpn",
+    "direction": "ltr"
+  },
+  "accessibility": {
+    "skip_to_content": "メインコンテンツへスキップ"
+  },
+  "nav": {
+    "home": "ホーム",
+    "menu": "メニュー",
+    "theme_switch": "ライト／ダークモード",
+    "language_selector_label": "言語",
+    "current_language": "現在の言語"
+  },
+  "main_page": {
+    "websites": "ウェブサイト",
+    "contacts": "連絡先",
+    "social": "ソーシャル"
+  },
+  "cv_homepage": {
+    "curriculum_label": "履歴書",
+    "curriculum_action": "履歴書を見る"
+  },
+  "cv_curriculum": {
+    "page_title": "履歴書",
+    "city_label": "市区町村:",
+    "birth_date_label": "生年月日:",
+    "website_label": "ウェブサイト:",
+    "email_label": "Eメール:",
+    "about_heading": "自己紹介",
+    "experience_heading": "職務経験",
+    "more_experiences": "完全な職務経歴一覧は {domain} でご覧いただけます。",
+    "other_projects_heading": "その他のプロジェクト",
+    "education_heading": "学歴",
+    "skills_heading": "スキル",
+    "courses_heading": "コース・認定資格",
+    "courses_more_info": "コース・認定資格の全リストは {domain} でご覧いただけます。",
+    "course_released_by": "発行元",
+    "course_released_on": "発行日",
+    "certificate_link": "証明書",
+    "legal_notice": "私は、本履歴書に含まれる個人情報が、採用及び選考のみを目的とし、イタリア法 D. Lgs. 196/2003 第13条およびGDPR（EU規則2016/679）第13条に基づき処理されることに同意します。",
+    "contact_heading": "お問い合わせ",
+    "contact_description": "直接メッセージを送るには、フォームにご入力ください。",
+    "contact_submit": "メッセージを送信",
+    "contact_labels": {
+      "full_name": "氏名",
+      "company": "会社名",
+      "email": "Eメール",
+      "message": "メッセージ"
+    },
+    "curriculum_link": "履歴書",
+    "vote": "成績",
+    "project_link": "リンク"
+  },
+  "cv_menu": {
+    "title": "メニュー",
+    "about": "自己紹介",
+    "experiences": "職務経験",
+    "education": "学歴",
+    "skills": "スキル",
+    "courses": "コース・認定資格",
+    "contact": "お問い合わせ"
+  },
+  "contact": {
+    "feedback_success": "メッセージが正常に送信されました。",
+    "feedback_error": "メッセージの送信中にエラーが発生しました。後でもう一度お試しください。"
+  },
+  "validation": {
+    "required_fields": "送信する前にすべての項目を入力してください。",
+    "full_name_length": "氏名は3〜120文字で入力してください。",
+    "company_length": "会社名は2〜120文字で入力してください。",
+    "email": "有効なEメールアドレスを入力してください。",
+    "message_length": "メッセージは10〜2000文字で入力してください。"
+  },
+  "errors": {
+    "title": "エラー",
+    "default_message": "問題が発生しました",
+    "back_home": "ホームページに戻る",
+    "client_error": "リクエストエラー",
+    "server_error": "サーバー内部エラー",
+    "status_messages": {
+      "400": "不正なリクエスト",
+      "401": "認証が必要です",
+      "403": "アクセスが拒否されました",
+      "404": "ページが見つかりません",
+      "405": "許可されていないメソッド",
+      "410": "ページは利用できません",
+      "429": "リクエストが多すぎます",
+      "501": "機能が実装されていません",
+      "502": "不正なゲートウェイ",
+      "503": "サービス利用不可",
+      "504": "タイムアウト",
+      "505": "サポートされていないHTTPバージョン"
+    }
+  },
+  "dates": {
+    "month_names": [
+      "1月",
+      "2月",
+      "3月",
+      "4月",
+      "5月",
+      "6月",
+      "7月",
+      "8月",
+      "9月",
+      "10月",
+      "11月",
+      "12月"
+    ],
+    "ongoing": "現在",
+    "year": "年",
+    "years": "年",
+    "month": "か月",
+    "months": "か月"
+  }
+}

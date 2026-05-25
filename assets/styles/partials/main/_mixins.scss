@@ -1,0 +1,17 @@
+@mixin social-link($background: false, $color) {
+  color: $color;
+
+  @if $background {
+    background: $background;
+  }
+
+  > svg {
+    fill: $color;
+  }
+
+  &:hover {
+    @if $background {
+      background: darken($background, 10%);
+    }
+  }
+}

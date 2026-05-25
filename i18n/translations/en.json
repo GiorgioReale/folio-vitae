@@ -1,0 +1,121 @@
+{
+  "language": {
+    "code": "en",
+    "tag": "en-US",
+    "meta_language": "EN",
+    "dc_language": "eng",
+    "direction": "ltr"
+  },
+  "accessibility": {
+    "skip_to_content": "Skip to main content"
+  },
+  "nav": {
+    "home": "Home",
+    "menu": "Menu",
+    "theme_switch": "Light/Dark Mode",
+    "language_selector_label": "Language",
+    "current_language": "Current language"
+  },
+  "main_page": {
+    "websites": "Websites",
+    "contacts": "Contacts",
+    "social": "Social"
+  },
+  "cv_homepage": {
+    "curriculum_label": "Curriculum",
+    "curriculum_action": "Go to the curriculum"
+  },
+  "cv_curriculum": {
+    "page_title": "Curriculum",
+    "city_label": "City:",
+    "birth_date_label": "Birth date:",
+    "website_label": "Website:",
+    "email_label": "E-Mail:",
+    "about_heading": "About Me",
+    "experience_heading": "Experience",
+    "more_experiences": "The full list of work experiences is available at {domain}.",
+    "other_projects_heading": "Other Projects",
+    "education_heading": "Education",
+    "skills_heading": "Skills",
+    "courses_heading": "Courses & Certifications",
+    "courses_more_info": "The complete list of courses and certifications is available at {domain}.",
+    "course_released_by": "Released by",
+    "course_released_on": "Released on",
+    "certificate_link": "Certificate",
+    "legal_notice": "I authorize the processing of the personal data contained in my CV pursuant to art. 13 of Legislative Decree 196/2003 and art. 13 GDPR (EU Regulation 2016/679) solely for recruitment purposes.",
+    "contact_heading": "Contact Me",
+    "contact_description": "Fill out the form to send me a direct message.",
+    "contact_submit": "Send Message",
+    "contact_labels": {
+      "full_name": "Full Name",
+      "company": "Company",
+      "email": "Email",
+      "message": "Message"
+    },
+    "curriculum_link": "Curriculum",
+    "vote": "Vote",
+    "project_link": "Link"
+  },
+  "cv_menu": {
+    "title": "Menu",
+    "about": "About Me",
+    "experiences": "Experience",
+    "education": "Education",
+    "skills": "Skills",
+    "courses": "Courses & Certifications",
+    "contact": "Contact Me"
+  },
+  "contact": {
+    "feedback_success": "Message successfully sent.",
+    "feedback_error": "An error occurred while sending the message. Please try again later."
+  },
+  "validation": {
+    "required_fields": "Fill in all fields before submitting.",
+    "full_name_length": "The full name must contain between 3 and 120 characters.",
+    "company_length": "The company name must contain between 2 and 120 characters.",
+    "email": "Enter a valid email address.",
+    "message_length": "The message must contain between 10 and 2000 characters."
+  },
+  "errors": {
+    "title": "Error",
+    "default_message": "Something went wrong",
+    "back_home": "Back to HomePage",
+    "client_error": "Client error",
+    "server_error": "Internal server error",
+    "status_messages": {
+      "400": "Bad request",
+      "401": "Authentication required",
+      "403": "Access denied",
+      "404": "Page not found",
+      "405": "Method not allowed",
+      "410": "Page no longer available",
+      "429": "Too many requests",
+      "501": "Functionality not implemented",
+      "502": "Bad gateway",
+      "503": "Service unavailable",
+      "504": "Response timeout",
+      "505": "HTTP version not supported"
+    }
+  },
+  "dates": {
+    "month_names": [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ],
+    "ongoing": "Present",
+    "year": "year",
+    "years": "years",
+    "month": "month",
+    "months": "months"
+  }
+}

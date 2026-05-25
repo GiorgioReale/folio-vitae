@@ -1,0 +1,192 @@
+@use '../../variables' as *;
+@use '../mixins' as *;
+
+body#homepage {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-content: center;
+  justify-content: space-between;
+  align-items: stretch;
+
+  > aside {
+    > picture {
+      width: 250px;
+      max-width: 75%;
+      aspect-ratio: 1;
+      border-radius: 100%;
+      background-color: var(--color-text-primary);
+      overflow: hidden;
+
+      > img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+    }
+  }
+
+  > section {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-content: center;
+    justify-content: center;
+    align-items: stretch;
+
+    > main {
+      margin: 0 0 auto 0;
+
+      > h4 {
+        padding: 3rem 0 0.75rem 0;
+
+        &:first-child {
+          padding: 0 0 0.75rem 0;
+        }
+      }
+
+      > div.social {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-content: center;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 0.5rem;
+
+        > a {
+          background-color: var(--background-buttons-primary);
+          width: fit-content;
+          padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+          display: flex;
+          flex-direction: row;
+          flex-wrap: nowrap;
+          align-content: center;
+          justify-content: center;
+          align-items: center;
+
+          > svg {
+            fill: var(--color-buttons-primary);
+            width: 1.5rem;
+            height: 1.5rem;
+            margin: 0 0.5rem 0 0;
+          }
+
+          &:hover {
+            background-color: var(--background-buttons-primary-hover);
+
+            > svg {
+              fill: var(--color-buttons-primary-hover);
+            }
+          }
+        }
+
+        > a.linkedin {
+          @include social-link($background: #0a66c2, $color: #fff);
+        }
+
+        > a.github {
+          @include social-link($background: #181717, $color: #fff);
+        }
+
+        > a.gitlab {
+          @include social-link($background: #fc6d26, $color: #fff);
+        }
+
+        > a.x {
+          @include social-link($background: #000, $color: #fff);
+        }
+
+        > a.mastodon {
+          @include social-link($background: #6364ff, $color: #fff);
+        }
+
+        > a.reddit {
+          @include social-link($background: #ff4300, $color: #fff);
+        }
+
+        > a.stackoverflow {
+          @include social-link($background: #f58025, $color: #fff);
+        }
+
+        > a.devdotto {
+          @include social-link($background: #0a0a0a, $color: #fff);
+        }
+
+        > a.hashnode {
+          @include social-link($background: #2962ff, $color: #fff);
+        }
+
+        > a.instagram {
+          @include social-link($background: #ff0069, $color: #fff);
+        }
+
+        > a.facebook {
+          @include social-link($background: #0866ff, $color: #fff);
+        }
+
+        > a.youtube {
+          @include social-link($background: #ff0000, $color: #fff);
+        }
+
+        > a.tiktok {
+          @include social-link($background: #000, $color: #fff);
+        }
+
+        > a.twitch {
+          @include social-link($background: #9146ff, $color: #fff);
+        }
+
+        > a.snapchat {
+          @include social-link($background: #fffc00, $color: #000);
+        }
+
+        > a[class] {
+          @media (prefers-contrast: more) {
+            color: var(--color-buttons-primary);
+            background: var(--background-buttons-primary);
+
+            svg {
+              fill: var(--color-buttons-primary);
+            }
+
+            &:hover {
+              color: var(--color-buttons-primary-hover);
+              background: var(--background-buttons-primary-hover);
+
+              > svg {
+                fill: var(--color-buttons-primary-hover);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  @media screen and (max-width: $breakpoint-lg) {
+    flex-direction: column;
+
+    > aside {
+      flex: none;
+      position: relative;
+      height: auto;
+      border-right: 0;
+      padding: 0.5rem;
+
+      > img {
+        width: 200px;
+        height: 200px;
+        max-width: unset;
+        max-height: unset;
+      }
+    }
+
+    > section {
+      flex: none;
+      min-height: calc(100vh - 292px);
+      min-height: calc(100dvh - 292px);
+    }
+  }
+}

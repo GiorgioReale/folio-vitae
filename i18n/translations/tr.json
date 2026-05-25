@@ -1,0 +1,121 @@
+{
+  "language": {
+    "code": "tr",
+    "tag": "tr-TR",
+    "meta_language": "TR",
+    "dc_language": "tur",
+    "direction": "ltr"
+  },
+  "accessibility": {
+    "skip_to_content": "Ana içeriğe geç"
+  },
+  "nav": {
+    "home": "Ana Sayfa",
+    "menu": "Menü",
+    "theme_switch": "Açık/Koyu Mod",
+    "language_selector_label": "Dil",
+    "current_language": "Geçerli dil"
+  },
+  "main_page": {
+    "websites": "Web Siteleri",
+    "contacts": "İletişim",
+    "social": "Sosyal"
+  },
+  "cv_homepage": {
+    "curriculum_label": "CV",
+    "curriculum_action": "CV'yi görüntüle"
+  },
+  "cv_curriculum": {
+    "page_title": "CV",
+    "city_label": "Şehir:",
+    "birth_date_label": "Doğum tarihi:",
+    "website_label": "Web sitesi:",
+    "email_label": "E-posta:",
+    "about_heading": "Hakkımda",
+    "experience_heading": "Deneyim",
+    "more_experiences": "Tüm iş deneyimleri listesi {domain} adresinde mevcuttur.",
+    "other_projects_heading": "Diğer Projeler",
+    "education_heading": "Eğitim",
+    "skills_heading": "Yetenekler",
+    "courses_heading": "Kurslar & Sertifikalar",
+    "courses_more_info": "Tüm kurs ve sertifika listesi {domain} adresinde mevcuttur.",
+    "course_released_by": "Veren kurum",
+    "course_released_on": "Veriliş tarihi",
+    "certificate_link": "Sertifika",
+    "legal_notice": "CV'de yer alan kişisel verilerimin, yalnızca işe alım ve değerlendirme amacıyla, D. Lgs. 196/2003 madde 13 ve GDPR (AB Yönetmeliği 2016/679) madde 13 uyarınca işlenmesine izin veriyorum.",
+    "contact_heading": "Benimle iletişime geçin",
+    "contact_description": "Bana doğrudan mesaj göndermek için formu doldurun.",
+    "contact_submit": "Mesaj gönder",
+    "contact_labels": {
+      "full_name": "Ad soyad",
+      "company": "Şirket",
+      "email": "E-posta",
+      "message": "Mesaj"
+    },
+    "curriculum_link": "CV",
+    "vote": "Not",
+    "project_link": "Bağlantı"
+  },
+  "cv_menu": {
+    "title": "Menü",
+    "about": "Hakkımda",
+    "experiences": "Deneyim",
+    "education": "Eğitim",
+    "skills": "Yetenekler",
+    "courses": "Kurslar & Sertifikalar",
+    "contact": "İletişim"
+  },
+  "contact": {
+    "feedback_success": "Mesaj başarıyla gönderildi.",
+    "feedback_error": "Mesaj gönderilirken bir hata oluştu. Lütfen daha sonra tekrar deneyin."
+  },
+  "validation": {
+    "required_fields": "Göndermeden önce tüm alanları doldurun.",
+    "full_name_length": "Ad soyad 3 ile 120 karakter arasında olmalıdır.",
+    "company_length": "Şirket adı 2 ile 120 karakter arasında olmalıdır.",
+    "email": "Geçerli bir e-posta adresi girin.",
+    "message_length": "Mesaj 10 ile 2000 karakter arasında olmalıdır."
+  },
+  "errors": {
+    "title": "Hata",
+    "default_message": "Bir şeyler ters gitti",
+    "back_home": "Ana sayfaya dön",
+    "client_error": "İstek hatası",
+    "server_error": "Sunucu hatası",
+    "status_messages": {
+      "400": "Geçersiz istek",
+      "401": "Kimlik doğrulama gerekli",
+      "403": "Erişim reddedildi",
+      "404": "Sayfa bulunamadı",
+      "405": "İzin verilmeyen yöntem",
+      "410": "Sayfa artık mevcut değil",
+      "429": "Çok fazla istek",
+      "501": "Özellik uygulanmadı",
+      "502": "Geçersiz ağ geçidi",
+      "503": "Hizmet kullanılamıyor",
+      "504": "Zaman aşımı",
+      "505": "HTTP sürümü desteklenmiyor"
+    }
+  },
+  "dates": {
+    "month_names": [
+      "Ocak",
+      "Şubat",
+      "Mart",
+      "Nisan",
+      "Mayıs",
+      "Haziran",
+      "Temmuz",
+      "Ağustos",
+      "Eylül",
+      "Ekim",
+      "Kasım",
+      "Aralık"
+    ],
+    "ongoing": "Günümüz",
+    "year": "yıl",
+    "years": "yıl",
+    "month": "ay",
+    "months": "ay"
+  }
+}

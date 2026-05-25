@@ -1,0 +1,121 @@
+{
+  "language": {
+    "code": "pt",
+    "tag": "pt-PT",
+    "meta_language": "PT",
+    "dc_language": "por",
+    "direction": "ltr"
+  },
+  "accessibility": {
+    "skip_to_content": "Saltar para o conteúdo principal"
+  },
+  "nav": {
+    "home": "Início",
+    "menu": "Menu",
+    "theme_switch": "Modo Claro/Escuro",
+    "language_selector_label": "Idioma",
+    "current_language": "Idioma atual"
+  },
+  "main_page": {
+    "websites": "Websites",
+    "contacts": "Contactos",
+    "social": "Redes sociais"
+  },
+  "cv_homepage": {
+    "curriculum_label": "Currículo",
+    "curriculum_action": "Ir para o currículo"
+  },
+  "cv_curriculum": {
+    "page_title": "Currículo",
+    "city_label": "Cidade:",
+    "birth_date_label": "Data de nascimento:",
+    "website_label": "Website:",
+    "email_label": "E-mail:",
+    "about_heading": "Sobre mim",
+    "experience_heading": "Experiência",
+    "more_experiences": "A lista completa de experiências profissionais está disponível em {domain}.",
+    "other_projects_heading": "Outros Projetos",
+    "education_heading": "Formação",
+    "skills_heading": "Competências",
+    "courses_heading": "Cursos & Certificações",
+    "courses_more_info": "A lista completa de cursos e certificações está disponível em {domain}.",
+    "course_released_by": "Emitido por",
+    "course_released_on": "Emitido em",
+    "certificate_link": "Certificado",
+    "legal_notice": "Autorizo o tratamento dos dados pessoais incluídos no meu currículo, nos termos do art. 13 do Decreto Legislativo italiano 196/2003 e do art. 13 do GDPR (Regulamento UE 2016/679), exclusivamente para fins de recrutamento e seleção.",
+    "contact_heading": "Contacte-me",
+    "contact_description": "Preencha o formulário para me enviar uma mensagem direta.",
+    "contact_submit": "Enviar mensagem",
+    "contact_labels": {
+      "full_name": "Nome completo",
+      "company": "Empresa",
+      "email": "E-mail",
+      "message": "Mensagem"
+    },
+    "curriculum_link": "Currículo",
+    "vote": "Nota",
+    "project_link": "Link"
+  },
+  "cv_menu": {
+    "title": "Menu",
+    "about": "Sobre mim",
+    "experiences": "Experiência",
+    "education": "Formação",
+    "skills": "Competências",
+    "courses": "Cursos & Certificações",
+    "contact": "Contactos"
+  },
+  "contact": {
+    "feedback_success": "Mensagem enviada com sucesso.",
+    "feedback_error": "Ocorreu um erro ao enviar a mensagem. Tente novamente mais tarde."
+  },
+  "validation": {
+    "required_fields": "Preencha todos os campos antes de enviar.",
+    "full_name_length": "O nome completo deve ter entre 3 e 120 caracteres.",
+    "company_length": "O nome da empresa deve ter entre 2 e 120 caracteres.",
+    "email": "Insira um endereço de e-mail válido.",
+    "message_length": "A mensagem deve ter entre 10 e 2000 caracteres."
+  },
+  "errors": {
+    "title": "Erro",
+    "default_message": "Algo correu mal",
+    "back_home": "Voltar à Página Inicial",
+    "client_error": "Erro na requisição",
+    "server_error": "Erro interno do servidor",
+    "status_messages": {
+      "400": "Pedido inválido",
+      "401": "Autenticação necessária",
+      "403": "Acesso negado",
+      "404": "Página não encontrada",
+      "405": "Método não permitido",
+      "410": "Página já não está disponível",
+      "429": "Demasiados pedidos",
+      "501": "Funcionalidade não implementada",
+      "502": "Gateway inválido",
+      "503": "Serviço indisponível",
+      "504": "Tempo de resposta esgotado",
+      "505": "Versão HTTP não suportada"
+    }
+  },
+  "dates": {
+    "month_names": [
+      "janeiro",
+      "fevereiro",
+      "março",
+      "abril",
+      "maio",
+      "junho",
+      "julho",
+      "agosto",
+      "setembro",
+      "outubro",
+      "novembro",
+      "dezembro"
+    ],
+    "ongoing": "Presente",
+    "year": "ano",
+    "years": "anos",
+    "month": "mês",
+    "months": "meses"
+  }
+}

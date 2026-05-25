@@ -1,0 +1,38 @@
+[advisories]
+ignore = [
+    "RUSTSEC-2024-0436", # paste - no maintained alternative available currently
+    "RUSTSEC-2026-0105", # core2 - pulled in by image's AVIF encoder via ravif/rav1e; no safe upgrade is available yet
+]
+git-fetch-with-cli = true
+
+[licenses]
+allow = [
+    "Apache-2.0",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "CC0-1.0",
+    "NCSA",
+    "MIT",
+    "Unicode-3.0",
+    "Zlib",
+]
+confidence-threshold = 0.8
+
+[licenses.private]
+ignore = true
+
+[bans]
+multiple-versions = "warn"
+wildcards = "deny"
+highlight = "all"
+
+[sources]
+unknown-registry = "warn"
+unknown-git = "warn"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+allow-git = []
+
+[sources.allow-org]
+github = []
+gitlab = []
+bitbucket = []

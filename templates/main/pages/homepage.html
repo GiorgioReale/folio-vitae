@@ -1,0 +1,46 @@
+{% extends "main/base.html" %}
+{% block body_id %}homepage{% endblock body_id %}
+{% block aside %}
+<aside>
+  <picture>
+    <source srcset="/assets/images/main/profile-pictures/profile-picture.avif" type="image/avif"/>
+    <img src="/assets/images/main/profile-pictures/profile-picture.jpg" alt="{{ first_name }} {{ last_name }}" width="512" height="512" fetchpriority="high" decoding="async" importance="high"/>
+  </picture>
+  <h1>{{ first_name }} {{ last_name }}</h1>
+</aside>
+{% endblock aside %}
+
+{% block content %}
+<main id="main-content" tabindex="-1">
+  {% set has_additional_websites = websites | length > 0 %}
+  {% if has_website_cv or has_additional_websites %}
+  <h4>{{ translations.main_page.websites }}</h4>
+  {% if has_website_cv %}
+  <a href="https://{{ website_cv.domain }}/" target="_blank" rel="noopener noreferrer">{{ website_cv.domain }}</a>{% if has_additional_websites %}, {% endif %}
+  {% endif %}
+  {% for website in websites %}
+  <a href="https://{{ website.domain }}/" target="_blank" rel="noopener noreferrer">{{ website.domain }}</a>{% if not loop.last %}, {% endif %}
+  {% endfor %}
+  {% endif %}
+  <h4>{{ translations.main_page.contacts }}</h4>
+  <a href="mailto:{{ email_main }}">{{ email_main }}</a>, <a href="mailto:{{ email_cv }}">{{ email_cv }}</a>{% if emails | length > 0 %}, {% endif %}
+  {% for email in emails %}
+  <a href="mailto:{{ email }}">{{ email }}</a>{% if not loop.last %}, {% endif %}
+  {% endfor %}
+  <h4>{{ translations.main_page.social }}</h4>
+  <div class="social">
+    {% for social in socials %}
+    <a href="{{ social.link }}" target="_blank" rel="noopener noreferrer" aria-label="{{ social.social_full_name }}" title="{{ social.social_full_name }}" class="{{ social.social_name }}">
+      {% if social.social_name == 'linkedin' %}
+      <svg aria-hidden="true" focusable="false">
+        <use href="/assets/icons/main/website/sprites.svg#linkedin"></use>
+      </svg>
+      {% else %}
+      {{ social.icon_svg | default(value="") | safe }}
+      {% endif %}
+      {{ social.profile_nickname }}
+    </a>
+    {% endfor %}
+  </div>
+</main>
+{% endblock content %}

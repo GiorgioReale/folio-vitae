@@ -1,0 +1,162 @@
+{% extends "cv/base.html" %}
+{% block body_id %}curriculum{% endblock body_id %}
+{% block aside %}
+<aside>
+  <picture>
+    <source srcset="/assets/images/cv/profile-pictures/profile-picture.avif" type="image/avif" />
+    <img src="/assets/images/cv/profile-pictures/profile-picture.jpg" alt="{{ first_name }} {{ last_name }}" width="512" height="512" fetchpriority="high" decoding="async" importance="high" />
+  </picture>
+  <div>
+    <h1>{{ first_name }} {{ last_name }}</h1>
+    <h2>{{ role }}</h2>
+  </div>
+  <div>
+    <div>
+      <p>{{ translations.cv_curriculum.city_label }}</p>
+      <p>{{ position.locality }}</p>
+    </div>
+    <div>
+      <p>{{ translations.cv_curriculum.birth_date_label }}</p>
+      <p>{{ date_of_birth }} ({{ age }})</p>
+    </div>
+    {% if has_website_main %}
+    <div>
+      <p>{{ translations.cv_curriculum.website_label }}</p>
+      <p><a href="https://{{ website_main.domain }}/">{{ website_main.domain }}</a></p>
+    </div>
+    {% endif %}
+    <div>
+      <p>{{ translations.cv_curriculum.email_label }}</p>
+      <p><a href="mailto:{{ email_cv }}">{{ email_cv }}</a></p>
+    </div>
+  </div>
+  <div>
+    {% for social in socials %}
+    {% if social.social_name in ['linkedin', 'github', 'gitlab', 'stackoverflow'] %}
+    <a href="{{ social.link }}" target="_blank" rel="noopener noreferrer" aria-label="{{ social.social_full_name }}"
+      title="{{ social.social_full_name }}">
+      {% if social.social_name == 'linkedin' %}
+      <svg aria-hidden="true" focusable="false">
+        <use href="/assets/icons/cv/website/sprites.svg#linkedin"></use>
+      </svg>
+      {% else %}
+      {{ social.icon_svg | default(value="") | safe }}
+      {% endif %}
+    </a>
+    {% endif %}
+    {% endfor %}
+  </div>
+</aside>
+{% endblock aside %}
+{% block content %}
+<main id="main-content" tabindex="-1">
+  {% if description %}
+  <div id="info" class="info">
+    <h3>{{ translations.cv_curriculum.about_heading }}</h3>
+    <p>{{ description }}</p>
+  </div>
+  {% endif %}
+  {% if work_experiences | length > 0 %}
+  <div id="experience" class="experience">
+    <h3>{{ translations.cv_curriculum.experience_heading }}</h3>
+    {% for work_experience in work_experiences %}
+    <div>
+      <h4>{{ work_experience.company }}</h4>
+      <p>{{ work_experience.location }}</p>
+      {% for role in work_experience.roles %}
+      <div>
+        <h5>{{ role.title }}</h5>
+        <p class="dates">{{ role.start_date }} - {{ role.end_date }}{% if role.duration %} ({{ role.duration }}){% endif %}</p>
+        <p>{{ role.description }}</p>
+      </div>
+      {% endfor %}
+    </div>
+    {% endfor %}
+    {% if has_website_cv and work_experiences | length > 4 %}
+    <p class="more-information-online">{{ translations.cv_curriculum.more_experiences | replace(from='{domain}', to=website_cv.domain) }}</p>
+    {% endif %}
+  </div>
+  {% endif %}
+  {% if other_projects | length > 0 %}
+  <div id="other-projects" class="other-projects">
+    <h3>{{ translations.cv_curriculum.other_projects_heading }}</h3>
+    {% for project in other_projects %}
+    <div>
+      <h4>{{ project.title }}</h4>
+      <p class="dates">{{ project.start_date }} - {{ project.end_date }}{% if project.duration %} ({{ project.duration }}){% endif %}</p>
+      <p>{{ project.description }}</p>
+      <a href="{{ project.link }}" target="_blank" rel="noopener noreferrer">{{ translations.cv_curriculum.project_link }}</a>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% if educations | length > 0 %}
+  <div id="education" class="formation">
+    <h3>{{ translations.cv_curriculum.education_heading }}</h3>
+    {% for education in educations %}
+    <div>
+      <h4>{{ education.institute }}</h4>
+      <p>{{ education.course_of_study }}</p>
+      <p><b>{{ education.educational_qualification }}</b></p>
+      <p class="dates">{{ education.date_start }} - {{ education.date_end }}{% if education.duration %} ({{ education.duration }}){% endif %}</p>
+      <p>{{ education.description }}</p>
+      {% if education.vote %}<p>{{ translations.cv_curriculum.vote }}: {{ education.vote }}</p>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% if skills | length > 0 %}
+  <div id="skills" class="skills">
+    <h3>{{ translations.cv_curriculum.skills_heading }}</h3>
+    <div>
+      {% for skill in skills %}
+      <div title="{{ skill.name }}">
+        {{ skill.icon_svg | default(value="") | safe }}
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+  {% if courses_certifications | length > 0 %}
+  <div id="courses-certifications" class="training-courses">
+    <h3>{{ translations.cv_curriculum.courses_heading }}</h3>
+    {% for courses_certification in courses_certifications %}
+    <div>
+      <h4>{{ courses_certification.title }}</h4>
+      <p><b>{{ translations.cv_curriculum.course_released_by }}</b>: {{ courses_certification.released_by }}</p>
+      <p><b>{{ translations.cv_curriculum.course_released_on }}</b> {{ courses_certification.released_on }}</p>
+      <a href="{{ courses_certification.link }}" target="_blank" rel="noopener noreferrer">{{ translations.cv_curriculum.certificate_link }}</a>
+    </div>
+    {% endfor %}
+    {% if has_website_cv and courses_certifications | length > 4 %}
+    <p class="more-information-online">{{ translations.cv_curriculum.courses_more_info | replace(from='{domain}', to=website_cv.domain) }}</p>
+    {% endif %}
+  </div>
+  {% endif %}
+  <div class="legal-notice">
+    <p>{{ translations.cv_curriculum.legal_notice }}</p>
+  </div>
+</main>
+{% if contact_form_enabled %}
+<div class="contact-form" id="contact">
+  <div class="contact-form__header">
+    <h4>{{ translations.cv_curriculum.contact_heading }}</h4>
+    <p>{{ translations.cv_curriculum.contact_description }}</p>
+  </div>
+  <div class="contact-form__feedback{% if contact_form.feedback %} contact-form__feedback--{{ contact_form.feedback.status }}{% endif %}" aria-live="polite" data-contact-feedback {% if not contact_form.feedback %}hidden{% endif %}>
+    <p>{% if contact_form.feedback %}{{ contact_form.feedback.message }}{% endif %}</p>
+  </div>
+  <form action="{{ language_prefix ~ '/contact' }}" method="post" novalidate autocomplete="off" data-contact-form>
+    <label for="full-name">{{ translations.cv_curriculum.contact_labels.full_name }}</label>
+    <input type="text" id="full-name" name="full-name" autocomplete="off" required minlength="3" maxlength="120" value="{{ contact_form.full_name }}">
+    <label for="company">{{ translations.cv_curriculum.contact_labels.company }}</label>
+    <input type="text" id="company" name="company" autocomplete="off" required minlength="2" maxlength="120" value="{{ contact_form.company }}">
+    <label for="email">{{ translations.cv_curriculum.contact_labels.email }}</label>
+    <input type="email" id="email" name="email" autocomplete="off" required minlength="5" maxlength="254" value="{{ contact_form.email }}">
+    <label for="message">{{ translations.cv_curriculum.contact_labels.message }}</label>
+    <textarea id="message" name="message" rows="6" required autocomplete="off" minlength="10" maxlength="2000">{{ contact_form.message }}</textarea>
+    <button type="submit">{{ translations.cv_curriculum.contact_submit }}</button>
+  </form>
+</div>
+{% endif %}
+{% endblock content %}

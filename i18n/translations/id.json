@@ -1,0 +1,121 @@
+{
+  "language": {
+    "code": "id",
+    "tag": "id-ID",
+    "meta_language": "ID",
+    "dc_language": "ind",
+    "direction": "ltr"
+  },
+  "accessibility": {
+    "skip_to_content": "Lewati ke konten utama"
+  },
+  "nav": {
+    "home": "Beranda",
+    "menu": "Menu",
+    "theme_switch": "Mode Terang/Gelap",
+    "language_selector_label": "Bahasa",
+    "current_language": "Bahasa saat ini"
+  },
+  "main_page": {
+    "websites": "Situs Web",
+    "contacts": "Kontak",
+    "social": "Sosial"
+  },
+  "cv_homepage": {
+    "curriculum_label": "CV",
+    "curriculum_action": "Lihat CV"
+  },
+  "cv_curriculum": {
+    "page_title": "CV",
+    "city_label": "Kota:",
+    "birth_date_label": "Tanggal Lahir:",
+    "website_label": "Situs Web:",
+    "email_label": "E-mail:",
+    "about_heading": "Tentang Saya",
+    "experience_heading": "Pengalaman",
+    "more_experiences": "Daftar lengkap pengalaman kerja tersedia di {domain}.",
+    "other_projects_heading": "Proyek Lain",
+    "education_heading": "Pendidikan",
+    "skills_heading": "Keahlian",
+    "courses_heading": "Kursus & Sertifikasi",
+    "courses_more_info": "Daftar lengkap kursus dan sertifikasi tersedia di {domain}.",
+    "course_released_by": "Diterbitkan oleh",
+    "course_released_on": "Tanggal diterbitkan",
+    "certificate_link": "Sertifikat",
+    "legal_notice": "Saya memberi izin penggunaan data pribadi dalam CV ini sesuai dengan Pasal 13 D. Lgs. 196/2003 dan Pasal 13 GDPR (Peraturan UE 2016/679), hanya untuk tujuan rekrutmen dan seleksi.",
+    "contact_heading": "Hubungi Saya",
+    "contact_description": "Isi formulir untuk mengirim pesan langsung kepada saya.",
+    "contact_submit": "Kirim pesan",
+    "contact_labels": {
+      "full_name": "Nama lengkap",
+      "company": "Perusahaan",
+      "email": "E-mail",
+      "message": "Pesan"
+    },
+    "curriculum_link": "CV",
+    "vote": "Nilai",
+    "project_link": "Tautan"
+  },
+  "cv_menu": {
+    "title": "Menu",
+    "about": "Tentang Saya",
+    "experiences": "Pengalaman",
+    "education": "Pendidikan",
+    "skills": "Keahlian",
+    "courses": "Kursus & Sertifikasi",
+    "contact": "Kontak"
+  },
+  "contact": {
+    "feedback_success": "Pesan berhasil dikirim.",
+    "feedback_error": "Terjadi kesalahan saat mengirim pesan. Silakan coba lagi nanti."
+  },
+  "validation": {
+    "required_fields": "Isi semua kolom sebelum mengirim.",
+    "full_name_length": "Nama lengkap harus terdiri dari 3 hingga 120 karakter.",
+    "company_length": "Nama perusahaan harus terdiri dari 2 hingga 120 karakter.",
+    "email": "Masukkan alamat e-mail yang valid.",
+    "message_length": "Pesan harus terdiri dari 10 hingga 2000 karakter."
+  },
+  "errors": {
+    "title": "Kesalahan",
+    "default_message": "Terjadi kesalahan",
+    "back_home": "Kembali ke Beranda",
+    "client_error": "Kesalahan permintaan",
+    "server_error": "Kesalahan internal server",
+    "status_messages": {
+      "400": "Permintaan tidak valid",
+      "401": "Autentikasi diperlukan",
+      "403": "Akses ditolak",
+      "404": "Halaman tidak ditemukan",
+      "405": "Metode tidak diizinkan",
+      "410": "Halaman tidak tersedia lagi",
+      "429": "Terlalu banyak permintaan",
+      "501": "Fitur belum diterapkan",
+      "502": "Gateway tidak valid",
+      "503": "Layanan tidak tersedia",
+      "504": "Batas waktu habis",
+      "505": "Versi HTTP tidak didukung"
+    }
+  },
+  "dates": {
+    "month_names": [
+      "Januari",
+      "Februari",
+      "Maret",
+      "April",
+      "Mei",
+      "Juni",
+      "Juli",
+      "Agustus",
+      "September",
+      "Oktober",
+      "November",
+      "Desember"
+    ],
+    "ongoing": "Sekarang",
+    "year": "tahun",
+    "years": "tahun",
+    "month": "bulan",
+    "months": "bulan"
+  }
+}

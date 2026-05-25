@@ -1,0 +1,4 @@
+Contact: mailto:Giorgio Reale <security.giorgioreale.xyz>
+Expires: {{ security_txt_expires }}
+Preferred-Languages: en, it
+Canonical: {{ base_url }}/.well-known/security.txt

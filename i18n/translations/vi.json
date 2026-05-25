@@ -1,0 +1,121 @@
+{
+  "language": {
+    "code": "vi",
+    "tag": "vi-VN",
+    "meta_language": "VI",
+    "dc_language": "vie",
+    "direction": "ltr"
+  },
+  "accessibility": {
+    "skip_to_content": "Chuyển đến nội dung chính"
+  },
+  "nav": {
+    "home": "Trang chủ",
+    "menu": "Menu",
+    "theme_switch": "Chế độ Sáng/Tối",
+    "language_selector_label": "Ngôn ngữ",
+    "current_language": "Ngôn ngữ hiện tại"
+  },
+  "main_page": {
+    "websites": "Trang web",
+    "contacts": "Liên hệ",
+    "social": "Mạng xã hội"
+  },
+  "cv_homepage": {
+    "curriculum_label": "CV",
+    "curriculum_action": "Xem CV"
+  },
+  "cv_curriculum": {
+    "page_title": "CV",
+    "city_label": "Thành phố:",
+    "birth_date_label": "Ngày sinh:",
+    "website_label": "Website:",
+    "email_label": "E-mail:",
+    "about_heading": "Giới thiệu",
+    "experience_heading": "Kinh nghiệm",
+    "more_experiences": "Danh sách đầy đủ kinh nghiệm làm việc có tại {domain}.",
+    "other_projects_heading": "Dự án khác",
+    "education_heading": "Học vấn",
+    "skills_heading": "Kỹ năng",
+    "courses_heading": "Khóa học & Chứng chỉ",
+    "courses_more_info": "Danh sách đầy đủ các khóa học và chứng chỉ có tại {domain}.",
+    "course_released_by": "Đơn vị cấp",
+    "course_released_on": "Ngày cấp",
+    "certificate_link": "Chứng chỉ",
+    "legal_notice": "Tôi đồng ý cho phép xử lý dữ liệu cá nhân trong CV theo Điều 13 của D. Lgs. 196/2003 và Điều 13 của GDPR (Quy định EU 2016/679), chỉ phục vụ mục đích tuyển dụng và lựa chọn ứng viên.",
+    "contact_heading": "Liên hệ với tôi",
+    "contact_description": "Điền vào biểu mẫu để gửi tin nhắn trực tiếp.",
+    "contact_submit": "Gửi tin nhắn",
+    "contact_labels": {
+      "full_name": "Họ và tên",
+      "company": "Công ty",
+      "email": "E-mail",
+      "message": "Tin nhắn"
+    },
+    "curriculum_link": "CV",
+    "vote": "Điểm",
+    "project_link": "Liên kết"
+  },
+  "cv_menu": {
+    "title": "Menu",
+    "about": "Giới thiệu",
+    "experiences": "Kinh nghiệm",
+    "education": "Học vấn",
+    "skills": "Kỹ năng",
+    "courses": "Khóa học & Chứng chỉ",
+    "contact": "Liên hệ"
+  },
+  "contact": {
+    "feedback_success": "Gửi tin nhắn thành công.",
+    "feedback_error": "Đã xảy ra lỗi khi gửi tin nhắn. Vui lòng thử lại sau."
+  },
+  "validation": {
+    "required_fields": "Hãy điền đầy đủ tất cả các trường trước khi gửi.",
+    "full_name_length": "Họ và tên phải từ 3 đến 120 ký tự.",
+    "company_length": "Tên công ty phải từ 2 đến 120 ký tự.",
+    "email": "Vui lòng nhập địa chỉ e-mail hợp lệ.",
+    "message_length": "Tin nhắn phải từ 10 đến 2000 ký tự."
+  },
+  "errors": {
+    "title": "Lỗi",
+    "default_message": "Đã xảy ra sự cố",
+    "back_home": "Quay về Trang chủ",
+    "client_error": "Lỗi yêu cầu",
+    "server_error": "Lỗi máy chủ nội bộ",
+    "status_messages": {
+      "400": "Yêu cầu không hợp lệ",
+      "401": "Cần xác thực",
+      "403": "Truy cập bị từ chối",
+      "404": "Không tìm thấy trang",
+      "405": "Phương thức không được phép",
+      "410": "Trang không còn tồn tại",
+      "429": "Quá nhiều yêu cầu",
+      "501": "Tính năng chưa được triển khai",
+      "502": "Cổng không hợp lệ",
+      "503": "Dịch vụ không khả dụng",
+      "504": "Hết thời gian chờ",
+      "505": "Phiên bản HTTP không được hỗ trợ"
+    }
+  },
+  "dates": {
+    "month_names": [
+      "Tháng 1",
+      "Tháng 2",
+      "Tháng 3",
+      "Tháng 4",
+      "Tháng 5",
+      "Tháng 6",
+      "Tháng 7",
+      "Tháng 8",
+      "Tháng 9",
+      "Tháng 10",
+      "Tháng 11",
+      "Tháng 12"
+    ],
+    "ongoing": "Hiện tại",
+    "year": "năm",
+    "years": "năm",
+    "month": "tháng",
+    "months": "tháng"
+  }
+}

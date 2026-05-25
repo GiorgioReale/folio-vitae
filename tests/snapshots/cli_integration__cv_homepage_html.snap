@@ -1,0 +1,220 @@
+---
+source: tests/cli_integration.rs
+expression: cv_homepage
+---
+<!DOCTYPE html>
+<html dir="ltr" lang="en-US">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="generator" content="folio-vitae v0.1.0" />
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <meta name="title" content="Alex Carter | Curriculum Vitae" />
+  
+  
+  <meta name="description" content="Experience, projects, education, and skills of Alex Carter." />
+  
+  <meta name="keywords" content="Alex Carter, cv, resume, experience, skills" />
+  <meta name="copyright" content="Alex Carter" />
+  <meta name="language" content="EN" />
+  <meta name="dc.language" content="eng" />
+  <meta http-equiv="content-language" content="EN" />
+  <meta name="robots" content="index,follow" />
+  <meta name="author" content="Giorgio Reale, info@giorgioreale.xyz" />
+  <meta name="designer" content="Giorgio Reale, info@giorgioreale.xyz" />
+  <meta name="reply-to" content="work@alexcarter.dev" />
+  <meta name="owner" content="Alex Carter" />
+  
+  <meta name="url" content="https://cv.alexcarter.dev&#x2F;en&#x2F;" />
+  <meta name="identifier-URL" content="https://cv.alexcarter.dev&#x2F;en&#x2F;" />
+  
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  
+  <meta property="og:title" content="Alex Carter | Curriculum Vitae" />
+  
+  <meta property="og:type" content="website" />
+  
+  <meta property="og:url" content="https://cv.alexcarter.dev&#x2F;en&#x2F;" />
+  <meta property="og:image" content="https://cv.alexcarter.dev/assets/images/cv/social-card/social-card.png" />
+  <meta property="og:image:url" content="https://cv.alexcarter.dev/assets/images/cv/social-card/social-card.png" />
+  <meta property="og:image:secure_url" content="https://cv.alexcarter.dev/assets/images/cv/social-card/social-card.png" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1920" />
+  <meta property="og:image:height" content="1080" />
+  <meta property="og:image:alt" content="Social card del sito di Alex Carter" />
+  
+  
+  <meta property="og:site_name" content="Alex Carter | Curriculum Vitae" />
+  
+  
+  <meta property="og:description" content="Experience, projects, education, and skills of Alex Carter." />
+  
+  
+  <meta property="og:email" content="work@alexcarter.dev" />
+  
+  
+  <meta property="og:locale" content="en_US" />
+  
+  
+  <meta property="og:locality" content="Austin" />
+  
+  
+  <meta property="og:region" content="Texas" />
+  
+  
+  <meta property="og:postal-code" content="78701" />
+  
+  
+  <meta property="og:country-name" content="United States" />
+  
+  
+  
+  <meta name="twitter:card" content="summary" />
+  
+  <meta name="twitter:url" content="https://cv.alexcarter.dev&#x2F;en&#x2F;" />
+  <meta name="twitter:image" content="https://cv.alexcarter.dev/assets/images/cv/social-card/social-card.png" />
+  <meta name="twitter:image:alt" content="Social card del sito di Alex Carter" />
+  
+  
+  <meta name="twitter:title" content="Alex Carter | Curriculum Vitae" />
+  
+  
+  <meta name="twitter:description" content="Experience, projects, education, and skills of Alex Carter." />
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  <title>Alex Carter | Curriculum Vitae</title>
+  
+  
+  <link rel="canonical" href="https://cv.alexcarter.dev&#x2F;en&#x2F;" />
+  
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/cv/logos/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/cv/logos/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/cv/logos/favicon-16x16.png" />
+  <link rel="icon" type="image/svg+xml" href="/assets/icons/cv/logos/favicon.svg" />
+  <link rel="manifest" href="/site.webmanifest" />
+  
+  <meta name="apple-mobile-web-app-title" content="Alex Carter | Curriculum Vitae" />
+  
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#000000" />
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000" />
+  <meta name="view-transition" content="same-origin" />
+  <link rel="preload" href="/assets/styles/cv.css?v=ASSET_VERSION" as="style" />
+  <link rel="stylesheet" href="/assets/styles/cv.css?v=ASSET_VERSION" type="text/css" fetchpriority="high" />
+  
+  <script src="/assets/scripts/light-dark-mode.js?v=ASSET_VERSION" charset="utf-8" defer data-sprite-prefix="/assets/icons/cv/website/sprites.svg#"></script>
+  <script src="/assets/scripts/cv/open-close-menu.js?v=ASSET_VERSION" charset="utf-8" defer></script>
+  <script src="/assets/scripts/cv/contact-form.js?v=ASSET_VERSION" charset="utf-8" defer></script>
+  
+</head>
+
+<body id="homepage">
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+  
+<aside></aside>
+
+  <section>
+    <header>
+      <nav>
+        
+        <div class="language-switcher" role="navigation" aria-label="Language">
+          
+          
+          
+          <span class="language-switcher__current" lang="en" aria-current="page">
+            <span aria-hidden="true">en</span>
+            <span class="sr-only">Language: English (Current language)</span>
+          </span>
+          
+          
+          
+          
+          <a href="&#x2F;it&#x2F;" lang="it" aria-label="Language: italiano" title="Language: italiano">
+            <span aria-hidden="true">it</span>
+            <span class="sr-only">Language: italiano</span>
+          </a>
+          
+          
+        </div>
+        
+        <a href="/en/" aria-label="Home" title="Home">
+          <svg aria-hidden="true" focusable="false">
+            <use xlink:href="/assets/icons/cv/website/sprites.svg#home" />
+          </svg>
+        </a>
+        <button type="button" id="theme-switch" aria-label="Light&#x2F;Dark Mode"
+          title="Light&#x2F;Dark Mode">
+          <svg aria-hidden="true" focusable="false">
+            <use xlink:href="/assets/icons/cv/website/sprites.svg#moon-auto" />
+          </svg>
+        </button>
+        <a href="/en/menu" id="menu" aria-label="Menu" title="Menu">
+          <svg aria-hidden="true" focusable="false">
+            <use xlink:href="/assets/icons/cv/website/sprites.svg#menu" />
+          </svg>
+        </a>
+      </nav>
+    </header>
+    
+<main id="main-content" tabindex="-1">
+  <h1>Alex Carter</h1>
+  <h2>Full Stack Developer</h2>
+  <a href="/en/curriculum" aria-label="Curriculum">
+    <svg aria-hidden="true" focusable="false">
+      <use xlink:href="/assets/icons/cv/website/sprites.svg#right-arrow" />
+    </svg>
+    <span class="sr-only">Go to the curriculum</span>
+  </a>
+</main>
+
+    <footer>
+      <p>
+        <svg aria-hidden="true" focusable="false">
+          <use xlink:href="/assets/icons/cv/website/sprites.svg#copyright" />
+        </svg>
+        
+        CURRENT_YEAR - <a href="https://alexcarter.dev" target="_blank" rel="noopener noreferrer">Alex Carter</a>
+        
+      </p>
+      
+      <p>
+        &#60;&#47;&#62; with
+        <svg aria-hidden="true" focusable="false">
+          <use xlink:href="/assets/icons/cv/website/sprites.svg#love" />
+        </svg>
+        by <a href="https://github.com/GiorgioReale/folio-vitae" target="_blank" rel="noopener noreferrer">Giorgio Reale</a>
+      </p>
+      
+    </footer>
+  </section>
+</body>
+
+</html>

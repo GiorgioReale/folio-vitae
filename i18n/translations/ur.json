@@ -1,0 +1,121 @@
+{
+  "language": {
+    "code": "ur",
+    "tag": "ur-PK",
+    "meta_language": "UR",
+    "dc_language": "urd",
+    "direction": "ltr"
+  },
+  "accessibility": {
+    "skip_to_content": "اہم مواد پر جائیں"
+  },
+  "nav": {
+    "home": "ہوم",
+    "menu": "مینو",
+    "theme_switch": "لائٹ/ڈارک موڈ",
+    "language_selector_label": "زبان",
+    "current_language": "موجودہ زبان"
+  },
+  "main_page": {
+    "websites": "ویب سائٹس",
+    "contacts": "رابطے",
+    "social": "سوشل"
+  },
+  "cv_homepage": {
+    "curriculum_label": "سی وی",
+    "curriculum_action": "سی وی دیکھیں"
+  },
+  "cv_curriculum": {
+    "page_title": "سی وی",
+    "city_label": "شہر:",
+    "birth_date_label": "تاریخِ پیدائش:",
+    "website_label": "ویب سائٹ:",
+    "email_label": "ای میل:",
+    "about_heading": "میرے بارے میں",
+    "experience_heading": "تجربہ",
+    "more_experiences": "کام کے مکمل تجربات کی فہرست {domain} پر دستیاب ہے۔",
+    "other_projects_heading": "دیگر پروجیکٹس",
+    "education_heading": "تعلیم",
+    "skills_heading": "مہارتیں",
+    "courses_heading": "کورسز اور سرٹیفیکیشن",
+    "courses_more_info": "کورسز اور سرٹیفیکیشن کی مکمل فہرست {domain} پر دستیاب ہے۔",
+    "course_released_by": "جاری کردہ ادارہ",
+    "course_released_on": "اجراء کی تاریخ",
+    "certificate_link": "سرٹیفکیٹ",
+    "legal_notice": "میں اجازت دیتا ہوں کہ میرے سی وی میں شامل ذاتی معلومات کو اطالوی قانون D. Lgs. 196/2003 کے آرٹیکل 13 اور GDPR (Regolamento UE 2016/679) کے آرٹیکل 13 کے مطابق صرف ملازمت کے انتخاب اور بھرتی کے مقصد کے لیے استعمال کیا جائے۔",
+    "contact_heading": "مجھ سے رابطہ کریں",
+    "contact_description": "مجھے براہِ راست پیغام بھیجنے کے لیے فارم پُر کریں۔",
+    "contact_submit": "پیغام بھیجیں",
+    "contact_labels": {
+      "full_name": "پورا نام",
+      "company": "کمپنی",
+      "email": "ای میل",
+      "message": "پیغام"
+    },
+    "curriculum_link": "سی وی",
+    "vote": "گریڈ",
+    "project_link": "لنک"
+  },
+  "cv_menu": {
+    "title": "مینو",
+    "about": "میرے بارے میں",
+    "experiences": "تجربہ",
+    "education": "تعلیم",
+    "skills": "مہارتیں",
+    "courses": "کورسز اور سرٹیفیکیشن",
+    "contact": "رابطہ"
+  },
+  "contact": {
+    "feedback_success": "پیغام کامیابی سے بھیج دیا گیا ہے۔",
+    "feedback_error": "پیغام بھیجنے میں خرابی پیش آئی۔ براہ کرم بعد میں دوبارہ کوشش کریں۔"
+  },
+  "validation": {
+    "required_fields": "براہ کرم بھیجنے سے پہلے تمام فیلڈز پُر کریں۔",
+    "full_name_length": "پورا نام 3 سے 120 حروف کے درمیان ہونا چاہیے۔",
+    "company_length": "کمپنی کا نام 2 سے 120 حروف کے درمیان ہونا چاہیے۔",
+    "email": "براہ کرم درست ای میل درج کریں۔",
+    "message_length": "پیغام 10 سے 2000 حروف کے درمیان ہونا چاہیے۔"
+  },
+  "errors": {
+    "title": "غلطی",
+    "default_message": "کچھ غلط ہو گیا",
+    "back_home": "ہوم پیج پر واپس جائیں",
+    "client_error": "درخواست میں خرابی",
+    "server_error": "سرور کی اندرونی خرابی",
+    "status_messages": {
+      "400": "غلط درخواست",
+      "401": "تصدیق درکار ہے",
+      "403": "رسائی مسترد",
+      "404": "صفحہ نہیں ملا",
+      "405": "طریقہ کار غیر مجاز",
+      "410": "صفحہ اب دستیاب نہیں",
+      "429": "بہت زیادہ درخواستیں",
+      "501": "فیچر نافذ نہیں کیا گیا",
+      "502": "غلط گیٹ وے",
+      "503": "سروس دستیاب نہیں",
+      "504": "جواب دینے کا وقت ختم",
+      "505": "HTTP ورژن سپورٹ نہیں کیا جاتا"
+    }
+  },
+  "dates": {
+    "month_names": [
+      "جنوری",
+      "فروری",
+      "مارچ",
+      "اپریل",
+      "مئی",
+      "جون",
+      "جولائی",
+      "اگست",
+      "ستمبر",
+      "اکتوبر",
+      "نومبر",
+      "دسمبر"
+    ],
+    "ongoing": "موجودہ",
+    "year": "سال",
+    "years": "سال",
+    "month": "مہینہ",
+    "months": "مہینے"
+  }
+}

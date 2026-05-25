@@ -1,0 +1,296 @@
+@use '../../variables' as *;
+
+body#curriculum {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-content: center;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  > aside {
+    > picture {
+      width: 250px;
+      max-width: 75%;
+      aspect-ratio: 1;
+      border-radius: 100%;
+      background-color: var(--color-text-primary);
+      overflow: hidden;
+
+      > img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+    }
+
+    > div {
+      display: flex;
+      flex-direction: column;
+      flex-wrap: nowrap;
+      align-content: center;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+
+      > h1 {
+        font-size: 1.802rem;
+      }
+
+      > h2 {
+        font-variation-settings: 'wght' 400;
+        font-weight: 400;
+        font-size: 1.602rem;
+      }
+
+      &:nth-child(3) {
+        gap: 0.5rem;
+
+        > div {
+          display: flex;
+          flex-direction: column;
+          flex-wrap: nowrap;
+          align-content: center;
+          justify-content: center;
+          align-items: center;
+
+          > p {
+            &:nth-child(odd) {
+              font-variation-settings: 'wght' 700;
+              font-weight: 700;
+            }
+          }
+        }
+      }
+
+      &:last-child {
+        flex-direction: row;
+        gap: 0.5rem;
+
+        > a {
+          > svg {
+            fill: var(--color-buttons-primary);
+            background-color: var(--background-buttons-primary);
+            width: 2rem;
+            height: 2rem;
+            padding: 0.25rem;
+
+            &:hover {
+              fill: var(--color-buttons-primary-hover);
+              background-color: var(--background-buttons-primary-hover);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  > section {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-content: center;
+    justify-content: flex-start;
+    align-items: stretch;
+
+    > main {
+      > div {
+        > h3 {
+          margin: 3rem 0 0.75rem 0;
+        }
+
+        > p {
+          &.more-information-online {
+            display: none;
+            font-size: 0.75rem;
+            margin: 1.5rem 0 0 0;
+          }
+        }
+
+        h3,
+        h4,
+        p {
+          white-space: break-spaces;
+          text-wrap: balance;
+        }
+
+        &.info {
+          > h3 {
+            margin: 1.5rem 0 1.5rem 0;
+          }
+        }
+
+        &.experience,
+        &.other-projects,
+        &.formation,
+        &.training-courses {
+          > div {
+            margin: 1rem 0 0 1rem;
+
+            > div {
+              margin: 0.5rem 0 0 1rem;
+
+              > h5 {
+                font-size: 1.424rem;
+              }
+
+              > p {
+              }
+            }
+
+            p.dates {
+              font-variation-settings: 'wght' 300;
+              font-weight: 300;
+              font-size: 0.75rem;
+            }
+
+            a {
+              text-decoration: underline;
+            }
+          }
+        }
+
+        &.skills {
+          > div {
+            margin: 0 0 0 0;
+            display: flex;
+            justify-content: space-between;
+
+            > div {
+              > svg {
+                width: 3rem;
+                max-width: 12vw;
+                aspect-ratio: 1;
+                fill: var(--color-text-primary);
+              }
+            }
+          }
+        }
+      }
+
+      > div.legal-notice {
+        > p {
+          font-size: 0.75rem;
+          margin: 3rem 0 1rem 0;
+        }
+      }
+    }
+
+    > div.contact-form {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      padding: 2rem 2rem 2rem 2rem;
+      margin: 0 0 3rem 0;
+
+      > form {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+
+        > input,
+        > textarea {
+          padding: 0.5rem 0.75rem 0.5rem 0.75rem;
+          border: 1px solid var(--color-text-primary);
+          background-color: transparent;
+          color: var(--color-text-primary);
+          font-size: 1rem;
+          font-family: var(--font-family-sans-serif);
+
+          &:focus {
+            outline: 2px solid var(--color-buttons-primary);
+            outline-offset: 4px;
+          }
+
+          &.is-invalid {
+            border-color: #f00;
+            box-shadow: 0 0 0 1px #f00;
+          }
+        }
+
+        > textarea {
+          resize: vertical;
+          min-height: 8rem;
+        }
+
+        > label {
+          font-variation-settings: 'wght' 600;
+          font-weight: 600;
+          margin: 0.5rem 0 0 0;
+        }
+
+        > button {
+          justify-self: start;
+          padding: 0.75rem 1.5rem 0.75rem 1.5rem;
+          background-color: var(--background-buttons-primary);
+          color: var(--color-buttons-primary);
+          border: none;
+          cursor: pointer;
+          font-size: 0.9rem;
+          font-family: var(--font-family-sans-serif);
+          margin: 0.5rem 0 0 0;
+
+          &:hover {
+            background-color: var(--background-buttons-primary-hover);
+            color: var(--color-buttons-primary-hover);
+          }
+        }
+      }
+
+      > div.contact-form__feedback {
+        border-inline-start: 0.2rem solid var(--color-buttons-primary);
+        padding: 0.5rem 0.75rem 0.5rem 0.75rem;
+        background-color: color-mix(in srgb, var(--background-main) 70%, var(--color-buttons-primary) 30%);
+
+        &[hidden] {
+          display: none;
+        }
+
+        &.contact-form__feedback--error {
+          border-color: #f00;
+          background-color: color-mix(in srgb, var(--background-main) 70%, #f00 30%);
+        }
+
+        &.contact-form__feedback--success {
+          border-color: #00a500;
+          background-color: color-mix(in srgb, var(--background-main) 70%, #00a500 30%);
+        }
+
+        > p {
+          margin: 0;
+          font-size: 0.95rem;
+        }
+      }
+    }
+  }
+
+  @media screen and (max-width: $breakpoint-lg) {
+    flex-direction: column;
+    align-items: stretch;
+
+    > aside {
+      flex: none;
+      position: relative;
+      height: auto;
+      padding: 0.5rem;
+    }
+
+    > section {
+      flex: none;
+
+      > main {
+        > div {
+          h3,
+          h4,
+          p {
+            width: auto !important;
+          }
+        }
+      }
+    }
+  }
+
+}

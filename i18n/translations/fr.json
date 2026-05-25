@@ -1,0 +1,121 @@
+{
+  "language": {
+    "code": "fr",
+    "tag": "fr-FR",
+    "meta_language": "FR",
+    "dc_language": "fra",
+    "direction": "ltr"
+  },
+  "accessibility": {
+    "skip_to_content": "Aller au contenu principal"
+  },
+  "nav": {
+    "home": "Accueil",
+    "menu": "Menu",
+    "theme_switch": "Mode clair/sombre",
+    "language_selector_label": "Langue",
+    "current_language": "Langue actuelle"
+  },
+  "main_page": {
+    "websites": "Sites web",
+    "contacts": "Contacts",
+    "social": "Réseaux sociaux"
+  },
+  "cv_homepage": {
+    "curriculum_label": "CV",
+    "curriculum_action": "Aller au CV"
+  },
+  "cv_curriculum": {
+    "page_title": "CV",
+    "city_label": "Ville :",
+    "birth_date_label": "Date de naissance :",
+    "website_label": "Site web :",
+    "email_label": "E-mail :",
+    "about_heading": "À propos de moi",
+    "experience_heading": "Expérience",
+    "more_experiences": "La liste complète des expériences professionnelles est disponible sur {domain}.",
+    "other_projects_heading": "Autres projets",
+    "education_heading": "Formation",
+    "skills_heading": "Compétences",
+    "courses_heading": "Cours et certifications",
+    "courses_more_info": "La liste complète des cours et certifications est disponible sur {domain}.",
+    "course_released_by": "Délivré par",
+    "course_released_on": "Délivré le",
+    "certificate_link": "Certificat",
+    "legal_notice": "J'autorise le traitement des données personnelles contenues dans mon CV conformément à l'art. 13 du décret législatif 196/2003 et à l'art. 13 du RGPD (Règlement UE 2016/679), aux seules fins de recrutement et de sélection du personnel.",
+    "contact_heading": "Me contacter",
+    "contact_description": "Remplissez le formulaire pour m'envoyer un message direct.",
+    "contact_submit": "Envoyer le message",
+    "contact_labels": {
+      "full_name": "Nom et prénom",
+      "company": "Société",
+      "email": "E-mail",
+      "message": "Message"
+    },
+    "curriculum_link": "CV",
+    "vote": "Note",
+    "project_link": "Lien"
+  },
+  "cv_menu": {
+    "title": "Menu",
+    "about": "À propos de moi",
+    "experiences": "Expérience",
+    "education": "Formation",
+    "skills": "Compétences",
+    "courses": "Cours et certifications",
+    "contact": "Me contacter"
+  },
+  "contact": {
+    "feedback_success": "Message envoyé avec succès.",
+    "feedback_error": "Une erreur est survenue lors de l'envoi du message. Veuillez réessayer plus tard."
+  },
+  "validation": {
+    "required_fields": "Veuillez remplir tous les champs avant d'envoyer.",
+    "full_name_length": "Le nom et le prénom doivent contenir entre 3 et 120 caractères.",
+    "company_length": "Le nom de la société doit contenir entre 2 et 120 caractères.",
+    "email": "Veuillez saisir une adresse e-mail valide.",
+    "message_length": "Le message doit contenir entre 10 et 2000 caractères."
+  },
+  "errors": {
+    "title": "Erreur",
+    "default_message": "Une erreur s'est produite",
+    "back_home": "Retour à la page d'accueil",
+    "client_error": "Erreur dans la requête",
+    "server_error": "Erreur interne du serveur",
+    "status_messages": {
+      "400": "Requête incorrecte",
+      "401": "Authentification requise",
+      "403": "Accès refusé",
+      "404": "Page non trouvée",
+      "405": "Méthode non autorisée",
+      "410": "Page non disponible",
+      "429": "Trop de requêtes",
+      "501": "Fonctionnalité non implémentée",
+      "502": "Mauvaise passerelle",
+      "503": "Service indisponible",
+      "504": "Délai d'attente dépassé",
+      "505": "Version HTTP non prise en charge"
+    }
+  },
+  "dates": {
+    "month_names": [
+      "janvier",
+      "février",
+      "mars",
+      "avril",
+      "mai",
+      "juin",
+      "juillet",
+      "août",
+      "septembre",
+      "octobre",
+      "novembre",
+      "décembre"
+    ],
+    "ongoing": "Présent",
+    "year": "an",
+    "years": "ans",
+    "month": "mois",
+    "months": "mois"
+  }
+}

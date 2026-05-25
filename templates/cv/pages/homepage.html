@@ -1,0 +1,17 @@
+{% extends "cv/base.html" %}
+{% block body_id %}homepage{% endblock body_id %}
+{% block aside %}
+<aside></aside>
+{% endblock aside %}
+{% block content %}
+<main id="main-content" tabindex="-1">
+  <h1>{{ first_name }} {{ last_name }}</h1>
+  <h2>{{ role }}</h2>
+  <a href="{{ language_prefix ~ '/curriculum' }}" aria-label="{{ translations.cv_homepage.curriculum_label }}">
+    <svg aria-hidden="true" focusable="false">
+      <use xlink:href="/assets/icons/cv/website/sprites.svg#right-arrow" />
+    </svg>
+    <span class="sr-only">{{ translations.cv_homepage.curriculum_action }}</span>
+  </a>
+</main>
+{% endblock content %}

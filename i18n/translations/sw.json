@@ -1,0 +1,121 @@
+{
+  "language": {
+    "code": "sw",
+    "tag": "sw-KE",
+    "meta_language": "SW",
+    "dc_language": "swa",
+    "direction": "ltr"
+  },
+  "accessibility": {
+    "skip_to_content": "Ruka hadi kwenye maudhui kuu"
+  },
+  "nav": {
+    "home": "Nyumbani",
+    "menu": "Menyu",
+    "theme_switch": "Hali ya Mwangaza/Giza",
+    "language_selector_label": "Lugha",
+    "current_language": "Lugha ya sasa"
+  },
+  "main_page": {
+    "websites": "Tovuti",
+    "contacts": "Mawasiliano",
+    "social": "Mitandao ya kijamii"
+  },
+  "cv_homepage": {
+    "curriculum_label": "CV",
+    "curriculum_action": "Fungua CV"
+  },
+  "cv_curriculum": {
+    "page_title": "CV",
+    "city_label": "Jiji:",
+    "birth_date_label": "Tarehe ya kuzaliwa:",
+    "website_label": "Tovuti:",
+    "email_label": "Barua pepe:",
+    "about_heading": "Kuhusu Mimi",
+    "experience_heading": "Uzoefu",
+    "more_experiences": "Orodha kamili ya uzoefu wa kazi inapatikana kwenye {domain}.",
+    "other_projects_heading": "Miradi Mengine",
+    "education_heading": "Elimu",
+    "skills_heading": "Ujuzi",
+    "courses_heading": "Kozi & Vyeti",
+    "courses_more_info": "Orodha kamili ya kozi na vyeti inapatikana kwenye {domain}.",
+    "course_released_by": "Imetolewa na",
+    "course_released_on": "Tarehe ya kutolewa",
+    "certificate_link": "Cheti",
+    "legal_notice": "Ninaruhusu uchakataji wa taarifa zangu binafsi zilizo kwenye CV yangu kulingana na kifungu cha 13 cha D. Lgs. 196/2003 na kifungu cha 13 cha GDPR (Kanuni ya Umoja wa Ulaya 2016/679) kwa madhumuni ya utafutaji na uteuzi wa wafanyakazi pekee.",
+    "contact_heading": "Wasiliana Nami",
+    "contact_description": "Jaza fomu ili kunitumia ujumbe moja kwa moja.",
+    "contact_submit": "Tuma ujumbe",
+    "contact_labels": {
+      "full_name": "Jina kamili",
+      "company": "Kampuni",
+      "email": "Barua pepe",
+      "message": "Ujumbe"
+    },
+    "curriculum_link": "CV",
+    "vote": "Alama",
+    "project_link": "Kiungo"
+  },
+  "cv_menu": {
+    "title": "Menyu",
+    "about": "Kuhusu Mimi",
+    "experiences": "Uzoefu",
+    "education": "Elimu",
+    "skills": "Ujuzi",
+    "courses": "Kozi & Vyeti",
+    "contact": "Mawasiliano"
+  },
+  "contact": {
+    "feedback_success": "Ujumbe umetumwa kwa mafanikio.",
+    "feedback_error": "Hitilafu imetokea wakati wa kutuma ujumbe. Tafadhali jaribu tena baadaye."
+  },
+  "validation": {
+    "required_fields": "Jaza sehemu zote kabla ya kutuma.",
+    "full_name_length": "Jina kamili linapaswa kuwa kati ya herufi 3 na 120.",
+    "company_length": "Jina la kampuni linapaswa kuwa kati ya herufi 2 na 120.",
+    "email": "Tafadhali weka anwani ya barua pepe halali.",
+    "message_length": "Ujumbe unapaswa kuwa kati ya herufi 10 na 2000."
+  },
+  "errors": {
+    "title": "Hitilafu",
+    "default_message": "Kuna kitu kimetokea",
+    "back_home": "Rudi kwenye ukurasa wa nyumbani",
+    "client_error": "Hitilafu ya ombi",
+    "server_error": "Hitilafu ya ndani ya seva",
+    "status_messages": {
+      "400": "Ombi batili",
+      "401": "Inahitaji uthibitisho",
+      "403": "Ruhusa imekataliwa",
+      "404": "Ukurasa haukupatikana",
+      "405": "Mbinu haijaruhusiwa",
+      "410": "Ukurasa haupatikani tena",
+      "429": "Maombi mengi sana",
+      "501": "Kipengele hakijatekelezwa",
+      "502": "Lango batili",
+      "503": "Huduma haipatikani",
+      "504": "Muda umeisha",
+      "505": "Toleo la HTTP halitambuliwi"
+    }
+  },
+  "dates": {
+    "month_names": [
+      "Januari",
+      "Februari",
+      "Machi",
+      "Aprili",
+      "Mei",
+      "Juni",
+      "Julai",
+      "Agosti",
+      "Septemba",
+      "Oktoba",
+      "Novemba",
+      "Desemba"
+    ],
+    "ongoing": "Sasa",
+    "year": "mwaka",
+    "years": "miaka",
+    "month": "mwezi",
+    "months": "miezi"
+  }
+}

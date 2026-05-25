@@ -1,0 +1,21 @@
+{% import "errors/macros.html" as errors %}
+{% set code = error_code | default(value="500") %}
+{% set message = error_message | default(value=translations.errors.default_message) %}
+{% set title = page_title | default(value=translations.errors.title ~ " " ~ code) %}
+
+{{ errors::document(
+  page_title=title,
+  page_url=page_url,
+  robots=robots,
+  site=site,
+  asset_version=asset_version,
+  website_main=website_main,
+  website_cv=website_cv,
+  first_name=first_name,
+  last_name=last_name,
+  code=code,
+  message=message,
+  error_code_first=error_code_first,
+  error_code_middle=error_code_middle,
+  error_code_last=error_code_last,
+) }}

@@ -1,0 +1,121 @@
+{
+  "language": {
+    "code": "ko",
+    "tag": "ko-KR",
+    "meta_language": "KO",
+    "dc_language": "kor",
+    "direction": "ltr"
+  },
+  "accessibility": {
+    "skip_to_content": "주요 콘텐츠로 건너뛰기"
+  },
+  "nav": {
+    "home": "홈",
+    "menu": "메뉴",
+    "theme_switch": "라이트/다크 모드",
+    "language_selector_label": "언어",
+    "current_language": "현재 언어"
+  },
+  "main_page": {
+    "websites": "웹사이트",
+    "contacts": "연락처",
+    "social": "소셜"
+  },
+  "cv_homepage": {
+    "curriculum_label": "이력서",
+    "curriculum_action": "이력서 보기"
+  },
+  "cv_curriculum": {
+    "page_title": "이력서",
+    "city_label": "도시:",
+    "birth_date_label": "생년월일:",
+    "website_label": "웹사이트:",
+    "email_label": "이메일:",
+    "about_heading": "소개",
+    "experience_heading": "경력",
+    "more_experiences": "전체 경력 목록은 {domain}에서 확인할 수 있습니다.",
+    "other_projects_heading": "기타 프로젝트",
+    "education_heading": "학력",
+    "skills_heading": "기술",
+    "courses_heading": "교육 과정 & 인증",
+    "courses_more_info": "전체 과정 및 인증 목록은 {domain}에서 확인할 수 있습니다.",
+    "course_released_by": "발행 기관",
+    "course_released_on": "발행 날짜",
+    "certificate_link": "인증서",
+    "legal_notice": "본인은 이력서에 포함된 개인정보가 채용 및 인재 선발 목적에 한하여, D. Lgs. 196/2003 제13조 및 GDPR (EU 규정 2016/679) 제13조에 따라 처리되는 것에 동의합니다.",
+    "contact_heading": "문의하기",
+    "contact_description": "직접 메시지를 보내려면 양식을 작성하세요.",
+    "contact_submit": "메시지 보내기",
+    "contact_labels": {
+      "full_name": "성명",
+      "company": "회사",
+      "email": "이메일",
+      "message": "메시지"
+    },
+    "curriculum_link": "이력서",
+    "vote": "성적",
+    "project_link": "링크"
+  },
+  "cv_menu": {
+    "title": "메뉴",
+    "about": "소개",
+    "experiences": "경력",
+    "education": "학력",
+    "skills": "기술",
+    "courses": "교육 과정 & 인증",
+    "contact": "연락처"
+  },
+  "contact": {
+    "feedback_success": "메시지가 성공적으로 전송되었습니다.",
+    "feedback_error": "메시지 전송 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요."
+  },
+  "validation": {
+    "required_fields": "전송하기 전에 모든 항목을 입력해주세요.",
+    "full_name_length": "성명은 3~120자 사이여야 합니다.",
+    "company_length": "회사명은 2~120자 사이여야 합니다.",
+    "email": "유효한 이메일 주소를 입력해주세요.",
+    "message_length": "메시지는 10~2000자 사이여야 합니다."
+  },
+  "errors": {
+    "title": "오류",
+    "default_message": "문제가 발생했습니다",
+    "back_home": "홈페이지로 돌아가기",
+    "client_error": "요청 오류",
+    "server_error": "서버 내부 오류",
+    "status_messages": {
+      "400": "잘못된 요청",
+      "401": "인증 필요",
+      "403": "접근 거부됨",
+      "404": "페이지를 찾을 수 없습니다",
+      "405": "허용되지 않은 메서드",
+      "410": "페이지가 더 이상 제공되지 않습니다",
+      "429": "요청이 너무 많습니다",
+      "501": "기능이 구현되지 않음",
+      "502": "잘못된 게이트웨이",
+      "503": "서비스를 사용할 수 없음",
+      "504": "응답 시간 초과",
+      "505": "지원되지 않는 HTTP 버전"
+    }
+  },
+  "dates": {
+    "month_names": [
+      "1월",
+      "2월",
+      "3월",
+      "4월",
+      "5월",
+      "6월",
+      "7월",
+      "8월",
+      "9월",
+      "10월",
+      "11월",
+      "12월"
+    ],
+    "ongoing": "현재",
+    "year": "년",
+    "years": "년",
+    "month": "개월",
+    "months": "개월"
+  }
+}

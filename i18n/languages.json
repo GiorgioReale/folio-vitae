@@ -1,0 +1,25 @@
+{
+  "language_names": {
+    "ar": "العربية",
+    "bn": "বাংলা",
+    "de": "Deutsch",
+    "en": "English",
+    "es": "Español",
+    "fr": "Français",
+    "hi": "हिन्दी",
+    "id": "Bahasa Indonesia",
+    "it": "italiano",
+    "ja": "日本語",
+    "ko": "한국어",
+    "mr": "मराठी",
+    "pt": "Português",
+    "ru": "Русский",
+    "sw": "Kiswahili",
+    "ta": "தமிழ்",
+    "te": "తెలుగు",
+    "tr": "Türkçe",
+    "ur": "اردو",
+    "vi": "Tiếng Việt",
+    "zh": "中文"
+  }
+}

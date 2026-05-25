@@ -1,0 +1,129 @@
+person:
+  # Basic personal information shown across the site.
+  first_name: Alex
+  last_name: Carter
+  role: Full Stack Developer
+  # Dates use YYYY-MM-DD.
+  date_of_birth: '1992-04-18'
+  position:
+    # Location details used in metadata and the CV.
+    locale: en_US
+    locality: Austin
+    region: Texas
+    postal_code: '78701'
+    country_name: United States
+    # These values are optional.
+    latitude: ''
+    longitude: ''
+
+sites:
+  main:
+    # Public portfolio or homepage.
+    domain: alexcarter.dev
+    title: 'Alex Carter | Full Stack Developer'
+    description: 'Portfolio and personal website of Alex Carter.'
+    keywords:
+      - developer
+      - portfolio
+      - web
+      - software
+  cv:
+    # Dedicated CV or resume website.
+    domain: cv.alexcarter.dev
+    title: 'Alex Carter | Curriculum Vitae'
+    description: 'Experience, projects, education, and skills of Alex Carter.'
+    keywords:
+      - cv
+      - resume
+      - experience
+      - skills
+    profile:
+      # Short introduction for the CV homepage.
+      summary: |
+        Full Stack Developer focused on building clear, useful, and maintainable web products.
+        I enjoy working across frontend and backend, improving developer experience, and turning
+        complex requirements into simple solutions.
+      work_experiences:
+        # Add companies in reverse chronological order.
+        - company:
+            name: BrightForge
+            location: Remote
+          roles:
+            - title: Senior Full Stack Developer
+              start_date: '2022-01-10'
+              end_date: null
+              description: |
+                Build internal tools and customer-facing features with Rust, TypeScript, and PostgreSQL.
+                Collaborate with design and product teams, review pull requests, and help keep the codebase
+                simple and reliable.
+        - company:
+            name: North Bay Studio
+            location: Austin, TX
+          roles:
+            - title: Full Stack Developer
+              start_date: '2018-06-01'
+              end_date: '2021-12-20'
+              description: |
+                Developed web applications for small businesses, improved page performance, and maintained
+                shared UI components used across multiple client projects.
+      other_projects:
+        # Optional side projects or open-source work.
+        - title: 'Starter Notes'
+          start_date: '2023-03-01'
+          end_date: null
+          description: |
+            A simple note-taking web app built to explore offline support and clean UI patterns.
+          link: https://github.com/alexcarter/starter-notes
+      educations:
+        - institute: University of Texas at Austin
+          educational_qualification: Bachelor of Science
+          course_of_study: Computer Science
+          date_start: '2010-09-01'
+          date_end: '2014-05-30'
+          vote: 'Graduated with Honors'
+          description: 'Focused on software engineering, databases, and human-computer interaction.'
+      skills:
+        # Keep this list short for a cleaner layout.
+        # Icons use names from simpleicons.org.
+        - name: Rust
+          icon: rust
+        - name: TypeScript
+          icon: typescript
+        - name: React
+          icon: react
+        - name: PostgreSQL
+          icon: postgresql
+      courses_certifications:
+        - title: 'Web Accessibility Fundamentals'
+          released_by: W3C
+          released_on: '2023-09-01'
+          link: https://www.w3.org/WAI/fundamentals/
+  additional:
+    # Optional extra websites.
+    - domain: blog.alexcarter.dev
+      title: "Alex Carter's Notes"
+      description: 'Short articles about web development and maintainable software.'
+      keywords:
+        - blog
+        - development
+        - software
+
+contact:
+  emails:
+    # Main email for the homepage.
+    main: hello@alexcarter.dev
+    # Email used in the CV area.
+    cv: work@alexcarter.dev
+    # Optional extra addresses.
+    other:
+      - speaking@alexcarter.dev
+  socials:
+    # `social_name` is also used to load the icon.
+    - social_name: github
+      social_full_name: GitHub
+      link: https://github.com/alexcarter
+      profile_nickname: alexcarter
+    - social_name: linkedin
+      social_full_name: LinkedIn
+      link: https://www.linkedin.com/in/alexcarter
+      profile_nickname: alexcarter

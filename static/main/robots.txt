@@ -1,0 +1,2 @@
+Sitemap: https://{{ domain }}/sitemap.xml
+Sitemap: http://{{ domain }}/sitemap.xml

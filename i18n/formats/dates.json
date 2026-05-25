@@ -1,0 +1,86 @@
+{
+  "ar": {
+    "short": "YYYY-MM-DD",
+    "long": "DD MMMM YYYY"
+  },
+  "bn": {
+    "short": "YYYY-MM-DD",
+    "long": "DD MMMM YYYY"
+  },
+  "de": {
+    "short": "YYYY-MM-DD",
+    "long": "DD. MMMM YYYY"
+  },
+  "en": {
+    "short": "YYYY-MM-DD",
+    "long": "MMMM DD, YYYY"
+  },
+  "es": {
+    "short": "YYYY-MM-DD",
+    "long": "DD de MMMM de YYYY"
+  },
+  "fr": {
+    "short": "YYYY-MM-DD",
+    "long": "DD MMMM YYYY"
+  },
+  "hi": {
+    "short": "YYYY-MM-DD",
+    "long": "DD MMMM YYYY"
+  },
+  "id": {
+    "short": "YYYY-MM-DD",
+    "long": "DD MMMM YYYY"
+  },
+  "it": {
+    "short": "YYYY-MM-DD",
+    "long": "DD MMMM YYYY"
+  },
+  "ja": {
+    "short": "YYYY-MM-DD",
+    "long": "DD MMMM YYYY"
+  },
+  "ko": {
+    "short": "YYYY-MM-DD",
+    "long": "DD MMMM YYYY"
+  },
+  "mr": {
+    "short": "YYYY-MM-DD",
+    "long": "DD MMMM YYYY"
+  },
+  "pt": {
+    "short": "YYYY-MM-DD",
+    "long": "DD MMMM YYYY"
+  },
+  "ru": {
+    "short": "YYYY-MM-DD",
+    "long": "DD MMMM YYYY"
+  },
+  "sw": {
+    "short": "YYYY-MM-DD",
+    "long": "DD MMMM YYYY"
+  },
+  "ta": {
+    "short": "YYYY-MM-DD",
+    "long": "DD MMMM YYYY"
+  },
+  "te": {
+    "short": "YYYY-MM-DD",
+    "long": "DD MMMM YYYY"
+  },
+  "tr": {
+    "short": "YYYY-MM-DD",
+    "long": "DD MMMM YYYY"
+  },
+  "ur": {
+    "short": "YYYY-MM-DD",
+    "long": "DD MMMM YYYY"
+  },
+  "vi": {
+    "short": "YYYY-MM-DD",
+    "long": "DD MMMM YYYY"
+  },
+  "zh": {
+    "short": "YYYY-MM-DD",
+    "long": "DD MMMM YYYY"
+  }
+}
