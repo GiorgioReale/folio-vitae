@@ -15,13 +15,13 @@ pub mod models;
 pub mod setup;
 pub mod state;
 
-#[cfg(feature = "build")]
+#[cfg(feature = "serve")]
 pub mod compression;
-#[cfg(feature = "build")]
+#[cfg(feature = "serve")]
 pub mod images;
-#[cfg(feature = "build")]
+#[cfg(feature = "serve")]
 pub mod render;
-#[cfg(feature = "build")]
+#[cfg(feature = "serve")]
 pub mod scripts;
-#[cfg(feature = "build")]
+#[cfg(feature = "serve")]
 pub mod styles;

@@ -24,7 +24,7 @@ pub enum AppError {
     #[error(transparent)]
     SerdeJson(#[from] serde_json::Error),
 
-    #[cfg(feature = "build")]
+    #[cfg(feature = "serve")]
     #[error(transparent)]
     Image(#[from] image::ImageError),
 
@@ -47,11 +47,11 @@ pub enum AppError {
     #[error(transparent)]
     Hyper(#[from] hyper::Error),
 
-    #[cfg(feature = "build")]
+    #[cfg(feature = "serve")]
     #[error(transparent)]
     Svg(#[from] resvg::usvg::Error),
 
-    #[cfg(feature = "build")]
+    #[cfg(feature = "serve")]
     #[error(transparent)]
     Grass(#[from] Box<grass::Error>),
 

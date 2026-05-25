@@ -7,21 +7,21 @@ use folio_vitae::{app::environment::Environment, load_env_file};
 #[cfg(feature = "serve")]
 use folio_vitae::{
     config::{DEFAULT_CV_PORT, DEFAULT_MAIN_PORT, ENV_CV_PORT, ENV_MAIN_PORT},
-    read_port_from_env, run_servers,
+    read_port_from_env, run_servers, run_servers_with_watch,
 };
 #[cfg(feature = "serve")]
 use folio_vitae::{logging::init_tracing, resources::ensure_runtime_assets};
 #[cfg(feature = "serve")]
 use serde::Serialize;
 #[cfg(feature = "serve")]
-use std::net::{IpAddr, Ipv4Addr, Ipv6Addr, SocketAddr};
+use std::net::{IpAddr, Ipv4Addr, SocketAddr};
 #[cfg(feature = "serve")]
 use tracing::warn;
 #[cfg(feature = "serve")]
 use tracing_subscriber::EnvFilter;
 
 #[derive(Parser)]
-#[command(author, version, about = "Generate and serve folio-vitae websites")]
+#[command(author, version, about = "Run folio-vitae websites in development or production")]
 struct Cli {
     #[command(subcommand)]
     command: Option<Commands>,
@@ -41,9 +41,31 @@ enum Commands {
         #[arg(long)]
         force: bool,
     },
-    /// Start the two websites on separate ports without file watching.
+    /// Run the two websites locally with automatic restart on file changes.
     #[cfg(feature = "serve")]
-    Start {
+    Dev {
+        /// Port for the main website server (overrides MAIN_PORT).
+        #[arg(long, value_parser = clap::value_parser!(u16))]
+        main_port: Option<u16>,
+        /// Port for the CV website server (overrides CV_PORT).
+        #[arg(long, value_parser = clap::value_parser!(u16))]
+        cv_port: Option<u16>,
+        /// Path to the environment file to load before starting.
+        #[arg(long, default_value = ".env", value_name = "PATH")]
+        env_file: String,
+        /// Host interface to bind the servers to.
+        #[arg(long, default_value = "127.0.0.1", value_parser)]
+        host: IpAddr,
+        /// Suppress non-essential output.
+        #[arg(long, conflicts_with = "json")]
+        quiet: bool,
+        /// Emit machine-readable JSON output.
+        #[arg(long, conflicts_with = "quiet")]
+        json: bool,
+    },
+    /// Run the two websites in production mode without file watching.
+    #[cfg(feature = "serve")]
+    Prod {
         /// Port for the main website server (overrides MAIN_PORT).
         #[arg(long, value_parser = clap::value_parser!(u16))]
         main_port: Option<u16>,
@@ -70,9 +92,28 @@ async fn main() -> AppResult<()> {
     match Cli::parse().command_or_default() {
         Commands::Init { force } => init_command(force),
         #[cfg(feature = "serve")]
-        Commands::Start { main_port, cv_port, env_file, host, quiet, json } => {
-            start_command(StartCommandOptions::new(
-                main_port, cv_port, env_file, host, false, quiet, json,
+        Commands::Dev { main_port, cv_port, env_file, host, quiet, json } => {
+            serve_command(ServeCommandOptions::new(
+                RuntimeMode::Development,
+                main_port,
+                cv_port,
+                env_file,
+                host,
+                quiet,
+                json,
+            ))
+            .await
+        },
+        #[cfg(feature = "serve")]
+        Commands::Prod { main_port, cv_port, env_file, host, quiet, json } => {
+            serve_command(ServeCommandOptions::new(
+                RuntimeMode::Production,
+                main_port,
+                cv_port,
+                env_file,
+                host,
+                quiet,
+                json,
             ))
             .await
         },
@@ -83,35 +124,35 @@ fn init_command(force: bool) -> AppResult<()> {
     initialize_project(force)?;
 
     println!("Initialized folio-vitae project in current directory.");
-    println!("You can now run `folio-vitae start`.");
+    println!("You can now run `folio-vitae dev`.");
 
     Ok(())
 }
 
 #[cfg(feature = "serve")]
-struct StartCommandOptions {
+struct ServeCommandOptions {
+    mode: RuntimeMode,
     main_port: Option<u16>,
     cv_port: Option<u16>,
     env_file: String,
     host: IpAddr,
-    open: bool,
     quiet: bool,
     json: bool,
 }
 
 #[cfg(feature = "serve")]
-impl StartCommandOptions {
+impl ServeCommandOptions {
     #[allow(clippy::too_many_arguments)]
     fn new(
+        mode: RuntimeMode,
         main_port: Option<u16>,
         cv_port: Option<u16>,
         env_file: String,
         host: IpAddr,
-        open: bool,
         quiet: bool,
         json: bool,
     ) -> Self {
-        Self { main_port, cv_port, env_file, host, open, quiet, json }
+        Self { mode, main_port, cv_port, env_file, host, quiet, json }
     }
 
     fn output_mode(&self) -> ServeOutputMode {
@@ -126,7 +167,7 @@ impl StartCommandOptions {
 }
 
 #[cfg(feature = "serve")]
-async fn start_command(options: StartCommandOptions) -> AppResult<()> {
+async fn serve_command(options: ServeCommandOptions) -> AppResult<()> {
     let output_mode = options.output_mode();
 
     match output_mode {
@@ -139,8 +180,7 @@ async fn start_command(options: StartCommandOptions) -> AppResult<()> {
     ensure_runtime_assets().with_context(|| "preparing embedded assets")?;
 
     load_env_file(&options.env_file)?;
-
-    let environment = Environment::detect();
+    let environment = options.mode.environment();
 
     let main_port = options
         .main_port
@@ -165,28 +205,26 @@ async fn start_command(options: StartCommandOptions) -> AppResult<()> {
 
     output.print(output_mode)?;
 
-    if options.open {
-        let open_host = match options.host {
-            IpAddr::V4(addr) if addr.is_unspecified() => IpAddr::V4(Ipv4Addr::LOCALHOST),
-            IpAddr::V6(addr) if addr.is_unspecified() => IpAddr::V6(Ipv6Addr::LOCALHOST),
-            _ => options.host,
-        };
-        let main_url = format!("http://{}", SocketAddr::new(open_host, main_port));
-        let cv_url = format!("http://{}", SocketAddr::new(open_host, cv_port));
+    match options.mode {
+        RuntimeMode::Development => {
+            run_servers_with_watch(
+                environment,
+                options.host,
+                main_port,
+                cv_port,
+                &options.env_file,
+            )
+            .await?;
+        },
+        RuntimeMode::Production => {
+            let shutdown = async {
+                tokio::signal::ctrl_c().await.with_context(|| "listening for shutdown signal")?;
+                Ok(())
+            };
 
-        for url in [main_url, cv_url] {
-            if let Err(error) = webbrowser::open(&url) {
-                warn!("Failed to open {url} in the default browser: {error}");
-            }
-        }
+            run_servers(environment, options.host, main_port, cv_port, shutdown).await?;
+        },
     }
-
-    let shutdown = async {
-        tokio::signal::ctrl_c().await.with_context(|| "listening for shutdown signal")?;
-        Ok(())
-    };
-
-    run_servers(environment, options.host, main_port, cv_port, shutdown).await?;
 
     Ok(())
 }
@@ -195,7 +233,7 @@ fn default_command() -> Commands {
     // Running the binary without a subcommand should feel useful for local development.
     #[cfg(feature = "serve")]
     {
-        Commands::Start {
+        Commands::Dev {
             main_port: None,
             cv_port: None,
             env_file: ".env".to_string(),
@@ -207,6 +245,23 @@ fn default_command() -> Commands {
     #[cfg(not(feature = "serve"))]
     {
         Commands::Init { force: false }
+    }
+}
+
+#[cfg(feature = "serve")]
+#[derive(Clone, Copy)]
+enum RuntimeMode {
+    Development,
+    Production,
+}
+
+#[cfg(feature = "serve")]
+impl RuntimeMode {
+    fn environment(self) -> Environment {
+        match self {
+            Self::Development => Environment::Development,
+            Self::Production => Environment::Production,
+        }
     }
 }
 

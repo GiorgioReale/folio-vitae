@@ -86,14 +86,6 @@ impl BuildCache {
     pub(crate) fn record_data(&mut self, data_last_modified: Option<SystemTime>) {
         self.data_last_modified = system_time_to_timestamp(data_last_modified);
     }
-
-    pub(crate) fn record_build(&mut self, snapshot: &InputSnapshot) {
-        self.last_build_inputs = Some(snapshot.clone());
-    }
-
-    pub(crate) fn last_build_matches(&self, snapshot: &InputSnapshot) -> bool {
-        self.last_build_inputs.as_ref() == Some(snapshot)
-    }
 }
 
 pub(crate) fn latest_modification<P: AsRef<Path>>(paths: &[P]) -> AppResult<Option<SystemTime>> {
