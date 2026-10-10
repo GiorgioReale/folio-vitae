@@ -38,44 +38,47 @@ pub(crate) fn build_app_states(
         .ok_or_else(|| crate::error::AppError::msg("loading default language resources"))?;
 
     let main_static =
-        compile_static_assets("static/main", SiteKind::Main, &default_resources.data)?;
-    let cv_static = compile_static_assets("static/cv", SiteKind::Cv, &default_resources.data)?;
-    let mailer = build_mailer(&default_resources.data)?;
+        Arc::new(compile_static_assets("static/main", SiteKind::Main, &default_resources.data)?);
+    let cv_static =
+        Arc::new(compile_static_assets("static/cv", SiteKind::Cv, &default_resources.data)?);
+    let mailer = build_mailer(&default_resources.data)?.map(Arc::new);
 
-    let asset_version = compute_asset_version()?;
+    let asset_version = Arc::<str>::from(compute_asset_version()?);
     let show_credits = credits_enabled_from_env();
-    let generator = format!("folio-vitae v{}", env!("CARGO_PKG_VERSION"));
+    let generator = Arc::<str>::from(format!("folio-vitae v{}", env!("CARGO_PKG_VERSION")));
 
     let shared_localization_state = Arc::new(RwLock::new(Arc::new(LocalizationState::new(
         localizations,
-        default_language.clone(),
-        supported_languages.clone(),
-        language_names.clone(),
+        default_language,
+        supported_languages,
+        language_names,
     ))));
     let data_last_modified = Arc::new(RwLock::new(data_last_modified));
 
     let shared_state = AppState {
         localization_state: shared_localization_state,
         data_last_modified,
+        localization_checked_at: Arc::new(std::sync::Mutex::new(None)),
         tera: Arc::new(tera),
         main_static,
         cv_static,
         default_site: SiteKind::Main,
         environment,
-        asset_version: asset_version.clone(),
-        generator: generator.clone(),
-        mailer: mailer.clone(),
+        asset_version,
+        generator,
+        mailer,
         show_credits,
+        cv_pdf_cache: Arc::new(RwLock::new(HashMap::new())),
     };
 
     Ok((
         AppState { default_site: SiteKind::Main, ..shared_state.clone() },
-        AppState { default_site: SiteKind::Cv, asset_version, generator, ..shared_state },
+        AppState { default_site: SiteKind::Cv, ..shared_state },
     ))
 }
 
 pub fn load_templates(_pattern: &str) -> AppResult<Tera> {
-    let mut tera = Tera::default();
+    let mut templates = Vec::new();
 
     for entry in WalkDir::new("templates")
         .into_iter()
@@ -97,9 +100,11 @@ pub fn load_templates(_pattern: &str) -> AppResult<Tera> {
 
         let contents =
             fs::read_to_string(path).with_context(|| format!("reading template {path:?}"))?;
-        tera.add_raw_template(&template_name, &contents)
-            .with_context(|| format!("loading template {template_name}"))?;
+        templates.push((template_name, contents));
     }
+
+    let mut tera = Tera::default();
+    tera.add_raw_templates(templates).with_context(|| "loading templates".to_string())?;
 
     tera.autoescape_on(vec![".html"]);
     Ok(tera)
@@ -142,5 +147,21 @@ fn credits_enabled_from_env() -> bool {
     match env::var("CREDITS") {
         Ok(value) => !value.eq_ignore_ascii_case("false"),
         Err(_) => true,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::load_templates;
+
+    #[test]
+    fn templates_and_chrome_components_load() {
+        let tera = load_templates("templates/**/*").expect("templates should load under Tera 2");
+        assert!(tera.contains_component("chrome.skip_link"));
+        assert!(tera.contains_component("chrome.site_header"));
+        assert!(tera.contains_component("chrome.site_footer"));
+        assert!(tera.contains_template("main/pages/homepage.html"));
+        assert!(tera.contains_template("cv/pages/curriculum.html"));
+        assert!(tera.contains_template("errors/error.html"));
     }
 }

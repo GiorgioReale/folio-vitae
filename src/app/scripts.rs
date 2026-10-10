@@ -35,8 +35,12 @@ pub(crate) fn process_scripts(environment: Environment) -> AppResult<()> {
 
         let source = fs::read_to_string(path).with_context(|| format!("reading {path:?}"))?;
 
-        let minified = js::minify(&source);
-        let minified = minified.to_string().into_bytes();
+        let minified = js::minify(&source)
+            .map_err(|error| {
+                crate::error::AppError::msg(format!("minifying {path:?}: {error}"))
+            })?
+            .to_string()
+            .into_bytes();
 
         let mut output_path = path.to_path_buf();
         output_path.set_extension("min.js");
