@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-10-10
+
+### Fixed
+- SMTP on port 587 now uses STARTTLS instead of implicit TLS (contact form)
+
+### CI
+- Narrower workflow triggers and clearer Docker image tag behavior
+
 ## [0.1.3] - 2026-10-10
 
 ### Added

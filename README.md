@@ -142,14 +142,14 @@ Notes:
 
 - The image runs `folio-vitae prod --host 0.0.0.0` and reads content from `/app/data`.
 - Put source images under `data/images/` when your YAML references them.
-- Pin a version in Compose (`image: ...:0.1.3`) if you do not want `latest` to move.
+- Pin a version in Compose (`image: ...:0.1.4`) if you do not want `latest` to move.
 - For a public deploy, put a reverse proxy (Caddy, Traefik, nginx) in front and point your domains at the two ports.
 - SMTP variables in `.env` enable the CV contact form.
 
 ### Image tags
 
 - `edge` and `sha-<short>` on pushes to `main` that touch image-relevant files
-- version tags (`0.1.3`, `0.1`) and `latest` on each GitHub Release
+- version tags (`0.1.4`, `0.1`) and `latest` on each GitHub Release
 - manual rebuild via Actions → Docker → Run workflow (refresh `latest` / version tags without a new app release)
 
 ### Build locally
