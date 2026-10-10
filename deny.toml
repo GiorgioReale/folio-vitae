@@ -1,7 +1,6 @@
 [advisories]
 ignore = [
     "RUSTSEC-2024-0436", # paste - no maintained alternative available currently
-    "RUSTSEC-2026-0105", # core2 - pulled in by image's AVIF encoder via ravif/rav1e; no safe upgrade is available yet
 ]
 git-fetch-with-cli = true
 
