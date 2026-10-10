@@ -148,7 +148,7 @@ Notes:
 
 ### Image tags
 
-- `latest`, `edge`, and `sha-<short>` on pushes to `main` (Dockerfile-only updates included)
+- `edge` and `sha-<short>` on pushes to `main` that touch image-relevant files
 - version tags (`0.1.3`, `0.1`) and `latest` on each GitHub Release
 - manual rebuild via Actions → Docker → Run workflow (refresh `latest` / version tags without a new app release)
 
