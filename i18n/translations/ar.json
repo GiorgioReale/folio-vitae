@@ -7,14 +7,25 @@
     "direction": "rtl"
   },
   "accessibility": {
-    "skip_to_content": "انتقال إلى المحتوى الرئيسي"
+    "skip_to_content": "انتقال إلى المحتوى الرئيسي",
+    "new_window": "يُفتح في علامة تبويب جديدة",
+    "profile": "الملف الشخصي",
+    "copyright": "حقوق النشر",
+    "love": "love",
+    "portrait": "صورة شخصية لـ {name}",
+    "required": "مطلوب"
   },
   "nav": {
     "home": "الرئيسية",
     "menu": "القائمة",
     "theme_switch": "وضع النهار/الليل",
     "language_selector_label": "اللغة",
-    "current_language": "اللغة الحالية"
+    "current_language": "اللغة الحالية",
+    "close_menu": "إغلاق القائمة",
+    "primary": "الموقع",
+    "theme_light": "السمة الفاتحة",
+    "theme_dark": "السمة الداكنة",
+    "theme_auto": "سمة النظام"
   },
   "main_page": {
     "websites": "المواقع",
@@ -54,7 +65,16 @@
     },
     "curriculum_link": "السيرة الذاتية",
     "vote": "التقدير",
-    "project_link": "رابط"
+    "project_link": "رابط",
+    "pdf_heading": "تنزيل PDF",
+    "pdf_description": "نسخة PDF من السيرة الذاتية.",
+    "pdf_action": "تنزيل PDF",
+    "contact_hints": {
+      "full_name": "بين 3 و120 حرفًا.",
+      "company": "بين 2 و120 حرفًا.",
+      "email": "أدخل بريدًا إلكترونيًا صالحًا، مثل name@example.com.",
+      "message": "بين 10 و2000 حرف."
+    }
   },
   "cv_menu": {
     "title": "القائمة",
@@ -63,7 +83,8 @@
     "education": "التعليم",
     "skills": "المهارات",
     "courses": "الدورات والشهادات",
-    "contact": "الاتصال"
+    "contact": "الاتصال",
+    "download": "تنزيل PDF"
   },
   "contact": {
     "feedback_success": "تم إرسال الرسالة بنجاح.",
@@ -74,7 +95,11 @@
     "full_name_length": "يجب أن يتراوح الاسم الكامل بين 3 و120 حرفًا.",
     "company_length": "يجب أن يتراوح اسم الشركة بين 2 و120 حرفًا.",
     "email": "يرجى إدخال بريد إلكتروني صالح.",
-    "message_length": "يجب أن تتراوح الرسالة بين 10 و2000 حرفًا."
+    "message_length": "يجب أن تتراوح الرسالة بين 10 و2000 حرفًا.",
+    "full_name_required": "أدخل اسمك الكامل.",
+    "company_required": "أدخل اسم الشركة.",
+    "email_required": "أدخل بريدك الإلكتروني.",
+    "message_required": "أدخل رسالة."
   },
   "errors": {
     "title": "خطأ",
@@ -116,6 +141,7 @@
     "year": "سنة",
     "years": "سنوات",
     "month": "شهر",
-    "months": "أشهر"
+    "months": "أشهر",
+    "and": "و"
   }
 }

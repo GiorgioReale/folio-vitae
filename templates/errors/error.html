@@ -1,21 +1,98 @@
-{% import "errors/macros.html" as errors %}
 {% set code = error_code | default(value="500") %}
 {% set message = error_message | default(value=translations.errors.default_message) %}
-{% set title = page_title | default(value=translations.errors.title ~ " " ~ code) %}
+{% set resolved_page_title = page_title | default(value=translations.errors.title ~ " " ~ code) %}
+{% set resolved_page_url = page_url | default(value="/") %}
+{% set resolved_robots = robots | default(value="noindex,nofollow") %}
+{% set website = website_main %}
+{% set base_domain = website_main.domain %}
+{% set stylesheet = "/assets/styles/main.css?v=" ~ asset_version %}
+{% set sprite_prefix = "/assets/icons/main/website/sprites.svg#" %}
+{% set social_card_path = "/assets/images/main/social-card/social-card.png" %}
+{% if site == "cv" %}
+{% set website = website_cv %}
+{% set base_domain = website_cv.domain %}
+{% set stylesheet = "/assets/styles/cv.css?v=" ~ asset_version %}
+{% set sprite_prefix = "/assets/icons/cv/website/sprites.svg#" %}
+{% set social_card_path = "/assets/images/cv/social-card/social-card.png" %}
+{% endif %}
+{% set twitter_handle = "" %}
+{% for social in socials %}
+{% if social.social_name == 'twitter' or social.social_name == 'x' %}
+{% set_global twitter_handle = social.profile_nickname | replace(from='@', to='') %}
+{% endif %}
+{% endfor %}
+<!DOCTYPE html>
+<html dir="{{ language_direction }}" lang="{{ language_tag }}">
 
-{{ errors::document(
-  page_title=title,
-  page_url=page_url,
-  robots=robots,
-  site=site,
-  asset_version=asset_version,
-  website_main=website_main,
-  website_cv=website_cv,
-  first_name=first_name,
-  last_name=last_name,
-  code=code,
-  message=message,
-  error_code_first=error_code_first,
-  error_code_middle=error_code_middle,
-  error_code_last=error_code_last,
-) }}
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="generator" content="{{ generator }}" />
+  <meta name="title" content="{{ resolved_page_title }} · {{ website.title }}" />
+  <meta name="description" content="{{ website.description }}" />
+  <meta name="keywords" content="{{ first_name }} {{ last_name }}" />
+  <meta name="copyright" content="{{ first_name }} {{ last_name }}" />
+  <meta name="language" content="{{ meta_language }}" />
+  <meta name="dc.language" content="{{ dc_language }}" />
+  <meta http-equiv="content-language" content="{{ meta_language }}" />
+  <meta name="robots" content="{{ resolved_robots }}" />
+  <meta property="og:title" content="{{ resolved_page_title }} · {{ website.title }}" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://{{ base_domain }}{{ resolved_page_url }}" />
+  <meta property="og:image" content="https://{{ base_domain }}{{ social_card_path }}" />
+  <meta property="og:image:alt" content="Social card del sito di {{ first_name }} {{ last_name }}" />
+  <meta property="og:image:type" content="image/png" />
+  <meta property="og:image:width" content="1920" />
+  <meta property="og:image:height" content="1080" />
+  <meta property="og:site_name" content="{{ website.title }}" />
+  <meta property="og:description" content="{{ website.description }}" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:url" content="https://{{ base_domain }}{{ resolved_page_url }}" />
+  <meta name="twitter:title" content="{{ resolved_page_title }} · {{ website.title }}" />
+  <meta name="twitter:description" content="{{ website.description }}" />
+  <meta name="twitter:image" content="https://{{ base_domain }}{{ social_card_path }}" />
+  <meta name="twitter:image:alt" content="Social card del sito di {{ first_name }} {{ last_name }}" />
+  <meta name="twitter:creator" content="@{{ twitter_handle }}" />
+  <title>{{ resolved_page_title }} · {{ website.title }}</title>
+  <link rel="canonical" href="https://{{ base_domain }}{{ resolved_page_url }}" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/{{ site }}/logos/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/{{ site }}/logos/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/{{ site }}/logos/favicon-16x16.png" />
+  <link rel="icon" type="image/svg+xml" href="/assets/icons/{{ site }}/logos/favicon.svg" />
+  <link rel="manifest" href="/site.webmanifest" />
+  <meta name="apple-mobile-web-app-title" content="{{ website.title }}" />
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#000000" />
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000" />
+  <meta name="view-transition" content="same-origin" />
+  <link rel="preload" href="{{ stylesheet }}" as="style" />
+  <link rel="stylesheet" href="{{ stylesheet }}" type="text/css" fetchpriority="high" />
+</head>
+
+<body id="errors">
+  {{ <chrome.skip_link /> }}
+  <div class="page-shell">
+    {{ <chrome.site_header site={site} /> }}
+    <main id="main-content" tabindex="-1">
+      <h1>{{ translations.errors.title }} <span class="sr-only">{{ code }}</span></h1>
+      <p class="error-code" aria-hidden="true">{{ error_code_first }}<span>{{ error_code_middle }}</span>{{ error_code_last }}</p>
+      <p>{{ message }}</p>
+      <a href="{{ language_prefix ~ '/' }}">{{ translations.errors.back_home }}</a>
+    </main>
+    {{ <chrome.site_footer site={site} /> }}
+  </div>
+  {% if minify_assets %}
+  <script src="/assets/scripts/light-dark-mode.min.js?v={{ asset_version }}" charset="utf-8" data-sprite-prefix="{{ sprite_prefix }}"></script>
+  {% if site == "cv" %}
+  <script src="/assets/scripts/cv/open-close-menu.min.js?v={{ asset_version }}" charset="utf-8"></script>
+  {% endif %}
+  {% else %}
+  <script src="/assets/scripts/light-dark-mode.js?v={{ asset_version }}" charset="utf-8" data-sprite-prefix="{{ sprite_prefix }}"></script>
+  {% if site == "cv" %}
+  <script src="/assets/scripts/cv/open-close-menu.js?v={{ asset_version }}" charset="utf-8"></script>
+  {% endif %}
+  {% endif %}
+</body>
+
+</html>

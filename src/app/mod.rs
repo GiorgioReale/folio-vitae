@@ -20,6 +20,8 @@ pub mod compression;
 #[cfg(feature = "serve")]
 pub mod images;
 #[cfg(feature = "serve")]
+pub mod pdf;
+#[cfg(feature = "serve")]
 pub mod render;
 #[cfg(feature = "serve")]
 pub mod scripts;

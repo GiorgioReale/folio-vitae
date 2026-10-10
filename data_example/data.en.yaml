@@ -1,129 +1,294 @@
+# English content for folio-vitae.
+#
+# `folio-vitae init` copies this file to data/data.en.yaml.
+# Add one file per language, named data/data.<code>.yaml (for example data/data.it.yaml).
+#
+# How to edit
+# - Dates are calendar days, written YYYY-MM-DD and quoted.
+# - Lists appear in the order written. Put the newest item first.
+# - An end date of null, or a missing end date, means the item is still current.
+#   The page prints the localized "Present" label. 9999-12-31 does the same.
+# - A `>-` block folds wrapped lines into one paragraph. A blank line starts
+#   a new paragraph in the PDF. The HTML page keeps the summary in a single paragraph.
+# - Optional text can be left out or set to an empty string.
+# - Unknown keys are rejected. Use only the fields shown here.
+# - At least one of sites.main.domain and sites.cv.domain is required.
+#   contact.emails.main is required too.
+
+# Identity shared by every page: name, role, age, and place.
 person:
-  # Basic personal information shown across the site.
   first_name: Alex
   last_name: Carter
-  role: Full Stack Developer
-  # Dates use YYYY-MM-DD.
+  # Job title under the name on the CV, and in the PDF header.
+  role: Senior Full Stack Developer
   date_of_birth: '1992-04-18'
+
+  # Place metadata. locality is the city printed on the CV.
+  # The other fields become Open Graph tags when they are not empty.
+  # locale uses the language_REGION form, such as en_US or it_IT.
   position:
-    # Location details used in metadata and the CV.
     locale: en_US
     locality: Austin
     region: Texas
     postal_code: '78701'
     country_name: United States
-    # These values are optional.
-    latitude: ''
-    longitude: ''
+    latitude: '30.2672'
+    longitude: '-97.7431'
 
+# The two generated sites, plus any other sites to link from the homepage.
 sites:
+  # Public homepage. domain is the hostname, without https:// or a trailing slash.
   main:
-    # Public portfolio or homepage.
     domain: alexcarter.dev
-    title: 'Alex Carter | Full Stack Developer'
-    description: 'Portfolio and personal website of Alex Carter.'
+    title: 'Alex Carter | Senior Full Stack Developer'
+    description: >-
+      Personal site of Alex Carter, a full stack developer based in Austin.
+      Notes, talks, and links to the CV.
+    # Stored with the site. The homepage keywords tag currently prints only the name.
     keywords:
-      - developer
-      - portfolio
-      - web
-      - software
+      - Alex Carter
+      - full stack developer
+      - software engineer
+      - Austin
+
+  # CV site. profile below is the resume itself.
   cv:
-    # Dedicated CV or resume website.
     domain: cv.alexcarter.dev
     title: 'Alex Carter | Curriculum Vitae'
-    description: 'Experience, projects, education, and skills of Alex Carter.'
+    description: >-
+      Experience, selected projects, education, and skills of Alex Carter,
+      senior full stack developer.
+    # Appended after the full name in the CV keywords meta tag.
     keywords:
-      - cv
-      - resume
-      - experience
-      - skills
+      - senior full stack developer
+      - Rust
+      - TypeScript
+      - React
+      - PostgreSQL
+      - distributed systems
+      - web performance
+      - Austin
+
     profile:
-      # Short introduction for the CV homepage.
-      summary: |
-        Full Stack Developer focused on building clear, useful, and maintainable web products.
-        I enjoy working across frontend and backend, improving developer experience, and turning
-        complex requirements into simple solutions.
+      # Opening section of the CV and the PDF. Two or three short paragraphs is enough.
+      summary: >-
+        Senior full stack developer focused on products that stay fast and
+        understandable as they grow. I work across TypeScript frontends, Rust
+        and Node services, and PostgreSQL, and I care as much about the release
+        path as about the feature itself.
+
+        Recent work has been internal platforms and customer-facing tools:
+        replacing a legacy admin suite, cutting p95 API latency, and giving a
+        small team a deploy pipeline they trust. I review design with product
+        and design partners, and I leave code easier to change than I found it.
+
+      # One entry per company. Roles inside a company are newest first.
+      # The printed CV adds a "more on the website" line after four companies.
       work_experiences:
-        # Add companies in reverse chronological order.
         - company:
             name: BrightForge
             location: Remote
           roles:
             - title: Senior Full Stack Developer
-              start_date: '2022-01-10'
+              start_date: '2023-03-01'
+              # null: this role is current.
               end_date: null
-              description: |
-                Build internal tools and customer-facing features with Rust, TypeScript, and PostgreSQL.
-                Collaborate with design and product teams, review pull requests, and help keep the codebase
-                simple and reliable.
+              description: >-
+                Lead development of the customer admin platform used by support
+                and success teams. Rebuilt the busiest workflows in React and
+                TypeScript, moved write paths to a Rust service backed by
+                PostgreSQL, and brought p95 latency on those endpoints from
+                about 800 ms to under 200 ms.
+
+                Pair with product on scope, review most of the team's pull
+                requests, and keep the deploy pipeline (Docker, GitHub Actions)
+                small enough that a new teammate can ship in the first week.
+
+            - title: Full Stack Developer
+              start_date: '2021-02-15'
+              end_date: '2023-02-28'
+              description: >-
+                Shipped the first version of the billing and account tools on
+                a TypeScript and PostgreSQL stack. Introduced shared UI
+                components, request-level tracing, and a migration path off
+                the previous PHP admin app.
+
         - company:
-            name: North Bay Studio
-            location: Austin, TX
+            name: Northline Studio
+            location: Austin, Texas
           roles:
             - title: Full Stack Developer
               start_date: '2018-06-01'
-              end_date: '2021-12-20'
-              description: |
-                Developed web applications for small businesses, improved page performance, and maintained
-                shared UI components used across multiple client projects.
+              end_date: '2021-01-29'
+              description: >-
+                Built client web apps and a shared component library used
+                across about a dozen projects. Owned frontend performance
+                budgets, accessibility fixes, and the Node APIs behind the
+                marketing sites.
+
+                Mentored two junior developers and ran the weekly release for
+                the studio's largest account.
+
+        - company:
+            name: Harbor & Co.
+            location: Austin, Texas
+          roles:
+            - title: Web Developer
+              start_date: '2016-01-11'
+              end_date: '2018-05-18'
+              description: >-
+                Delivered brochure sites and small custom features for local
+                businesses with HTML, CSS, PHP, and MySQL. Set up the studio's
+                first staging environment and a basic backup routine.
+
+      # Side projects, open source, talks, or freelance work.
+      # link is optional, but the CV prints an anchor for every project, so use a full URL.
       other_projects:
-        # Optional side projects or open-source work.
-        - title: 'Starter Notes'
-          start_date: '2023-03-01'
+        - title: Starter Notes
+          start_date: '2023-09-01'
           end_date: null
-          description: |
-            A simple note-taking web app built to explore offline support and clean UI patterns.
+          description: >-
+            A small note-taking web app for trying offline-first sync and a
+            keyboard-only editing flow. The client is React; the sync API is Rust.
           link: https://github.com/alexcarter/starter-notes
+
+        - title: Ledgerline
+          start_date: '2022-04-01'
+          end_date: '2022-11-30'
+          description: >-
+            Open-source importer that turns bank CSV exports into double-entry
+            ledger files. Used as a weekend project to learn strict parsing and
+            property tests.
+          link: https://github.com/alexcarter/ledgerline
+
+        - title: Civic Atlas
+          start_date: '2019-01-07'
+          end_date: '2019-06-14'
+          description: >-
+            Volunteer rebuild of a neighborhood association site: static pages,
+            an events calendar, and a contact form, with no tracking scripts.
+          link: https://github.com/alexcarter/civic-atlas
+
+      # Newest program first. vote is optional; leave it out when there is no grade to show.
+      # date_end null means the program is still in progress.
       educations:
+        - institute: University of Texas at Austin
+          educational_qualification: Master of Science
+          course_of_study: Information Studies
+          date_start: '2014-08-25'
+          date_end: '2016-05-20'
+          vote: '3.9 / 4.0'
+          description: >-
+            Coursework in data management, human-computer interaction, and
+            information architecture. Capstone on making public-records search
+            usable for non-specialists.
+
         - institute: University of Texas at Austin
           educational_qualification: Bachelor of Science
           course_of_study: Computer Science
-          date_start: '2010-09-01'
-          date_end: '2014-05-30'
-          vote: 'Graduated with Honors'
-          description: 'Focused on software engineering, databases, and human-computer interaction.'
+          date_start: '2010-08-23'
+          date_end: '2014-05-17'
+          description: >-
+            Software engineering, databases, and operating systems. Teaching
+            assistant for the introductory programming course in the final year.
+
+      # name is the accessible label. icon is a Simple Icons slug
+      # (https://simpleicons.org) and must match exactly, for example nextdotjs.
+      # The CV shows the icon; the name is read by screen readers. A short list
+      # keeps the row from wrapping into a wall of logos.
       skills:
-        # Keep this list short for a cleaner layout.
-        # Icons use names from simpleicons.org.
         - name: Rust
           icon: rust
         - name: TypeScript
           icon: typescript
         - name: React
           icon: react
+        - name: Next.js
+          icon: nextdotjs
+        - name: Node.js
+          icon: nodedotjs
         - name: PostgreSQL
           icon: postgresql
+        - name: Docker
+          icon: docker
+        - name: Linux
+          icon: linux
+
+      # Courses and certificates, newest first.
+      # The printed CV adds a "more on the website" line after four entries.
+      # link is printed for every entry, so point it at the credential or the course page.
       courses_certifications:
-        - title: 'Web Accessibility Fundamentals'
+        - title: Web Accessibility Fundamentals
           released_by: W3C
-          released_on: '2023-09-01'
+          released_on: '2024-02-12'
           link: https://www.w3.org/WAI/fundamentals/
+
+        - title: Rust Fundamentals
+          released_by: Rust Foundation training partners
+          released_on: '2023-06-03'
+          link: https://www.rust-lang.org/learn
+
+        - title: PostgreSQL for Developers
+          released_by: PostgreSQL community workshops
+          released_on: '2021-10-18'
+          link: https://www.postgresql.org/docs/
+
+  # Extra hostnames listed on the homepage, after the CV link.
+  # Each entry needs a domain. title, description, and keywords are stored with it
+  # and are not required for that homepage list.
   additional:
-    # Optional extra websites.
-    - domain: blog.alexcarter.dev
-      title: "Alex Carter's Notes"
-      description: 'Short articles about web development and maintainable software.'
+    - domain: notes.alexcarter.dev
+      title: Field Notes
+      description: Short articles on maintainable web software and release hygiene.
       keywords:
         - blog
-        - development
         - software
+        - engineering notes
+    - domain: talks.alexcarter.dev
+      title: Talks
+      description: Slides and write-ups from local meetups.
+      keywords:
+        - talks
+        - slides
+        - meetups
 
+# Addresses and profiles. The homepage lists every email and every social.
+# The CV uses contact.emails.cv, falling back to contact.emails.main when cv is empty.
 contact:
   emails:
-    # Main email for the homepage.
     main: hello@alexcarter.dev
-    # Email used in the CV area.
     cv: work@alexcarter.dev
-    # Optional extra addresses.
     other:
       - speaking@alexcarter.dev
+      - press@alexcarter.dev
+
+  # social_name selects the icon and must be a lowercase Simple Icons slug.
+  # linkedin is the exception: it uses the icon shipped with the templates.
+  # The CV sidebar shows only linkedin, github, gitlab, and stackoverflow.
+  # The homepage shows the full list.
+  # profile_nickname is the visible handle. link is the full profile URL.
   socials:
-    # `social_name` is also used to load the icon.
-    - social_name: github
-      social_full_name: GitHub
-      link: https://github.com/alexcarter
-      profile_nickname: alexcarter
     - social_name: linkedin
       social_full_name: LinkedIn
       link: https://www.linkedin.com/in/alexcarter
       profile_nickname: alexcarter
+    - social_name: github
+      social_full_name: GitHub
+      link: https://github.com/alexcarter
+      profile_nickname: alexcarter
+    - social_name: gitlab
+      social_full_name: GitLab
+      link: https://gitlab.com/alexcarter
+      profile_nickname: alexcarter
+    - social_name: stackoverflow
+      social_full_name: Stack Overflow
+      link: https://stackoverflow.com/users/0000000/alexcarter
+      profile_nickname: alexcarter
+    - social_name: mastodon
+      social_full_name: Mastodon
+      link: https://mastodon.social/@alexcarter
+      profile_nickname: '@alexcarter@mastodon.social'
+    - social_name: bluesky
+      social_full_name: Bluesky
+      link: https://bsky.app/profile/alexcarter.dev
+      profile_nickname: '@alexcarter.dev'

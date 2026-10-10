@@ -43,28 +43,54 @@
     window.matchMedia("(prefers-color-scheme: dark)").matches
       ? "dark"
       : "light";
-  const applyTheme = (theme, iconButtonThemeSwitch) => {
+  const setIcon = (icon, name) => {
+    if (!icon) {
+      return;
+    }
+    const value = `${spritePrefix}${name}`;
+    icon.setAttribute("href", value);
+    icon.setAttribute("xlink:href", value);
+  };
+  const themeStatus = () => document.querySelector("[data-theme-status]");
+  const describeTheme = (theme, button, announce) => {
+    if (!button) {
+      return;
+    }
+    const stateLabel =
+      theme === "dark"
+        ? button.dataset.themeDark
+        : theme === "light"
+          ? button.dataset.themeLight
+          : button.dataset.themeAuto;
+    const name = button.querySelector("[data-theme-name]");
+    if (name && button.dataset.themeAction && stateLabel) {
+      name.textContent = `${button.dataset.themeAction}: ${stateLabel}`;
+    }
+    if (!announce) {
+      return;
+    }
+    const status = themeStatus();
+    if (status && stateLabel) {
+      status.textContent = stateLabel;
+    }
+  };
+  const applyTheme = (theme, iconButtonThemeSwitch, button, announce) => {
     switch (theme) {
       case "dark":
         document.documentElement.setAttribute("data-theme", "dark");
-        iconButtonThemeSwitch?.setAttribute(
-          "xlink:href",
-          `${spritePrefix}moon`
-        );
+        setIcon(iconButtonThemeSwitch, "moon");
         break;
       case "light":
         document.documentElement.setAttribute("data-theme", "light");
-        iconButtonThemeSwitch?.setAttribute("xlink:href", `${spritePrefix}sun`);
+        setIcon(iconButtonThemeSwitch, "sun");
         break;
       default: {
         const preferredTheme = getPreferredTheme();
         document.documentElement.setAttribute("data-theme", preferredTheme);
-        iconButtonThemeSwitch?.setAttribute(
-          "xlink:href",
-          `${spritePrefix}moon-auto`
-        );
+        setIcon(iconButtonThemeSwitch, "moon-auto");
       }
     }
+    describeTheme(theme, button, announce);
   };
   const getInitialTheme = () => {
     const cookieTheme = getThemeCookie();
@@ -74,13 +100,13 @@
     return "auto";
   };
   let currentTheme = "auto";
-  const syncThemeWithCookie = (iconButtonThemeSwitch) => {
+  const syncThemeWithCookie = (iconButtonThemeSwitch, button) => {
     const storedTheme = getThemeCookie();
     if (!storedTheme || storedTheme === currentTheme) {
       return;
     }
     currentTheme = storedTheme;
-    applyTheme(currentTheme, iconButtonThemeSwitch);
+    applyTheme(currentTheme, iconButtonThemeSwitch, button, false);
   };
   document.addEventListener("DOMContentLoaded", () => {
     const buttonThemeSwitch = document.querySelector("#theme-switch");
@@ -89,41 +115,43 @@
       return;
     }
     const audioThemeSwitch = new Audio("/assets/audios/light-switch.mp3");
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     currentTheme = getInitialTheme();
     if (!getThemeCookie()) {
       setThemeCookie(currentTheme);
     }
-    applyTheme(currentTheme, iconButtonThemeSwitch);
+    applyTheme(currentTheme, iconButtonThemeSwitch, buttonThemeSwitch, false);
     window
       .matchMedia("(prefers-color-scheme: dark)")
       .addEventListener("change", () => {
         if (currentTheme === "auto") {
-          applyTheme(currentTheme, iconButtonThemeSwitch);
+          applyTheme(currentTheme, iconButtonThemeSwitch, buttonThemeSwitch, false);
         }
       });
     buttonThemeSwitch.addEventListener("click", (event) => {
       event.preventDefault();
-      switch (iconButtonThemeSwitch.getAttribute("xlink:href")) {
-        case `${spritePrefix}moon-auto`:
+      switch (currentTheme) {
+        case "auto":
           currentTheme = "light";
           break;
-        case `${spritePrefix}sun`:
+        case "light":
           currentTheme = "dark";
           break;
-        case `${spritePrefix}moon`:
+        default:
           currentTheme = "auto";
-          break;
       }
       setThemeCookie(currentTheme);
-      applyTheme(currentTheme, iconButtonThemeSwitch);
-      audioThemeSwitch.play();
+      applyTheme(currentTheme, iconButtonThemeSwitch, buttonThemeSwitch, true);
+      if (!reducedMotion.matches) {
+        audioThemeSwitch.play().catch(() => {});
+      }
     });
     const syncInterval = window.setInterval(() => {
-      syncThemeWithCookie(iconButtonThemeSwitch);
+      syncThemeWithCookie(iconButtonThemeSwitch, buttonThemeSwitch);
     }, 2000);
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") {
-        syncThemeWithCookie(iconButtonThemeSwitch);
+        syncThemeWithCookie(iconButtonThemeSwitch, buttonThemeSwitch);
       }
     });
     window.addEventListener("beforeunload", () => {

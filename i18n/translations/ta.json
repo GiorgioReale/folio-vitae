@@ -7,14 +7,25 @@
     "direction": "ltr"
   },
   "accessibility": {
-    "skip_to_content": "முதன்மை உள்ளடக்கத்திற்குச் செல்லவும்"
+    "skip_to_content": "முதன்மை உள்ளடக்கத்திற்குச் செல்லவும்",
+    "new_window": "புதிய தாவலில் திறக்கும்",
+    "profile": "சுயவிவரம்",
+    "copyright": "பதிப்புரிமை",
+    "love": "love",
+    "portrait": "{name} உருவப்படம்",
+    "required": "கட்டாயம்"
   },
   "nav": {
     "home": "முகப்பு",
     "menu": "பட்டி",
     "theme_switch": "ஒளிர்வு / இருள் நிலை",
     "language_selector_label": "மொழி",
-    "current_language": "தற்போதைய மொழி"
+    "current_language": "தற்போதைய மொழி",
+    "close_menu": "பட்டியலை மூடு",
+    "primary": "தளம்",
+    "theme_light": "ஒளி தீம்",
+    "theme_dark": "இருள் தீம்",
+    "theme_auto": "கணினி தீம்"
   },
   "main_page": {
     "websites": "வலைத்தளங்கள்",
@@ -54,7 +65,16 @@
     },
     "curriculum_link": "சிவி",
     "vote": "மதிப்பெண்",
-    "project_link": "இணைப்பு"
+    "project_link": "இணைப்பு",
+    "pdf_heading": "PDF பதிவிறக்கம்",
+    "pdf_description": "சிவியின் ஒரு PDF நகல்.",
+    "pdf_action": "PDF பதிவிறக்கம்",
+    "contact_hints": {
+      "full_name": "3 முதல் 120 எழுத்துகள்.",
+      "company": "2 முதல் 120 எழுத்துகள்.",
+      "email": "சரியான மின்னஞ்சலை உள்ளிடவும், எ.கா. name@example.com.",
+      "message": "10 முதல் 2000 எழுத்துகள்."
+    }
   },
   "cv_menu": {
     "title": "பட்டி",
@@ -63,7 +83,8 @@
     "education": "கல்வி",
     "skills": "திறன்கள்",
     "courses": "பாடநெறிகள் & சான்றிதழ்கள்",
-    "contact": "தொடர்பு"
+    "contact": "தொடர்பு",
+    "download": "PDF பதிவிறக்கம்"
   },
   "contact": {
     "feedback_success": "செய்தி வெற்றிகரமாக அனுப்பப்பட்டது.",
@@ -74,7 +95,11 @@
     "full_name_length": "முழுப் பெயர் 3 முதல் 120 எழுத்துகள் வரை இருக்க வேண்டும்.",
     "company_length": "நிறுவனத்தின் பெயர் 2 முதல் 120 எழுத்துகள் வரை இருக்க வேண்டும்.",
     "email": "சரியான மின்னஞ்சல் முகவரியை உள்ளிடவும்.",
-    "message_length": "செய்தி 10 முதல் 2000 எழுத்துகள் வரை இருக்க வேண்டும்."
+    "message_length": "செய்தி 10 முதல் 2000 எழுத்துகள் வரை இருக்க வேண்டும்.",
+    "full_name_required": "முழு பெயரை உள்ளிடவும்.",
+    "company_required": "நிறுவனத்தின் பெயரை உள்ளிடவும்.",
+    "email_required": "மின்னஞ்சலை உள்ளிடவும்.",
+    "message_required": "செய்தியை உள்ளிடவும்."
   },
   "errors": {
     "title": "பிழை",
@@ -116,6 +141,7 @@
     "year": "ஆண்டு",
     "years": "ஆண்டுகள்",
     "month": "மாதம்",
-    "months": "மாதங்கள்"
+    "months": "மாதங்கள்",
+    "and": "மற்றும்"
   }
 }

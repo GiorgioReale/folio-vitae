@@ -1,9 +1,12 @@
+use std::sync::Arc;
+
 use axum::{
     Form,
+    body::Bytes,
     extract::State,
     http::{
-        HeaderMap, StatusCode, Uri,
-        header::{CONTENT_TYPE, HOST, ORIGIN},
+        HeaderMap, HeaderValue, StatusCode, Uri,
+        header::{CACHE_CONTROL, CONTENT_DISPOSITION, CONTENT_TYPE, HOST, ORIGIN},
     },
     response::{Html, IntoResponse, Redirect, Response},
 };
@@ -12,12 +15,12 @@ use tracing::error;
 
 use crate::app::{
     email::CvContactPayload,
-    localization::Translations,
+    localization::{Language, Translations},
     render::{
         ContactFeedback, CvContactFormContext, render_cv_curriculum, render_cv_homepage,
-        render_cv_menu, render_error, render_main_homepage,
+        render_cv_menu, render_cv_pdf, render_error, render_main_homepage,
     },
-    state::{AppState, SiteKind},
+    state::{AppState, SiteKind, SitePage},
 };
 
 pub(crate) async fn homepage(
@@ -25,6 +28,10 @@ pub(crate) async fn homepage(
     headers: HeaderMap,
     uri: Uri,
 ) -> Response {
+    if let Some(response) = reject_unknown_page(&state, &headers, &uri, SitePage::Home) {
+        return response;
+    }
+
     if let Some(redirect) = redirect_missing_language(&state, &uri) {
         return redirect;
     }
@@ -55,6 +62,10 @@ pub(crate) async fn curriculum(
     headers: HeaderMap,
     uri: Uri,
 ) -> Response {
+    if let Some(response) = reject_unknown_page(&state, &headers, &uri, SitePage::Curriculum) {
+        return response;
+    }
+
     if let Some(redirect) = redirect_missing_language(&state, &uri) {
         return redirect;
     }
@@ -83,7 +94,99 @@ pub(crate) async fn curriculum(
         .unwrap_or_else(|status| status.into_response())
 }
 
+pub(crate) async fn curriculum_pdf(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    uri: Uri,
+) -> Response {
+    if let Some(response) = reject_unknown_page(&state, &headers, &uri, SitePage::CurriculumPdf) {
+        return response;
+    }
+
+    if let Some(redirect) = redirect_missing_language(&state, &uri) {
+        return redirect;
+    }
+
+    let (language, _, _) = state.language_from_path(uri.path());
+
+    let Some(site) = site_from_host(&headers, &state) else {
+        return site_not_available(&state, uri.path(), &language);
+    };
+
+    if site != SiteKind::Cv {
+        return render_error(&state, SiteKind::Main, StatusCode::NOT_FOUND, uri.path(), &language)
+            .map(|html| (StatusCode::NOT_FOUND, Html(html)).into_response())
+            .unwrap_or_else(|status| status.into_response());
+    }
+
+    if !state.language_has_site(&language, SiteKind::Cv) {
+        return render_error(&state, SiteKind::Cv, StatusCode::NOT_FOUND, uri.path(), &language)
+            .map(|html| (StatusCode::NOT_FOUND, Html(html)).into_response())
+            .unwrap_or_else(|status| status.into_response());
+    }
+
+    if let Some(bytes) = state.cached_cv_pdf(&language) {
+        return pdf_response(&state, &language, bytes);
+    }
+
+    let render_state = state.clone();
+    let render_language = language.clone();
+    let bytes =
+        match tokio::task::spawn_blocking(move || render_cv_pdf(&render_state, &render_language))
+            .await
+        {
+            Ok(Ok(bytes)) => Arc::new(bytes),
+            Ok(Err(status)) => return status.into_response(),
+            Err(error) => {
+                error!(error = %error, "pdf render task failed");
+                return StatusCode::INTERNAL_SERVER_ERROR.into_response();
+            },
+        };
+    state.store_cv_pdf(language.clone(), Arc::clone(&bytes));
+    pdf_response(&state, &language, bytes)
+}
+
+fn pdf_response(state: &AppState, language: &Language, bytes: Arc<Vec<u8>>) -> Response {
+    let disposition = match state.resources_for(language) {
+        Ok(resources) => crate::app::pdf::content_disposition(
+            &resources.data.person.first_name,
+            &resources.data.person.last_name,
+        ),
+        Err(error) => {
+            error!(error = ?error, "Failed to load the CV name for the PDF filename");
+            "attachment; filename=\"cv.pdf\"".to_string()
+        },
+    };
+    let disposition = HeaderValue::from_str(&disposition)
+        .unwrap_or_else(|_| HeaderValue::from_static("attachment; filename=\"cv.pdf\""));
+
+    (
+        [
+            (CONTENT_TYPE, HeaderValue::from_static("application/pdf")),
+            (CONTENT_DISPOSITION, disposition),
+            (CACHE_CONTROL, HeaderValue::from_static("private, no-cache")),
+        ],
+        Bytes::from_owner(SharedBytes(bytes)),
+    )
+        .into_response()
+}
+
+struct SharedBytes<T>(T);
+
+impl AsRef<[u8]> for SharedBytes<Arc<Vec<u8>>> {
+    fn as_ref(&self) -> &[u8] {
+        self.0.as_slice()
+    }
+}
+
+impl AsRef<[u8]> for SharedBytes<Arc<str>> {
+    fn as_ref(&self) -> &[u8] {
+        self.0.as_bytes()
+    }
+}
+
 #[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct CvContactForm {
     #[serde(rename = "full-name")]
     full_name: String,
@@ -107,6 +210,10 @@ pub(crate) async fn contact_cv(
     uri: Uri,
     Form(form): Form<CvContactForm>,
 ) -> Response {
+    if let Some(response) = reject_unknown_page(&state, &headers, &uri, SitePage::Contact) {
+        return response;
+    }
+
     if let Some(redirect) = redirect_missing_language(&state, &uri) {
         return redirect;
     }
@@ -150,10 +257,10 @@ pub(crate) async fn contact_cv(
 
     if let Some(error_feedback) = validate_form(&form_data, &translations) {
         let context = CvContactFormContext {
-            full_name: form_data.full_name.value.clone(),
-            company: form_data.company.value.clone(),
-            email: form_data.email.value.clone(),
-            message: form_data.message.value.clone(),
+            full_name: form_data.full_name.value,
+            company: form_data.company.value,
+            email: form_data.email.value,
+            message: form_data.message.value,
             feedback: Some(error_feedback),
         };
 
@@ -163,10 +270,10 @@ pub(crate) async fn contact_cv(
     }
 
     let payload = CvContactPayload {
-        full_name: form_data.full_name.value.clone(),
-        company: form_data.company.value.clone(),
-        email: form_data.email.value.clone(),
-        message: form_data.message.value.clone(),
+        full_name: &form_data.full_name.value,
+        company: &form_data.company.value,
+        email: &form_data.email.value,
+        message: &form_data.message.value,
     };
 
     let mailer = match &state.mailer {
@@ -192,6 +299,7 @@ pub(crate) async fn contact_cv(
                 message: translations
                     .get_str(&["contact", "feedback_success"])
                     .unwrap_or_else(|| "Message sent successfully.".to_string()),
+                field: None,
             },
         ),
         Err(error) => {
@@ -206,6 +314,7 @@ pub(crate) async fn contact_cv(
                                 .to_string()
                         },
                     ),
+                    field: None,
                 },
             )
         },
@@ -225,6 +334,10 @@ pub(crate) async fn contact_cv(
 }
 
 pub(crate) async fn menu(State(state): State<AppState>, headers: HeaderMap, uri: Uri) -> Response {
+    if let Some(response) = reject_unknown_page(&state, &headers, &uri, SitePage::Menu) {
+        return response;
+    }
+
     if let Some(redirect) = redirect_missing_language(&state, &uri) {
         return redirect;
     }
@@ -268,7 +381,11 @@ pub(crate) async fn robots(
         SiteKind::Cv => &state.cv_static.robots,
     };
 
-    ([(CONTENT_TYPE, "text/plain; charset=utf-8")], body.clone()).into_response()
+    (
+        [(CONTENT_TYPE, "text/plain; charset=utf-8")],
+        Bytes::from_owner(SharedBytes(Arc::clone(body))),
+    )
+        .into_response()
 }
 
 pub(crate) async fn sitemap(
@@ -286,7 +403,11 @@ pub(crate) async fn sitemap(
         SiteKind::Cv => &state.cv_static.sitemap,
     };
 
-    ([(CONTENT_TYPE, "application/xml; charset=utf-8")], body.clone()).into_response()
+    (
+        [(CONTENT_TYPE, "application/xml; charset=utf-8")],
+        Bytes::from_owner(SharedBytes(Arc::clone(body))),
+    )
+        .into_response()
 }
 
 pub(crate) async fn manifest(
@@ -304,7 +425,11 @@ pub(crate) async fn manifest(
         SiteKind::Cv => &state.cv_static.manifest,
     };
 
-    ([(CONTENT_TYPE, "application/manifest+json")], body.clone()).into_response()
+    (
+        [(CONTENT_TYPE, "application/manifest+json")],
+        Bytes::from_owner(SharedBytes(Arc::clone(body))),
+    )
+        .into_response()
 }
 
 pub(crate) async fn security_txt(
@@ -322,7 +447,11 @@ pub(crate) async fn security_txt(
         SiteKind::Cv => &state.cv_static.security_txt,
     };
 
-    ([(CONTENT_TYPE, "text/plain; charset=utf-8")], body.clone()).into_response()
+    (
+        [(CONTENT_TYPE, "text/plain; charset=utf-8")],
+        Bytes::from_owner(SharedBytes(Arc::clone(body))),
+    )
+        .into_response()
 }
 
 pub(crate) async fn not_found(
@@ -334,12 +463,28 @@ pub(crate) async fn not_found(
         return redirect;
     }
 
-    let (language, _, _) = state.language_from_path(uri.path());
+    not_found_response(&state, &headers, uri.path())
+}
 
-    let site = site_from_host(&headers, &state).or_else(|| fallback_site(&state));
+fn reject_unknown_page(
+    state: &AppState,
+    headers: &HeaderMap,
+    uri: &Uri,
+    page: SitePage,
+) -> Option<Response> {
+    if state.path_matches_page(uri.path(), page) {
+        return None;
+    }
+
+    Some(not_found_response(state, headers, uri.path()))
+}
+
+fn not_found_response(state: &AppState, headers: &HeaderMap, path: &str) -> Response {
+    let (language, _, _) = state.language_from_path(path);
+    let site = site_from_host(headers, state).or_else(|| fallback_site(state));
 
     match site {
-        Some(site) => render_error(&state, site, StatusCode::NOT_FOUND, uri.path(), &language)
+        Some(site) => render_error(state, site, StatusCode::NOT_FOUND, path, &language)
             .map(|html| (StatusCode::NOT_FOUND, Html(html)).into_response())
             .unwrap_or_else(|status| status.into_response()),
         None => StatusCode::NOT_FOUND.into_response(),
@@ -366,54 +511,90 @@ fn normalize_field(value: &str, max_len: usize) -> NormalizedField {
     NormalizedField { value, len }
 }
 
+fn field_feedback(
+    translations: &Translations,
+    field: &str,
+    key: &str,
+    fallback: &str,
+) -> ContactFeedback {
+    ContactFeedback {
+        status: "error".to_string(),
+        message: translations.get_str(&["validation", key]).unwrap_or_else(|| fallback.to_string()),
+        field: Some(field.to_string()),
+    }
+}
+
 fn validate_form(form: &FormData, translations: &Translations) -> Option<ContactFeedback> {
-    if form.full_name.value.is_empty()
-        || form.company.value.is_empty()
-        || form.email.value.is_empty()
-        || form.message.value.is_empty()
-    {
-        return Some(ContactFeedback {
-            status: "error".to_string(),
-            message: translations
-                .get_str(&["validation", "required_fields"])
-                .unwrap_or_else(|| "Please complete all fields before submitting.".to_string()),
-        });
+    if form.full_name.value.is_empty() {
+        return Some(field_feedback(
+            translations,
+            "full-name",
+            "full_name_required",
+            "Enter your full name.",
+        ));
     }
 
     if !(FULL_NAME_MIN..=FULL_NAME_MAX).contains(&form.full_name.len) {
-        return Some(ContactFeedback {
-            status: "error".to_string(),
-            message: translations
-                .get_str(&["validation", "full_name_length"])
-                .unwrap_or_else(|| "Full name must be between 3 and 120 characters.".to_string()),
-        });
+        return Some(field_feedback(
+            translations,
+            "full-name",
+            "full_name_length",
+            "Full name must be between 3 and 120 characters.",
+        ));
+    }
+
+    if form.company.value.is_empty() {
+        return Some(field_feedback(
+            translations,
+            "company",
+            "company_required",
+            "Enter the company name.",
+        ));
     }
 
     if !(COMPANY_MIN..=COMPANY_MAX).contains(&form.company.len) {
-        return Some(ContactFeedback {
-            status: "error".to_string(),
-            message: translations.get_str(&["validation", "company_length"]).unwrap_or_else(|| {
-                "Company name must be between 2 and 120 characters.".to_string()
-            }),
-        });
+        return Some(field_feedback(
+            translations,
+            "company",
+            "company_length",
+            "Company name must be between 2 and 120 characters.",
+        ));
+    }
+
+    if form.email.value.is_empty() {
+        return Some(field_feedback(
+            translations,
+            "email",
+            "email_required",
+            "Enter your email address.",
+        ));
     }
 
     if !(EMAIL_MIN..=EMAIL_MAX).contains(&form.email.len) || !email_is_valid(&form.email.value) {
-        return Some(ContactFeedback {
-            status: "error".to_string(),
-            message: translations
-                .get_str(&["validation", "email"])
-                .unwrap_or_else(|| "Please enter a valid email address.".to_string()),
-        });
+        return Some(field_feedback(
+            translations,
+            "email",
+            "email",
+            "Please enter a valid email address.",
+        ));
+    }
+
+    if form.message.value.is_empty() {
+        return Some(field_feedback(
+            translations,
+            "message",
+            "message_required",
+            "Enter a message.",
+        ));
     }
 
     if !(MESSAGE_MIN..=MESSAGE_MAX).contains(&form.message.len) {
-        return Some(ContactFeedback {
-            status: "error".to_string(),
-            message: translations
-                .get_str(&["validation", "message_length"])
-                .unwrap_or_else(|| "Message must be between 10 and 2000 characters.".to_string()),
-        });
+        return Some(field_feedback(
+            translations,
+            "message",
+            "message_length",
+            "Message must be between 10 and 2000 characters.",
+        ));
     }
 
     None
@@ -445,22 +626,22 @@ fn site_from_host(headers: &HeaderMap, state: &AppState) -> Option<SiteKind> {
     let host = headers
         .get(HOST)
         .and_then(|value| value.to_str().ok())
-        .unwrap_or_default()
-        .to_ascii_lowercase()
-        .split(':')
-        .next()
-        .unwrap_or_default()
-        .to_string();
+        .and_then(|value| value.split(':').next())
+        .unwrap_or_default();
 
-    if snapshot.cv_available && snapshot.cv_domains.contains(&host) {
+    if snapshot.cv_available && domain_list_contains(&snapshot.cv_domains, host) {
         return Some(SiteKind::Cv);
     }
 
-    if snapshot.main_available && snapshot.main_domains.contains(&host) {
+    if snapshot.main_available && domain_list_contains(&snapshot.main_domains, host) {
         return Some(SiteKind::Main);
     }
 
     fallback_site(state)
+}
+
+fn domain_list_contains(domains: &[String], host: &str) -> bool {
+    !host.is_empty() && domains.iter().any(|domain| domain.eq_ignore_ascii_case(host))
 }
 
 fn request_origin_is_allowed(headers: &HeaderMap, state: &AppState) -> bool {
@@ -575,10 +756,27 @@ mod tests {
     }
 
     #[test]
+    fn mixed_case_host_matches_configured_domain() {
+        let headers = headers_with("CV.Example.com:8081", "https://cv.example.com");
+
+        assert!(request_origin_is_allowed(&headers, &app_state()));
+        assert_eq!(site_from_host(&headers, &app_state()), Some(SiteKind::Cv));
+    }
+
+    #[test]
     fn cross_site_origin_is_rejected() {
         let headers = headers_with("cv.example.com", "https://attacker.example");
 
         assert!(!request_origin_is_allowed(&headers, &app_state()));
+    }
+
+    fn empty_static_assets() -> StaticAssets {
+        StaticAssets {
+            robots: Arc::from(""),
+            sitemap: Arc::from(""),
+            manifest: Arc::from(""),
+            security_txt: Arc::from(""),
+        }
     }
 
     fn headers_with(host: &str, origin: &str) -> HeaderMap {
@@ -600,25 +798,17 @@ mod tests {
         let mut state = AppState {
             localization_state: Arc::new(RwLock::new(localization_state)),
             data_last_modified: Arc::new(RwLock::new(None)),
+            localization_checked_at: Arc::new(std::sync::Mutex::new(None)),
             tera: Arc::new(Tera::default()),
-            main_static: StaticAssets {
-                robots: String::new(),
-                sitemap: String::new(),
-                manifest: String::new(),
-                security_txt: String::new(),
-            },
-            cv_static: StaticAssets {
-                robots: String::new(),
-                sitemap: String::new(),
-                manifest: String::new(),
-                security_txt: String::new(),
-            },
+            main_static: Arc::new(empty_static_assets()),
+            cv_static: Arc::new(empty_static_assets()),
             default_site: SiteKind::Cv,
             environment: Environment::Production,
-            asset_version: String::new(),
-            generator: String::new(),
+            asset_version: Arc::from(""),
+            generator: Arc::from(""),
             mailer: None,
             show_credits: true,
+            cv_pdf_cache: Arc::new(RwLock::new(std::collections::HashMap::new())),
         };
 
         let localization_state = Arc::new(LocalizationState {

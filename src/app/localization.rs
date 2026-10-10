@@ -1,4 +1,4 @@
-use std::{collections::HashMap, env, fs, io::ErrorKind, sync::Arc, time::SystemTime};
+use std::{collections::HashMap, env, fs, io::ErrorKind, path::Path, sync::Arc, time::SystemTime};
 
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use serde_json::Value;
@@ -141,19 +141,11 @@ mod tests {
             Some(vec![" January ".to_string(), "February".to_string()])
         );
         assert_eq!(translations.ongoing_label(), Some(" Ongoing ".to_string()));
-        assert_eq!(
-            translations.duration_labels(),
-            Some((
-                "year".to_string(),
-                "years".to_string(),
-                "month".to_string(),
-                "months".to_string()
-            ))
-        );
-        assert_eq!(translations.language_tag(), Some("en-US".to_string()));
-        assert_eq!(translations.meta_language(), Some("English".to_string()));
-        assert_eq!(translations.dc_language(), Some("en".to_string()));
-        assert_eq!(translations.language_direction(), Some("rtl".to_string()));
+        assert_eq!(translations.duration_labels(), Some(("year", "years", "month", "months")));
+        assert_eq!(translations.language_tag(), Some("en-US"));
+        assert_eq!(translations.meta_language(), Some("English"));
+        assert_eq!(translations.dc_language(), Some("en"));
+        assert_eq!(translations.language_direction(), Some("rtl"));
     }
 }
 
@@ -198,34 +190,31 @@ impl Translations {
         self.get_str(&["dates", "ongoing"])
     }
 
-    pub(crate) fn duration_labels(&self) -> Option<(String, String, String, String)> {
+    pub(crate) fn duration_labels(&self) -> Option<(&str, &str, &str, &str)> {
         Some((
-            self.get_str(&["dates", "year"])?.trim().to_string(),
-            self.get_str(&["dates", "years"])?.trim().to_string(),
-            self.get_str(&["dates", "month"])?.trim().to_string(),
-            self.get_str(&["dates", "months"])?.trim().to_string(),
+            self.navigate(&["dates", "year"])?.as_str()?.trim(),
+            self.navigate(&["dates", "years"])?.as_str()?.trim(),
+            self.navigate(&["dates", "month"])?.as_str()?.trim(),
+            self.navigate(&["dates", "months"])?.as_str()?.trim(),
         ))
     }
 
-    pub(crate) fn language_tag(&self) -> Option<String> {
-        self.get_str(&["language", "tag"])
+    pub(crate) fn language_tag(&self) -> Option<&str> {
+        self.navigate(&["language", "tag"]).and_then(Value::as_str)
     }
 
-    pub(crate) fn meta_language(&self) -> Option<String> {
-        self.get_str(&["language", "meta_language"])
+    pub(crate) fn meta_language(&self) -> Option<&str> {
+        self.navigate(&["language", "meta_language"]).and_then(Value::as_str)
     }
 
-    pub(crate) fn dc_language(&self) -> Option<String> {
-        self.get_str(&["language", "dc_language"])
+    pub(crate) fn dc_language(&self) -> Option<&str> {
+        self.navigate(&["language", "dc_language"]).and_then(Value::as_str)
     }
 
-    pub(crate) fn language_direction(&self) -> Option<String> {
-        self.get_str(&["language", "direction"]).map(|direction| {
-            match direction.to_lowercase().as_str() {
-                "rtl" => "rtl".to_string(),
-                _ => "ltr".to_string(),
-            }
-        })
+    pub(crate) fn language_direction(&self) -> Option<&'static str> {
+        let direction = self.navigate(&["language", "direction"])?.as_str()?;
+
+        Some(if direction.eq_ignore_ascii_case("rtl") { "rtl" } else { "ltr" })
     }
 }
 
@@ -291,13 +280,8 @@ pub(crate) fn detect_languages_with_last_change() -> AppResult<(Vec<Language>, O
             Err(_) => continue,
         };
 
-        if !entry.path().is_file() {
-            continue;
-        }
-
-        let Some(name) =
-            entry.path().file_name().and_then(|name| name.to_str().map(str::to_string))
-        else {
+        let file_name = entry.file_name();
+        let Some(name) = file_name.to_str() else {
             continue;
         };
 
@@ -308,6 +292,11 @@ pub(crate) fn detect_languages_with_last_change() -> AppResult<(Vec<Language>, O
         let stripped = name.trim_start_matches("data.").trim_end_matches(".yaml");
 
         if stripped.is_empty() || stripped == "yaml" || stripped == "yaml.example" {
+            continue;
+        }
+
+        let path = entry.path();
+        if !path.is_file() {
             continue;
         }
 
@@ -330,18 +319,17 @@ pub(crate) fn detect_languages_with_last_change() -> AppResult<(Vec<Language>, O
 }
 
 pub(crate) fn load_localizations(languages: &[Language]) -> AppResult<Localizations> {
-    let mut localizations = HashMap::new();
+    let mut localizations = HashMap::with_capacity(languages.len());
     let date_formats = load_date_formats().unwrap_or_default();
     let data_directory = data_dir();
 
     for language in languages {
-        let data_path =
-            data_directory.join(format!("data.{}.yaml", language.as_code())).display().to_string();
+        let data_path = data_directory.join(format!("data.{}.yaml", language.as_code()));
         let translations_path = format!("i18n/translations/{}.json", language.as_code());
 
         let data_contents = read_language_file(&data_path, language, "data")?;
         let translations_contents =
-            read_language_file(&translations_path, language, "translations")?;
+            read_language_file(Path::new(&translations_path), language, "translations")?;
 
         let data = parse_site_data(&data_contents, &data_path)?;
         let translations_value: Value =
@@ -369,7 +357,7 @@ pub(crate) fn load_language_names(languages: &[Language]) -> AppResult<HashMap<L
 
     let list: LanguageList = parse_json_with_path(&list_contents, list_path)?;
 
-    let mut names = HashMap::new();
+    let mut names = HashMap::with_capacity(languages.len());
 
     for language in languages {
         if let Some(name) = list.language_names.get(language) {
@@ -382,19 +370,23 @@ pub(crate) fn load_language_names(languages: &[Language]) -> AppResult<HashMap<L
     Ok(names)
 }
 
-fn read_language_file(path: &str, language: &Language, label: &str) -> AppResult<String> {
+fn read_language_file(path: &Path, language: &Language, label: &str) -> AppResult<String> {
     match fs::read_to_string(path) {
         Ok(contents) => Ok(contents),
         Err(error) if error.kind() == ErrorKind::NotFound => Err(AppError::msg(format!(
-            "Unsupported language '{}': missing {label} file at {path}",
-            language.as_code()
+            "Unsupported language '{}': missing {label} file at {}",
+            language.as_code(),
+            path.display()
         ))),
-        Err(error) => Err(AppError::from(error).with_context(format!("reading {path}"))),
+        Err(error) => {
+            Err(AppError::from(error).with_context(format!("reading {}", path.display())))
+        },
     }
 }
 
-fn parse_site_data(contents: &str, path: &str) -> AppResult<SiteData> {
-    let data: SiteData = parse_yaml_with_path(contents, path)?;
+fn parse_site_data(contents: &str, path: &Path) -> AppResult<SiteData> {
+    let path_label = path.display().to_string();
+    let data: SiteData = parse_yaml_with_path(contents, &path_label)?;
 
     let mut errors = data.validate();
     errors.extend(unknown_site_data_fields(contents)?);
@@ -402,7 +394,7 @@ fn parse_site_data(contents: &str, path: &str) -> AppResult<SiteData> {
     if errors.is_empty() {
         Ok(data)
     } else {
-        let mut message = format!("Invalid configuration in {path}:");
+        let mut message = format!("Invalid configuration in {path_label}:");
         for error in errors {
             message.push_str(&format!("\n- {error}"));
         }
@@ -411,7 +403,7 @@ fn parse_site_data(contents: &str, path: &str) -> AppResult<SiteData> {
 }
 
 fn parse_yaml_with_path<T: DeserializeOwned>(contents: &str, path: &str) -> AppResult<T> {
-    let deserializer = serde_yaml::Deserializer::from_str(contents);
+    let deserializer = serde_norway::Deserializer::from_str(contents);
     match serde_path_to_error::deserialize(deserializer) {
         Ok(value) => Ok(value),
         Err(error) => Err(AppError::msg(format_yaml_error(path, &error))),
@@ -426,7 +418,10 @@ fn parse_json_with_path<T: DeserializeOwned>(contents: &str, path: &str) -> AppR
     }
 }
 
-fn format_yaml_error(path: &str, error: &serde_path_to_error::Error<serde_yaml::Error>) -> String {
+fn format_yaml_error(
+    path: &str,
+    error: &serde_path_to_error::Error<serde_norway::Error>,
+) -> String {
     let mut message = format!("Invalid {path}: {}", error.inner());
     if let Some(location) = error.inner().location() {
         message.push_str(&format!(" at line {}, column {}", location.line(), location.column()));
@@ -451,8 +446,8 @@ fn format_json_error(path: &str, error: &serde_path_to_error::Error<serde_json::
 
 fn unknown_site_data_fields(contents: &str) -> AppResult<Vec<String>> {
     let mut unknown_paths = Vec::new();
-    let deserializer = serde_yaml::Deserializer::from_str(contents);
-    let result: Result<SiteData, serde_yaml::Error> =
+    let deserializer = serde_norway::Deserializer::from_str(contents);
+    let result: Result<SiteData, serde_norway::Error> =
         serde_ignored::deserialize(deserializer, |path| {
             unknown_paths.push(path.to_string());
         });

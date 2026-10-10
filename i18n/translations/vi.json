@@ -7,14 +7,25 @@
     "direction": "ltr"
   },
   "accessibility": {
-    "skip_to_content": "Chuyển đến nội dung chính"
+    "skip_to_content": "Chuyển đến nội dung chính",
+    "new_window": "Mở trong tab mới",
+    "profile": "Hồ sơ",
+    "copyright": "Bản quyền",
+    "love": "love",
+    "portrait": "Chân dung của {name}",
+    "required": "bắt buộc"
   },
   "nav": {
     "home": "Trang chủ",
     "menu": "Menu",
     "theme_switch": "Chế độ Sáng/Tối",
     "language_selector_label": "Ngôn ngữ",
-    "current_language": "Ngôn ngữ hiện tại"
+    "current_language": "Ngôn ngữ hiện tại",
+    "close_menu": "Đóng menu",
+    "primary": "Trang",
+    "theme_light": "Giao diện sáng",
+    "theme_dark": "Giao diện tối",
+    "theme_auto": "Giao diện hệ thống"
   },
   "main_page": {
     "websites": "Trang web",
@@ -54,7 +65,16 @@
     },
     "curriculum_link": "CV",
     "vote": "Điểm",
-    "project_link": "Liên kết"
+    "project_link": "Liên kết",
+    "pdf_heading": "Tải PDF",
+    "pdf_description": "Một bản PDF của CV.",
+    "pdf_action": "Tải PDF",
+    "contact_hints": {
+      "full_name": "Từ 3 đến 120 ký tự.",
+      "company": "Từ 2 đến 120 ký tự.",
+      "email": "Nhập email hợp lệ, ví dụ name@example.com.",
+      "message": "Từ 10 đến 2000 ký tự."
+    }
   },
   "cv_menu": {
     "title": "Menu",
@@ -63,7 +83,8 @@
     "education": "Học vấn",
     "skills": "Kỹ năng",
     "courses": "Khóa học & Chứng chỉ",
-    "contact": "Liên hệ"
+    "contact": "Liên hệ",
+    "download": "Tải PDF"
   },
   "contact": {
     "feedback_success": "Gửi tin nhắn thành công.",
@@ -74,7 +95,11 @@
     "full_name_length": "Họ và tên phải từ 3 đến 120 ký tự.",
     "company_length": "Tên công ty phải từ 2 đến 120 ký tự.",
     "email": "Vui lòng nhập địa chỉ e-mail hợp lệ.",
-    "message_length": "Tin nhắn phải từ 10 đến 2000 ký tự."
+    "message_length": "Tin nhắn phải từ 10 đến 2000 ký tự.",
+    "full_name_required": "Nhập họ và tên.",
+    "company_required": "Nhập tên công ty.",
+    "email_required": "Nhập email của bạn.",
+    "message_required": "Nhập nội dung tin nhắn."
   },
   "errors": {
     "title": "Lỗi",
@@ -116,6 +141,7 @@
     "year": "năm",
     "years": "năm",
     "month": "tháng",
-    "months": "tháng"
+    "months": "tháng",
+    "and": "và"
   }
 }

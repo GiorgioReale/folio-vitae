@@ -2,7 +2,7 @@
 name = "folio-vitae"
 version = "0.1.1"
 edition = "2024"
-rust-version = "1.88.0"
+rust-version = "1.89.0"
 publish = true
 authors = ["Giorgio Reale <info@giorgioreale.xyz>"]
 description = "A simple tool to generate a personal website and online CV."
@@ -55,32 +55,35 @@ serve = [
   "dep:resvg",
   "dep:axum",
   "dep:hyper",
+  "dep:printpdf",
   "dep:tower",
   "dep:tower-http",
+  "dep:skrifa",
+  "dep:wuff",
 ]
 smtp = ["dep:lettre"]
 
 [dependencies]
 axum = { version = "0.8", optional = true }
 chrono = { version = "0.4", features = ["clock"] }
-clap = { version = "4.5", features = ["derive"] }
+clap = { version = "4.6", features = ["derive"] }
 grass = { version = "0.13", optional = true }
-http = "1.4"
+http = "1.5"
 include_dir = "0.7"
-minifier = { version = "0.3", default-features = false, features = ["html"], optional = true }
+minifier = { version = "0.4", default-features = false, features = ["html"], optional = true }
 
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-serde_yaml = "0.9"
+serde_norway = "0.9"
 serde_ignored = "0.1"
 serde_path_to_error = "0.1"
 strsim = "0.11"
 webbrowser = "1.2"
 
 simpleicons-rs = "16"
-tera = { version = "1.20", features = ["chrono"] }
+tera = "2.4"
 
-tokio = { version = "1.50", features = [
+tokio = { version = "1.53", features = [
   "macros",
   "net",
   "rt-multi-thread",
@@ -90,7 +93,7 @@ tokio = { version = "1.50", features = [
 ] }
 
 tower = { version = "0.5", optional = true }
-tower-http = { version = "0.6", optional = true, features = [
+tower-http = { version = "0.7", optional = true, features = [
   "compression-full",
   "fs",
   "limit",
@@ -102,7 +105,7 @@ dotenvy = "0.15"
 sha2 = "0.11"
 flate2 = "1.1"
 
-lettre = { version = "0.11.22", default-features = false, features = [
+lettre = { version = "0.11.23", default-features = false, features = [
   "builder",
   "smtp-transport",
   "tokio1-rustls",
@@ -111,19 +114,42 @@ lettre = { version = "0.11.22", default-features = false, features = [
 ], optional = true }
 
 image = { version = "0.25", features = ["ico"], optional = true }
-fast_image_resize = { version = "6.0", optional = true }
+fast_image_resize = { version = "6.1", optional = true }
 
-resvg = { version = "0.47", optional = true }
+resvg = { version = "0.48", optional = true }
 ico = { version = "0.5", optional = true }
 
-hyper = { version = "1.10", optional = true }
+hyper = { version = "1.12", optional = true }
+printpdf = { version = "0.12", default-features = false, features = [
+  "images",
+  "jpeg",
+  "png",
+], optional = true }
 thiserror = "2.0"
+skrifa = { version = "0.48", optional = true }
+wuff = { version = "0.2", default-features = false, features = ["brotli"], optional = true }
 
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+strip = "symbols"
+
+[profile.bench]
+inherits = "release"
+debug = true
+strip = false
+
+# Dependencies stay optimized so `cargo run` and tests spend time in this crate,
+# not in debug builds of tera, image, and tokio.
+[profile.dev.package."*"]
+opt-level = 3
 
 [dev-dependencies]
 assert_cmd = "2"
 assert_fs = "1"
 predicates = "3"
-insta = { version = "1.47", features = ["glob"] }
+insta = { version = "1.49", features = ["glob"] }

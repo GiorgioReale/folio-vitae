@@ -1,10 +1,10 @@
 {% extends "main/base.html" %}
 {% block body_id %}homepage{% endblock body_id %}
 {% block aside %}
-<aside>
+<aside class="profile" aria-label="{{ translations.accessibility.profile }}">
   <picture>
     <source srcset="/assets/images/main/profile-pictures/profile-picture.avif" type="image/avif"/>
-    <img src="/assets/images/main/profile-pictures/profile-picture.jpg" alt="{{ first_name }} {{ last_name }}" width="512" height="512" fetchpriority="high" decoding="async" importance="high"/>
+    <img src="/assets/images/main/profile-pictures/profile-picture.jpg" alt="{{ translations.accessibility.portrait | replace(from='{name}', to=first_name ~ ' ' ~ last_name) }}" width="512" height="512" fetchpriority="high" decoding="async"/>
   </picture>
   <h1>{{ first_name }} {{ last_name }}</h1>
 </aside>
@@ -14,33 +14,46 @@
 <main id="main-content" tabindex="-1">
   {% set has_additional_websites = websites | length > 0 %}
   {% if has_website_cv or has_additional_websites %}
-  <h4>{{ translations.main_page.websites }}</h4>
-  {% if has_website_cv %}
-  <a href="https://{{ website_cv.domain }}/" target="_blank" rel="noopener noreferrer">{{ website_cv.domain }}</a>{% if has_additional_websites %}, {% endif %}
-  {% endif %}
-  {% for website in websites %}
-  <a href="https://{{ website.domain }}/" target="_blank" rel="noopener noreferrer">{{ website.domain }}</a>{% if not loop.last %}, {% endif %}
-  {% endfor %}
-  {% endif %}
-  <h4>{{ translations.main_page.contacts }}</h4>
-  <a href="mailto:{{ email_main }}">{{ email_main }}</a>, <a href="mailto:{{ email_cv }}">{{ email_cv }}</a>{% if emails | length > 0 %}, {% endif %}
-  {% for email in emails %}
-  <a href="mailto:{{ email }}">{{ email }}</a>{% if not loop.last %}, {% endif %}
-  {% endfor %}
-  <h4>{{ translations.main_page.social }}</h4>
-  <div class="social">
-    {% for social in socials %}
-    <a href="{{ social.link }}" target="_blank" rel="noopener noreferrer" aria-label="{{ social.social_full_name }}" title="{{ social.social_full_name }}" class="{{ social.social_name }}">
-      {% if social.social_name == 'linkedin' %}
-      <svg aria-hidden="true" focusable="false">
-        <use href="/assets/icons/main/website/sprites.svg#linkedin"></use>
-      </svg>
-      {% else %}
-      {{ social.icon_svg | default(value="") | safe }}
+  <section aria-labelledby="websites-heading">
+    <h2 id="websites-heading">{{ translations.main_page.websites }}</h2>
+    <ul class="inline-list">
+      {% if has_website_cv %}
+      <li><a href="https://{{ website_cv.domain }}/" target="_blank" rel="noopener noreferrer">{{ website_cv.domain }}<span class="sr-only"> ({{ translations.accessibility.new_window }})</span></a></li>
       {% endif %}
-      {{ social.profile_nickname }}
-    </a>
-    {% endfor %}
-  </div>
+      {% for website in websites %}
+      <li><a href="https://{{ website.domain }}/" target="_blank" rel="noopener noreferrer">{{ website.domain }}<span class="sr-only"> ({{ translations.accessibility.new_window }})</span></a></li>
+      {% endfor %}
+    </ul>
+  </section>
+  {% endif %}
+  <section aria-labelledby="contacts-heading">
+    <h2 id="contacts-heading">{{ translations.main_page.contacts }}</h2>
+    <ul class="inline-list">
+      <li><a href="mailto:{{ email_main }}">{{ email_main }}</a></li>
+      <li><a href="mailto:{{ email_cv }}">{{ email_cv }}</a></li>
+      {% for email in emails %}
+      <li><a href="mailto:{{ email }}">{{ email }}</a></li>
+      {% endfor %}
+    </ul>
+  </section>
+  <section aria-labelledby="social-heading">
+    <h2 id="social-heading">{{ translations.main_page.social }}</h2>
+    <ul class="social">
+      {% for social in socials %}
+      <li>
+        <a href="{{ social.link }}" target="_blank" rel="noopener noreferrer" class="{{ social.social_name }}">
+          {% if social.social_name == 'linkedin' %}
+          <svg aria-hidden="true" focusable="false">
+            <use href="/assets/icons/main/website/sprites.svg#linkedin"></use>
+          </svg>
+          {% else %}
+          <span aria-hidden="true">{{ social.icon_svg | default(value="") | safe }}</span>
+          {% endif %}
+          <span class="sr-only">{{ social.social_full_name }}: </span>{{ social.profile_nickname }}<span class="sr-only"> ({{ translations.accessibility.new_window }})</span>
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </section>
 </main>
 {% endblock content %}

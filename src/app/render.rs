@@ -1,9 +1,12 @@
+use std::borrow::Cow;
+
 use chrono::{Datelike, NaiveDate, Utc};
 use http::StatusCode;
 use minifier::html;
 use serde::Serialize;
 use simpleicons_rs;
 use tera::Context;
+use tracing::error;
 
 use crate::app::{
     localization::{Language, Translations},
@@ -15,7 +18,9 @@ pub(crate) fn render_main_homepage(
     language: &Language,
     request_path: &str,
 ) -> Result<String, StatusCode> {
-    let mut context = base_context(state, language, request_path, SiteKind::Main)?;
+    let resources =
+        load_resources(state, language, "failed to load resources for the main homepage")?;
+    let mut context = base_context(state, &resources, language, request_path, SiteKind::Main);
     context.insert("page_url", request_path);
     context.insert("robots", "index,follow");
     render_template(state, "main/pages/homepage.html", context)
@@ -26,7 +31,9 @@ pub(crate) fn render_cv_homepage(
     language: &Language,
     request_path: &str,
 ) -> Result<String, StatusCode> {
-    let mut context = base_context(state, language, request_path, SiteKind::Cv)?;
+    let resources =
+        load_resources(state, language, "failed to load resources for the CV homepage")?;
+    let mut context = base_context(state, &resources, language, request_path, SiteKind::Cv);
     context.insert("page_url", request_path);
     context.insert("robots", "index,follow");
     render_template(state, "cv/pages/homepage.html", context)
@@ -38,20 +45,12 @@ pub(crate) fn render_cv_curriculum(
     language: &Language,
     request_path: &str,
 ) -> Result<String, StatusCode> {
-    let mut context = base_context(state, language, request_path, SiteKind::Cv)?;
+    let resources = load_resources(state, language, "failed to load resources for the curriculum")?;
+    let mut context = base_context(state, &resources, language, request_path, SiteKind::Cv);
+    let translations = resources.translations.as_ref();
+    let page_title = translated_or(translations, &["cv_curriculum", "page_title"], "Curriculum");
 
-    let translations = state
-        .resources_for(language)
-        .map_err(|error| {
-            eprintln!("Failed to load translations: {error:#?}");
-            StatusCode::INTERNAL_SERVER_ERROR
-        })?
-        .translations;
-    let page_title = translations
-        .get_str(&["cv_curriculum", "page_title"])
-        .unwrap_or_else(|| "Curriculum".to_string());
-
-    context.insert("page_title", &page_title);
+    context.insert("page_title", page_title.as_ref());
     context.insert("page_url", request_path);
     context.insert("robots", "index,follow");
 
@@ -59,19 +58,7 @@ pub(crate) fn render_cv_curriculum(
     context.insert("contact_form", &contact_form_context);
     context.insert("contact_form_enabled", &state.mailer.is_some());
 
-    if let Some(age) = calculate_age(
-        &state
-            .resources_for(language)
-            .map_err(|error| {
-                eprintln!("Failed to load resources for age calculation: {error:#?}");
-                StatusCode::INTERNAL_SERVER_ERROR
-            })?
-            .data
-            .person
-            .date_of_birth,
-    ) {
-        context.insert("age", &age);
-    }
+    context.insert("age", &calculate_age(&resources.data.person.date_of_birth));
 
     render_template(state, "cv/pages/curriculum.html", context)
 }
@@ -81,18 +68,13 @@ pub(crate) fn render_cv_menu(
     language: &Language,
     request_path: &str,
 ) -> Result<String, StatusCode> {
-    let mut context = base_context(state, language, request_path, SiteKind::Cv)?;
-    let resources = state.resources_for(language).map_err(|error| {
-        eprintln!("Failed to load resources for menu: {error:#?}");
-        StatusCode::INTERNAL_SERVER_ERROR
-    })?;
-    let translations = resources.translations;
+    let resources = load_resources(state, language, "failed to load resources for menu")?;
+    let mut context = base_context(state, &resources, language, request_path, SiteKind::Cv);
+    let translations = resources.translations.as_ref();
     let profile = &resources.data.sites.cv.profile;
+    let page_title = translated_or(translations, &["cv_menu", "title"], "Menu");
 
-    let page_title =
-        translations.get_str(&["cv_menu", "title"]).unwrap_or_else(|| "Menu".to_string());
-
-    context.insert("page_title", &page_title);
+    context.insert("page_title", page_title.as_ref());
     context.insert("page_url", request_path);
     context.insert("robots", "noindex,nofollow");
     context.insert("has_about_section", &!profile.summary.trim().is_empty());
@@ -112,7 +94,8 @@ pub(crate) fn render_error(
     page_url: &str,
     language: &Language,
 ) -> Result<String, StatusCode> {
-    let mut context = base_context(state, language, page_url, site)?;
+    let resources = load_resources(state, language, "failed to load resources for error page")?;
+    let mut context = base_context(state, &resources, language, page_url, site);
     context.insert("page_url", page_url);
     context.insert("robots", "noindex,nofollow");
 
@@ -123,19 +106,12 @@ pub(crate) fn render_error(
 
     context.insert("site", site_value);
 
-    let translations = state
-        .resources_for(language)
-        .map_err(|error| {
-            eprintln!("Failed to load translations for error page: {error:#?}");
-            StatusCode::INTERNAL_SERVER_ERROR
-        })?
-        .translations;
-    let error = error_details(status, translations.as_ref());
-    let title_prefix =
-        translations.get_str(&["errors", "title"]).unwrap_or_else(|| "Error".to_string());
+    let translations = resources.translations.as_ref();
+    let error = error_details(status, translations);
+    let title_prefix = translated_or(translations, &["errors", "title"], "Error");
     let page_title = format!("{title_prefix} {}", error.code);
 
-    context.insert("page_title", &page_title);
+    context.insert("page_title", page_title.as_str());
     let error_code = error.code.to_string();
     context.insert("error_code", &error_code);
     context.insert("error_code_first", &error_code.chars().next().unwrap_or('0').to_string());
@@ -146,94 +122,90 @@ pub(crate) fn render_error(
     render_template(state, "errors/error.html", context)
 }
 
+fn load_resources(
+    state: &AppState,
+    language: &Language,
+    reason: &'static str,
+) -> Result<crate::app::localization::LocalizedResources, StatusCode> {
+    state.resources_for(language).map_err(|error| {
+        error!(error = ?error, "{reason}");
+        StatusCode::INTERNAL_SERVER_ERROR
+    })
+}
+
+fn translated_or<'a>(
+    translations: &'a Translations,
+    path: &[&str],
+    fallback: &'a str,
+) -> Cow<'a, str> {
+    match translations.navigate(path).and_then(serde_json::Value::as_str) {
+        Some(value) => Cow::Borrowed(value),
+        None => Cow::Borrowed(fallback),
+    }
+}
+
 fn base_context(
     state: &AppState,
+    resources: &crate::app::localization::LocalizedResources,
     language: &Language,
     request_path: &str,
     site: SiteKind,
-) -> Result<Context, StatusCode> {
+) -> Context {
     let mut context = Context::new();
-    let resources = state.resources_for(language).map_err(|error| {
-        eprintln!("Failed to load resources for context: {error:#?}");
-        StatusCode::INTERNAL_SERVER_ERROR
-    })?;
     let data = resources.data.as_ref();
     let translations = resources.translations.as_ref();
-    let date_formats = resources.date_formats.as_ref();
+    let dates = RenderDates::new(translations, resources.date_formats.as_ref());
     let person = &data.person;
     context.insert("first_name", &person.first_name);
     context.insert("last_name", &person.last_name);
     context.insert("role", &person.role);
-    context.insert(
-        "date_of_birth",
-        &format_display_date(&person.date_of_birth, translations, date_formats),
-    );
+    context.insert("date_of_birth", &dates.display(&person.date_of_birth));
     context.insert("position", &person.position);
 
     let sites = &data.sites;
-    let website_main = sites.resolved_main();
-    let website_cv = sites.resolved_cv();
     let has_website_main = state.language_has_site(language, SiteKind::Main);
     let has_website_cv = state.language_has_site(language, SiteKind::Cv);
 
-    context.insert("website_main", &website_main);
-    context.insert("website_cv", &website_cv);
+    context.insert("website_main", sites.resolved_main());
+    context.insert("website_cv", sites.resolved_cv());
     context.insert("has_website_main", &has_website_main);
     context.insert("has_website_cv", &has_website_cv);
     context.insert("websites", &sites.additional);
 
     let contact = &data.contact;
-    let email_main = &contact.emails.main;
-    let email_cv = contact.emails.resolved_cv();
-
-    context.insert("email_main", email_main);
-    context.insert("email_cv", &email_cv);
+    context.insert("email_main", &contact.emails.main);
+    context.insert("email_cv", contact.emails.resolved_cv());
     context.insert("emails", &contact.emails.other);
     context.insert("socials", &format_socials(&contact.socials));
 
     let profile = &data.sites.cv.profile;
-    context.insert(
-        "work_experiences",
-        &format_work_experiences(&profile.work_experiences, translations, date_formats),
-    );
-    context.insert(
-        "other_projects",
-        &format_projects(&profile.other_projects, translations, date_formats),
-    );
-    context
-        .insert("educations", &format_educations(&profile.educations, translations, date_formats));
+    context.insert("work_experiences", &format_work_experiences(&profile.work_experiences, &dates));
+    context.insert("other_projects", &format_projects(&profile.other_projects, &dates));
+    context.insert("educations", &format_educations(&profile.educations, &dates));
     context.insert("skills", &format_skills(&profile.skills));
     context.insert(
         "courses_certifications",
-        &format_courses_certifications(&profile.courses_certifications, translations, date_formats),
+        &format_courses_certifications(&profile.courses_certifications, &dates),
     );
     context.insert("description", &profile.summary);
     context.insert("current_year", &Utc::now().year());
     context.insert("minify_assets", &state.environment.should_minify_assets());
-    context.insert("asset_version", &state.asset_version);
-    context.insert("generator", &state.generator);
+    context.insert("asset_version", state.asset_version.as_ref());
+    context.insert("generator", state.generator.as_ref());
     context.insert("show_credits", &state.show_credits);
     let (_, _, language_prefix) = state.language_from_path(request_path);
     context.insert("language_prefix", &language_prefix);
     context.insert("languages", &state.language_links(language, request_path, site));
     context.insert("translations", translations);
-    context.insert(
-        "language_tag",
-        &translations.language_tag().unwrap_or_else(|| language.as_code().to_string()),
-    );
+    context.insert("language_tag", translations.language_tag().unwrap_or(language.as_code()));
+    let meta_language_fallback = language.as_code().to_uppercase();
     context.insert(
         "meta_language",
-        &translations.meta_language().unwrap_or_else(|| language.as_code().to_uppercase()),
+        translations.meta_language().unwrap_or(meta_language_fallback.as_str()),
     );
-    context.insert(
-        "dc_language",
-        &translations.dc_language().unwrap_or_else(|| language.as_code().to_string()),
-    );
-    context.insert(
-        "language_direction",
-        &translations.language_direction().unwrap_or_else(|| "ltr".to_string()),
-    );
-    Ok(context)
+    context.insert("dc_language", translations.dc_language().unwrap_or(language.as_code()));
+    context.insert("language_direction", translations.language_direction().unwrap_or("ltr"));
+    context
 }
 
 fn render_template(
@@ -242,7 +214,7 @@ fn render_template(
     context: Context,
 ) -> Result<String, StatusCode> {
     let rendered = state.tera.render(template, &context).map_err(|error| {
-        eprintln!("Failed to render template {template}: {error:#?}");
+        error!(error = ?error, template, "failed to render template");
         StatusCode::INTERNAL_SERVER_ERROR
     })?;
 
@@ -259,29 +231,20 @@ struct ErrorDetails {
 }
 
 fn error_details(status: StatusCode, translations: &Translations) -> ErrorDetails {
-    let status_messages = translations
-        .navigate(&["errors", "status_messages"])
-        .and_then(|value| value.as_object())
-        .cloned()
-        .unwrap_or_default();
     let code_key = status.as_u16().to_string();
-
-    let default_client_error = translations
-        .get_str(&["errors", "client_error"])
-        .unwrap_or_else(|| "Request error".to_string());
-    let default_server_error = translations
-        .get_str(&["errors", "server_error"])
-        .unwrap_or_else(|| "Server error".to_string());
-
-    let message = status_messages
-        .get(&code_key)
-        .and_then(|value| value.as_str())
-        .map(|value| value.to_string())
+    let message = translations
+        .navigate(&["errors", "status_messages", code_key.as_str()])
+        .and_then(serde_json::Value::as_str)
+        .map(str::to_string)
         .unwrap_or_else(|| {
             if status.is_server_error() {
-                default_server_error.clone()
+                translations
+                    .get_str(&["errors", "server_error"])
+                    .unwrap_or_else(|| "Server error".to_string())
             } else {
-                default_client_error.clone()
+                translations
+                    .get_str(&["errors", "client_error"])
+                    .unwrap_or_else(|| "Request error".to_string())
             }
         });
 
@@ -357,14 +320,14 @@ struct SocialWithIcon {
     social_full_name: String,
     link: String,
     profile_nickname: String,
-    icon_svg: Option<String>,
+    icon_svg: Option<&'static str>,
 }
 
 #[derive(Serialize)]
 struct SkillWithIcon {
     name: String,
     icon: String,
-    icon_svg: Option<String>,
+    icon_svg: Option<&'static str>,
 }
 
 #[derive(Serialize, Default, Clone)]
@@ -380,12 +343,113 @@ pub(crate) struct CvContactFormContext {
 pub(crate) struct ContactFeedback {
     pub status: String,
     pub message: String,
+    pub field: Option<String>,
+}
+
+struct RenderDates<'a> {
+    formats: &'a crate::app::localization::DateFormats,
+    months: Vec<String>,
+    ongoing: String,
+    singular_year: String,
+    plural_year: String,
+    singular_month: String,
+    plural_month: String,
+    and_word: String,
+}
+
+impl<'a> RenderDates<'a> {
+    fn new(
+        translations: &'a Translations,
+        formats: &'a crate::app::localization::DateFormats,
+    ) -> Self {
+        let (singular_year, plural_year, singular_month, plural_month) = match translations
+            .duration_labels()
+        {
+            Some((year, years, month, months)) => {
+                (year.to_string(), years.to_string(), month.to_string(), months.to_string())
+            },
+            None => {
+                ("year".to_string(), "years".to_string(), "month".to_string(), "months".to_string())
+            },
+        };
+
+        Self {
+            formats,
+            months: translations.months().unwrap_or_else(default_months),
+            ongoing: translations.ongoing_label().unwrap_or_else(|| "Present".to_string()),
+            singular_year,
+            plural_year,
+            singular_month,
+            plural_month,
+            and_word: translations.get_str(&["dates", "and"]).unwrap_or_else(|| "and".to_string()),
+        }
+    }
+
+    fn display(&self, date: &NaiveDate) -> String {
+        format_date_with_pattern(date, &self.months, &self.formats.long, true)
+    }
+
+    fn month_year(&self, date: &NaiveDate) -> String {
+        format_date_with_pattern(date, &self.months, &self.formats.long, false)
+    }
+
+    fn end(&self, end_date: Option<&NaiveDate>) -> String {
+        let Some(end_date) = end_date else {
+            return self.ongoing.clone();
+        };
+
+        if is_ongoing_date(end_date) {
+            return self.ongoing.clone();
+        }
+
+        self.month_year(end_date)
+    }
+
+    fn duration(&self, start_date: &NaiveDate, end_date: Option<&NaiveDate>) -> Option<String> {
+        let end = match end_date.filter(|date| !is_ongoing_date(date)) {
+            Some(date) => *date,
+            None => Utc::now().date_naive(),
+        };
+
+        if end < *start_date {
+            return None;
+        }
+
+        let mut total_months = end.year().saturating_sub(start_date.year()).saturating_mul(12)
+            + (end.month() as i32 - start_date.month() as i32)
+            + 1;
+
+        if end.day() < start_date.day() {
+            total_months = total_months.saturating_sub(1);
+        }
+
+        if total_months <= 0 {
+            return None;
+        }
+
+        let years = total_months / 12;
+        let months = total_months % 12;
+        let year_label =
+            if years == 1 { self.singular_year.as_str() } else { self.plural_year.as_str() };
+        let month_label =
+            if months == 1 { self.singular_month.as_str() } else { self.plural_month.as_str() };
+
+        Some(match (years, months) {
+            (0, month_count) => format!("{month_count} {month_label}"),
+            (year_count, 0) => format!("{year_count} {year_label}"),
+            (year_count, month_count) => {
+                format!(
+                    "{year_count} {year_label} {and_word} {month_count} {month_label}",
+                    and_word = self.and_word
+                )
+            },
+        })
+    }
 }
 
 fn format_work_experiences(
     work_experiences: &[crate::app::models::WorkExperience],
-    translations: &Translations,
-    date_formats: &crate::app::localization::DateFormats,
+    dates: &RenderDates<'_>,
 ) -> Vec<FormattedWorkExperience> {
     work_experiences
         .iter()
@@ -395,24 +459,17 @@ fn format_work_experiences(
                 .iter()
                 .map(|role| FormattedWorkRole {
                     title: role.title.clone(),
-                    start_date: format_month_year_date(
-                        &role.start_date,
-                        translations,
-                        date_formats,
-                    ),
-                    end_date: format_end_date(role.end_date.as_ref(), translations, date_formats),
-                    duration: format_duration(
-                        &role.start_date,
-                        role.end_date.as_ref(),
-                        translations,
-                    )
-                    .unwrap_or_default(),
+                    start_date: dates.month_year(&role.start_date),
+                    end_date: dates.end(role.end_date.as_ref()),
+                    duration: dates
+                        .duration(&role.start_date, role.end_date.as_ref())
+                        .unwrap_or_default(),
                     description: role.description.clone(),
                 })
                 .collect();
 
             let (start_date, end_date, duration) =
-                summarize_work_experience(&experience.roles, translations, date_formats);
+                summarize_work_experience(&experience.roles, dates);
 
             FormattedWorkExperience {
                 company: experience.company.name.clone(),
@@ -428,8 +485,7 @@ fn format_work_experiences(
 
 fn summarize_work_experience(
     roles: &[crate::app::models::WorkRole],
-    translations: &Translations,
-    date_formats: &crate::app::localization::DateFormats,
+    dates: &RenderDates<'_>,
 ) -> (String, String, String) {
     if roles.is_empty() {
         return (String::new(), String::new(), String::new());
@@ -455,31 +511,25 @@ fn summarize_work_experience(
 
     let end_date_value = if ongoing { None } else { latest_end.as_ref() };
 
-    let start_date = format_month_year_date(&earliest_start, translations, date_formats);
-    let end_date = if ongoing {
-        format_end_date(None, translations, date_formats)
-    } else {
-        format_end_date(end_date_value, translations, date_formats)
-    };
-
-    let duration =
-        format_duration(&earliest_start, end_date_value, translations).unwrap_or_default();
+    let start_date = dates.month_year(&earliest_start);
+    let end_date = if ongoing { dates.end(None) } else { dates.end(end_date_value) };
+    let duration = dates.duration(&earliest_start, end_date_value).unwrap_or_default();
 
     (start_date, end_date, duration)
 }
 
 fn format_projects(
     projects: &[crate::app::models::Project],
-    translations: &Translations,
-    date_formats: &crate::app::localization::DateFormats,
+    dates: &RenderDates<'_>,
 ) -> Vec<FormattedProject> {
     projects
         .iter()
         .map(|project| FormattedProject {
             title: project.title.clone(),
-            start_date: format_month_year_date(&project.start_date, translations, date_formats),
-            end_date: format_end_date(project.end_date.as_ref(), translations, date_formats),
-            duration: format_duration(&project.start_date, project.end_date.as_ref(), translations)
+            start_date: dates.month_year(&project.start_date),
+            end_date: dates.end(project.end_date.as_ref()),
+            duration: dates
+                .duration(&project.start_date, project.end_date.as_ref())
                 .unwrap_or_default(),
             description: project.description.clone(),
             link: project.link.clone(),
@@ -489,8 +539,7 @@ fn format_projects(
 
 fn format_educations(
     educations: &[crate::app::models::Education],
-    translations: &Translations,
-    date_formats: &crate::app::localization::DateFormats,
+    dates: &RenderDates<'_>,
 ) -> Vec<FormattedEducation> {
     educations
         .iter()
@@ -498,14 +547,11 @@ fn format_educations(
             institute: education.institute.clone(),
             educational_qualification: education.educational_qualification.clone(),
             course_of_study: education.course_of_study.clone(),
-            date_start: format_month_year_date(&education.date_start, translations, date_formats),
-            date_end: format_end_date(education.date_end.as_ref(), translations, date_formats),
-            duration: format_duration(
-                &education.date_start,
-                education.date_end.as_ref(),
-                translations,
-            )
-            .unwrap_or_default(),
+            date_start: dates.month_year(&education.date_start),
+            date_end: dates.end(education.date_end.as_ref()),
+            duration: dates
+                .duration(&education.date_start, education.date_end.as_ref())
+                .unwrap_or_default(),
             vote: education.vote.clone(),
             description: education.description.clone(),
         })
@@ -514,15 +560,14 @@ fn format_educations(
 
 fn format_courses_certifications(
     courses_certifications: &[crate::app::models::CourseCertification],
-    translations: &Translations,
-    date_formats: &crate::app::localization::DateFormats,
+    dates: &RenderDates<'_>,
 ) -> Vec<FormattedCourseCertification> {
     courses_certifications
         .iter()
         .map(|course| FormattedCourseCertification {
             title: course.title.clone(),
             released_by: course.released_by.clone(),
-            released_on: format_display_date(&course.released_on, translations, date_formats),
+            released_on: dates.display(&course.released_on),
             link: course.link.clone(),
         })
         .collect()
@@ -552,52 +597,16 @@ fn format_skills(skills: &[crate::app::models::Skill]) -> Vec<SkillWithIcon> {
         .collect()
 }
 
-fn simple_icon_svg(slug: &str) -> Option<String> {
+fn simple_icon_svg(slug: &str) -> Option<&'static str> {
     if slug.eq_ignore_ascii_case("linkedin") {
         return None;
     }
 
-    simpleicons_rs::slug(slug).map(|icon| icon.svg.to_string())
-}
-
-fn format_end_date(
-    end_date: Option<&NaiveDate>,
-    translations: &Translations,
-    date_formats: &crate::app::localization::DateFormats,
-) -> String {
-    let Some(end_date) = end_date else {
-        return translations.ongoing_label().unwrap_or_else(|| "Present".to_string());
-    };
-
-    if is_ongoing_date(end_date) {
-        return translations.ongoing_label().unwrap_or_else(|| "Present".to_string());
-    }
-
-    format_month_year_date(end_date, translations, date_formats)
+    simpleicons_rs::slug(slug).map(|icon| icon.svg)
 }
 
 fn is_ongoing_date(date: &NaiveDate) -> bool {
     date.year() == 9999 && date.month() == 12 && date.day() == 31
-}
-
-fn format_display_date(
-    date: &NaiveDate,
-    translations: &Translations,
-    date_formats: &crate::app::localization::DateFormats,
-) -> String {
-    let months = translations.months().unwrap_or_else(default_months);
-
-    format_date_with_pattern(date, &months, &date_formats.long, true)
-}
-
-fn format_month_year_date(
-    date: &NaiveDate,
-    translations: &Translations,
-    date_formats: &crate::app::localization::DateFormats,
-) -> String {
-    let months = translations.months().unwrap_or_else(default_months);
-
-    format_date_with_pattern(date, &months, &date_formats.long, false)
 }
 
 fn default_months() -> Vec<String> {
@@ -641,67 +650,345 @@ fn format_date_with_pattern(
         formatted = formatted.replace("DD", "");
     }
 
-    while formatted.contains("  ") {
-        formatted = formatted.replace("  ", " ");
+    normalize_formatted_date(&formatted)
+}
+
+fn is_date_edge(character: char) -> bool {
+    matches!(character, '-' | '/' | '.' | ',' | '\\') || character.is_whitespace()
+}
+
+fn collapse_repeated(input: &str, target: char) -> String {
+    let mut collapsed = String::with_capacity(input.len());
+    let mut previous_was_target = false;
+
+    for character in input.chars() {
+        if character == target {
+            if previous_was_target {
+                continue;
+            }
+            previous_was_target = true;
+        } else {
+            previous_was_target = false;
+        }
+
+        collapsed.push(character);
     }
 
-    let mut cleaned = formatted
-        .trim_matches(|c: char| matches!(c, '-' | '/' | '.' | ',' | '\\') || c.is_whitespace())
-        .to_string();
+    collapsed
+}
 
-    for duplicate in ["--", "//", "..", ",,"] {
-        if let Some(first_char) = duplicate.chars().next() {
+fn collapse_date_punctuation(input: &str) -> String {
+    let mut collapsed = String::with_capacity(input.len());
+    let mut previous = None;
+
+    for character in input.chars() {
+        if matches!(character, '-' | '/' | '.' | ',') && previous == Some(character) {
+            continue;
+        }
+
+        collapsed.push(character);
+        previous = Some(character);
+    }
+
+    collapsed
+}
+
+fn normalize_formatted_date(formatted: &str) -> String {
+    let collapsed_spaces = collapse_repeated(formatted, ' ');
+    let trimmed = collapsed_spaces.trim_matches(is_date_edge);
+    collapse_date_punctuation(trimmed).trim_matches(is_date_edge).to_string()
+}
+
+pub(crate) fn render_cv_pdf(state: &AppState, language: &Language) -> Result<Vec<u8>, StatusCode> {
+    let content = cv_pdf_content(state, language)?;
+    crate::app::pdf::render(&content).map_err(|error| {
+        error!(error = ?error, "failed to render CV PDF");
+        StatusCode::INTERNAL_SERVER_ERROR
+    })
+}
+
+fn cv_pdf_content(
+    state: &AppState,
+    language: &Language,
+) -> Result<crate::app::pdf::CvPdfContent, StatusCode> {
+    let resources = state.resources_for(language).map_err(|error| {
+        error!(error = ?error, "failed to load resources for CV PDF");
+        StatusCode::INTERNAL_SERVER_ERROR
+    })?;
+    let data = resources.data.as_ref();
+    let translations = resources.translations.as_ref();
+    let dates = RenderDates::new(translations, resources.date_formats.as_ref());
+    let person = &data.person;
+    let profile = &data.sites.cv.profile;
+
+    let label = |key: &str, fallback: &str| {
+        translations.get_str(&["cv_curriculum", key]).unwrap_or_else(|| fallback.to_string())
+    };
+
+    let mut facts = Vec::new();
+    if !person.position.locality.trim().is_empty() {
+        facts.push(crate::app::pdf::PdfFact {
+            label: label("city_label", "City:"),
+            value: person.position.locality.clone(),
+        });
+    }
+    facts.push(crate::app::pdf::PdfFact {
+        label: label("birth_date_label", "Birth date:"),
+        value: dates.display(&person.date_of_birth),
+    });
+    if state.language_has_site(language, SiteKind::Main) {
+        let domain = &data.sites.resolved_main().domain;
+        if !domain.trim().is_empty() {
+            facts.push(crate::app::pdf::PdfFact {
+                label: label("website_label", "Website:"),
+                value: domain.clone(),
+            });
+        }
+    }
+    let email = data.contact.emails.resolved_cv();
+    if !email.trim().is_empty() {
+        facts.push(crate::app::pdf::PdfFact {
+            label: label("email_label", "E-Mail:"),
+            value: email.to_string(),
+        });
+    }
+
+    let mut sections = Vec::new();
+    if !profile.summary.trim().is_empty() {
+        sections.push(crate::app::pdf::PdfSection {
+            heading: label("about_heading", "About Me"),
+            blocks: vec![crate::app::pdf::PdfBlock::Paragraph(profile.summary.clone())],
+        });
+    }
+
+    let experiences = format_work_experiences(&profile.work_experiences, &dates);
+    if !experiences.is_empty() {
+        sections.push(crate::app::pdf::PdfSection {
+            heading: label("experience_heading", "Experience"),
+            blocks: experiences
+                .into_iter()
+                .map(|experience| {
+                    crate::app::pdf::PdfBlock::Group(crate::app::pdf::PdfGroup {
+                        title: experience.company,
+                        subtitle: experience.location,
+                        entries: experience
+                            .roles
+                            .into_iter()
+                            .map(|role| crate::app::pdf::PdfEntry {
+                                title: role.title,
+                                subtitle: String::new(),
+                                meta: dated_meta(&role.start_date, &role.end_date, &role.duration),
+                                body: role.description,
+                                notes: Vec::new(),
+                            })
+                            .collect(),
+                    })
+                })
+                .collect(),
+        });
+    }
+
+    if !profile.skills.is_empty() {
+        sections.push(crate::app::pdf::PdfSection {
+            heading: label("skills_heading", "Skills"),
+            blocks: vec![crate::app::pdf::PdfBlock::Skills(
+                profile
+                    .skills
+                    .iter()
+                    .map(|skill| crate::app::pdf::PdfSkill { icon: skill.icon.clone() })
+                    .collect(),
+            )],
+        });
+    }
+
+    let projects = format_projects(&profile.other_projects, &dates);
+    if !projects.is_empty() {
+        let project_link = label("project_link", "Link");
+        sections.push(crate::app::pdf::PdfSection {
+            heading: label("other_projects_heading", "Other Projects"),
+            blocks: projects
+                .into_iter()
+                .map(|project| {
+                    let mut notes = Vec::new();
+                    if !project.link.trim().is_empty() {
+                        notes.push(format!("{project_link}: {}", project.link));
+                    }
+                    crate::app::pdf::PdfBlock::Entry(crate::app::pdf::PdfEntry {
+                        title: project.title,
+                        subtitle: String::new(),
+                        meta: dated_meta(&project.start_date, &project.end_date, &project.duration),
+                        body: project.description,
+                        notes,
+                    })
+                })
+                .collect(),
+        });
+    }
+
+    let educations = format_educations(&profile.educations, &dates);
+    if !educations.is_empty() {
+        let vote_label = label("vote", "Vote");
+        sections.push(crate::app::pdf::PdfSection {
+            heading: label("education_heading", "Education"),
+            blocks: educations
+                .into_iter()
+                .map(|education| {
+                    let mut notes = Vec::new();
+                    if let Some(vote) = education.vote.filter(|vote| !vote.trim().is_empty()) {
+                        notes.push(format!("{vote_label}: {vote}"));
+                    }
+                    crate::app::pdf::PdfBlock::Entry(crate::app::pdf::PdfEntry {
+                        title: education.institute,
+                        subtitle: [education.course_of_study, education.educational_qualification]
+                            .into_iter()
+                            .filter(|part| !part.trim().is_empty())
+                            .collect::<Vec<_>>()
+                            .join(" — "),
+                        meta: dated_meta(
+                            &education.date_start,
+                            &education.date_end,
+                            &education.duration,
+                        ),
+                        body: education.description,
+                        notes,
+                    })
+                })
+                .collect(),
+        });
+    }
+
+    let courses = format_courses_certifications(&profile.courses_certifications, &dates);
+    if !courses.is_empty() {
+        let released_by = label("course_released_by", "Released by");
+        let released_on = label("course_released_on", "Released on");
+        let certificate = label("certificate_link", "Certificate");
+        sections.push(crate::app::pdf::PdfSection {
+            heading: label("courses_heading", "Courses & Certifications"),
+            blocks: courses
+                .into_iter()
+                .map(|course| {
+                    let mut notes = Vec::new();
+                    if !course.link.trim().is_empty() {
+                        notes.push(format!("{certificate}: {}", course.link));
+                    }
+                    crate::app::pdf::PdfBlock::Entry(crate::app::pdf::PdfEntry {
+                        title: course.title,
+                        subtitle: format!("{released_by}: {}", course.released_by),
+                        meta: format!("{released_on} {}", course.released_on),
+                        body: String::new(),
+                        notes,
+                    })
+                })
+                .collect(),
+        });
+    }
+
+    let photo_jpeg = std::fs::read("assets/images/cv/profile-pictures/profile-picture.jpg").ok();
+
+    Ok(crate::app::pdf::CvPdfContent {
+        title: format!("{} {}", person.first_name.trim(), person.last_name.trim())
+            .split_whitespace()
+            .collect::<Vec<_>>()
+            .join(" "),
+        first_name: person.first_name.clone(),
+        last_name: person.last_name.clone(),
+        role: person.role.clone(),
+        photo_jpeg,
+        facts,
+        sections,
+        legal_notice: label("legal_notice", ""),
+    })
+}
+
+fn dated_meta(start: &str, end: &str, duration: &str) -> String {
+    let mut meta = format!("{start} - {end}");
+    if !duration.trim().is_empty() {
+        meta.push_str(&format!(" ({duration})"));
+    }
+    meta
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::{
+        app::{environment::Environment, localization::Language, state::SiteKind},
+        prepare_application_state,
+    };
+
+    #[test]
+    fn date_normalization_matches_the_previous_cleanup_rules() {
+        for sample in [
+            "18  April  1992",
+            "  --18//04..1992,, ",
+            "DD  MMMM   YYYY",
+            "----",
+            "a - - b",
+            "18---04",
+            "end\\",
+        ] {
+            assert_eq!(normalize_formatted_date(sample), legacy_date_cleanup(sample));
+        }
+    }
+
+    #[test]
+    fn key_pages_render_with_tera_v2() {
+        if !std::path::Path::new("data").is_dir() {
+            // CI and fresh checkouts do not ship a local `data/` directory.
+            return;
+        }
+
+        let prepared = prepare_application_state(Environment::Development)
+            .expect("application state should prepare for template smoke tests");
+        let language = Language::new("it");
+
+        let main_home = render_main_homepage(&prepared.main_state, &language, "/")
+            .expect("main homepage should render");
+        assert!(main_home.contains("skip-link"));
+        assert!(main_home.contains("main-content"));
+
+        let cv_home = render_cv_homepage(&prepared.cv_state, &language, "/")
+            .expect("cv homepage should render");
+        assert!(cv_home.contains("skip-link"));
+
+        let curriculum = render_cv_curriculum(&prepared.cv_state, None, &language, "/curriculum")
+            .expect("curriculum should render");
+        assert!(curriculum.contains("main-content"));
+
+        let menu =
+            render_cv_menu(&prepared.cv_state, &language, "/menu").expect("menu should render");
+        assert!(menu.contains("menu-title"));
+
+        let error = render_error(
+            &prepared.cv_state,
+            SiteKind::Cv,
+            StatusCode::NOT_FOUND,
+            "/missing",
+            &language,
+        )
+        .expect("error page should render");
+        assert!(error.contains("error-code"));
+    }
+
+    fn legacy_date_cleanup(formatted: &str) -> String {
+        let mut formatted = formatted.to_string();
+
+        while formatted.contains("  ") {
+            formatted = formatted.replace("  ", " ");
+        }
+
+        let mut cleaned = formatted.trim_matches(is_date_edge).to_string();
+
+        for duplicate in ["--", "//", "..", ",,"] {
+            let Some(first_char) = duplicate.chars().next() else {
+                continue;
+            };
+
             while cleaned.contains(duplicate) {
                 cleaned = cleaned.replace(duplicate, &first_char.to_string());
             }
         }
+
+        cleaned.trim_matches(is_date_edge).to_string()
     }
-
-    cleaned
-        .trim_matches(|c: char| matches!(c, '-' | '/' | '.' | ',' | '\\') || c.is_whitespace())
-        .to_string()
-}
-
-fn format_duration(
-    start_date: &NaiveDate,
-    end_date: Option<&NaiveDate>,
-    translations: &Translations,
-) -> Option<String> {
-    let end = match end_date.filter(|date| !is_ongoing_date(date)) {
-        Some(date) => *date,
-        None => Utc::now().date_naive(),
-    };
-
-    if end < *start_date {
-        return None;
-    }
-
-    let mut total_months = (end.year() - start_date.year()) * 12
-        + (end.month() as i32 - start_date.month() as i32)
-        + 1;
-
-    if end.day() < start_date.day() {
-        total_months -= 1;
-    }
-
-    if total_months <= 0 {
-        return None;
-    }
-
-    let years = total_months / 12;
-    let months = total_months % 12;
-
-    let (singular_year, plural_year, singular_month, plural_month) =
-        translations.duration_labels().unwrap_or_else(|| {
-            ("year".to_string(), "years".to_string(), "month".to_string(), "months".to_string())
-        });
-
-    let year_label = if years == 1 { singular_year.as_str() } else { plural_year.as_str() };
-    let month_label = if months == 1 { singular_month.as_str() } else { plural_month.as_str() };
-
-    Some(match (years, months) {
-        (0, m) => format!("{m} {month_label}"),
-        (y, 0) => format!("{y} {year_label}"),
-        (y, m) => format!("{y} {year_label} e {m} {month_label}"),
-    })
 }

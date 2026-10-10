@@ -1,153 +1,119 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const form = document.querySelector(".contact-form [data-contact-form]");
+  const form = document.querySelector("[data-contact-form]");
   if (!form) {
     return;
   }
-  const fullNameField = form.querySelector("#full-name");
-  const companyField = form.querySelector("#company");
-  const emailField = form.querySelector("#email");
-  const messageField = form.querySelector("#message");
+
+  // Native constraint validation stays available when this script does not run.
+  // With script, messages follow the page language and stay associated with each field.
+  form.noValidate = true;
+
   const feedback = document.querySelector("[data-contact-feedback]");
-  const FEEDBACK_SUCCESS = "contact-form__feedback--success";
-  const FEEDBACK_ERROR = "contact-form__feedback--error";
-  const LIMITS = {
-    fullName: { min: 3, max: 120 },
-    company: { min: 2, max: 120 },
-    email: { min: 5, max: 254 },
-    message: { min: 10, max: 2000 },
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const fields = [
+    {
+      element: form.querySelector("#full-name"),
+      required: form.dataset.msgFullNameRequired,
+      invalid: form.dataset.msgFullNameLength,
+    },
+    {
+      element: form.querySelector("#company"),
+      required: form.dataset.msgCompanyRequired,
+      invalid: form.dataset.msgCompanyLength,
+    },
+    {
+      element: form.querySelector("#email"),
+      required: form.dataset.msgEmailRequired,
+      invalid: form.dataset.msgEmail,
+      email: true,
+    },
+    {
+      element: form.querySelector("#message"),
+      required: form.dataset.msgMessageRequired,
+      invalid: form.dataset.msgMessageLength,
+    },
+  ].filter((field) => field.element);
+
+  const messageFor = (field) => {
+    const value = field.element.value.trim();
+    const min = Number(field.element.getAttribute("minlength")) || 0;
+    const max = Number(field.element.getAttribute("maxlength")) || Number.POSITIVE_INFINITY;
+    if (!value) {
+      return field.required || "";
+    }
+    if (value.length < min || value.length > max) {
+      return field.invalid || "";
+    }
+    if (field.email && !emailPattern.test(value)) {
+      return field.invalid || "";
+    }
+    return "";
   };
-  const EMAIL_REGEX = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
-  const fields = [fullNameField, companyField, emailField, messageField].filter(
-    Boolean
-  );
-  const setFeedback = (message, statusClass) => {
-    if (!feedback) {
-      return;
+
+  const describedBy = (field, invalid) => {
+    const ids = [`${field.element.id}-hint`];
+    if (invalid) {
+      ids.push(`${field.element.id}-error`);
     }
-    const messageTarget = feedback.querySelector("p");
-    if (!message) {
-      feedback.hidden = true;
-      feedback.classList.remove(FEEDBACK_SUCCESS, FEEDBACK_ERROR);
-      if (messageTarget) {
-        messageTarget.textContent = "";
-      }
-      return;
-    }
-    feedback.hidden = false;
-    feedback.classList.remove(FEEDBACK_SUCCESS, FEEDBACK_ERROR);
-    if (statusClass) {
-      feedback.classList.add(statusClass);
-    }
-    if (messageTarget) {
-      messageTarget.textContent = message;
-    }
+    field.element.setAttribute("aria-describedby", ids.join(" "));
   };
-  const markInvalid = (field) => {
-    if (!field) {
-      return;
+
+  const clearField = (field) => {
+    field.element.classList.remove("is-invalid");
+    field.element.removeAttribute("aria-invalid");
+    const error = document.getElementById(`${field.element.id}-error`);
+    if (error) {
+      error.hidden = true;
+      error.textContent = "";
     }
-    field.classList.add("is-invalid");
-    field.setAttribute("aria-invalid", "true");
+    describedBy(field, false);
   };
-  const clearInvalid = (field) => {
-    if (!field) {
-      return;
+
+  const markField = (field, message) => {
+    field.element.classList.add("is-invalid");
+    field.element.setAttribute("aria-invalid", "true");
+    const error = document.getElementById(`${field.element.id}-error`);
+    if (error) {
+      error.hidden = false;
+      error.textContent = message;
     }
-    field.classList.remove("is-invalid");
-    field.removeAttribute("aria-invalid");
+    describedBy(field, true);
   };
-  const validate = () => {
-    const values = {
-      fullName: fullNameField?.value.trim() ?? "",
-      company: companyField?.value.trim() ?? "",
-      email: emailField?.value.trim() ?? "",
-      message: messageField?.value.trim() ?? "",
-    };
-    let errorMessage = "";
-    fields.forEach((field) => clearInvalid(field));
-    if (
-      !values.fullName ||
-      !values.company ||
-      !values.email ||
-      !values.message
-    ) {
-      errorMessage = "Compila tutti i campi prima di inviare.";
-    } else if (
-      values.fullName.length < LIMITS.fullName.min ||
-      values.fullName.length > LIMITS.fullName.max
-    ) {
-      errorMessage = `Il nome e cognome deve contenere tra ${LIMITS.fullName.min} e ${LIMITS.fullName.max} caratteri.`;
-    } else if (
-      values.company.length < LIMITS.company.min ||
-      values.company.length > LIMITS.company.max
-    ) {
-      errorMessage = `Il nome dell'azienda deve contenere tra ${LIMITS.company.min} e ${LIMITS.company.max} caratteri.`;
-    } else if (
-      values.email.length < LIMITS.email.min ||
-      values.email.length > LIMITS.email.max ||
-      !EMAIL_REGEX.test(values.email)
-    ) {
-      errorMessage = "Inserisci un indirizzo email valido.";
-    } else if (
-      values.message.length < LIMITS.message.min ||
-      values.message.length > LIMITS.message.max
-    ) {
-      errorMessage = `Il messaggio deve contenere tra ${LIMITS.message.min} e ${LIMITS.message.max} caratteri.`;
-    }
-    if (errorMessage) {
-      if (!values.fullName) {
-        markInvalid(fullNameField);
-      }
-      if (!values.company) {
-        markInvalid(companyField);
-      }
-      if (!values.email) {
-        markInvalid(emailField);
-      }
-      if (!values.message) {
-        markInvalid(messageField);
-      }
-      if (errorMessage.includes("nome e cognome")) {
-        markInvalid(fullNameField);
-      } else if (errorMessage.includes("azienda")) {
-        markInvalid(companyField);
-      } else if (errorMessage.includes("email")) {
-        markInvalid(emailField);
-      } else if (errorMessage.includes("messaggio")) {
-        markInvalid(messageField);
-      }
-    }
-    return { values, errorMessage };
-  };
+
   form.addEventListener("submit", (event) => {
-    const { values, errorMessage } = validate();
-    if (errorMessage) {
-      event.preventDefault();
-      setFeedback(errorMessage, FEEDBACK_ERROR);
-      const firstInvalid = fields.find((field) =>
-        field?.classList.contains("is-invalid")
-      );
-      firstInvalid?.focus();
+    let firstInvalid = null;
+    fields.forEach((field) => {
+      field.element.value = field.element.value.trim();
+      const message = messageFor(field);
+      if (message) {
+        markField(field, message);
+        firstInvalid ??= field.element;
+        return;
+      }
+      clearField(field);
+    });
+    if (!firstInvalid) {
       return;
     }
-    setFeedback("", null);
-    if (fullNameField) {
-      fullNameField.value = values.fullName;
+    event.preventDefault();
+    if (feedback) {
+      feedback.hidden = true;
     }
-    if (companyField) {
-      companyField.value = values.company;
-    }
-    if (emailField) {
-      emailField.value = values.email;
-    }
-    if (messageField) {
-      messageField.value = values.message;
-    }
+    firstInvalid.focus();
   });
+
   fields.forEach((field) => {
-    field?.addEventListener("input", () => {
-      clearInvalid(field);
-      setFeedback("", null);
+    field.element.addEventListener("input", () => {
+      if (field.element.getAttribute("aria-invalid") !== "true") {
+        return;
+      }
+      if (messageFor(field)) {
+        return;
+      }
+      clearField(field);
+      if (feedback && feedback.dataset.field === field.element.id) {
+        feedback.hidden = true;
+      }
     });
   });
 });

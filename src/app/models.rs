@@ -288,12 +288,12 @@ impl From<CvWebsite> for Website {
 }
 
 impl Sites {
-    pub(crate) fn resolved_main(&self) -> Website {
-        self.main.clone()
+    pub(crate) fn resolved_main(&self) -> &Website {
+        &self.main
     }
 
-    pub(crate) fn resolved_cv(&self) -> CvWebsite {
-        self.cv.clone()
+    pub(crate) fn resolved_cv(&self) -> &CvWebsite {
+        &self.cv
     }
 
     pub(crate) fn has_main(&self) -> bool {
@@ -306,12 +306,8 @@ impl Sites {
 }
 
 impl ContactEmails {
-    pub(crate) fn resolved_cv(&self) -> String {
-        if self.cv.is_empty() {
-            return self.main.clone();
-        }
-
-        self.cv.clone()
+    pub(crate) fn resolved_cv(&self) -> &str {
+        if self.cv.is_empty() { self.main.as_str() } else { self.cv.as_str() }
     }
 }
 

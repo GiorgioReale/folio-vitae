@@ -1,12 +1,13 @@
 use std::{
     collections::HashMap,
-    sync::{Arc, RwLock},
-    time::SystemTime,
+    sync::{Arc, Mutex, RwLock},
+    time::{Duration, Instant, SystemTime},
 };
 
 use chrono::{Datelike, SecondsFormat, TimeZone, Utc};
 use serde::Serialize;
 use tera::{Context, Tera};
+use tracing::{error, warn};
 
 use crate::{
     app::{
@@ -21,19 +22,23 @@ use crate::{
     error::{AppError, AppResult, ResultExt},
 };
 
+const LOCALIZATION_RECHECK_INTERVAL: Duration = Duration::from_millis(2);
+
 #[derive(Clone)]
 pub struct AppState {
     pub(crate) localization_state: Arc<RwLock<Arc<LocalizationState>>>,
     pub(crate) data_last_modified: Arc<RwLock<Option<SystemTime>>>,
+    pub(crate) localization_checked_at: Arc<Mutex<Option<Instant>>>,
     pub(crate) tera: Arc<Tera>,
-    pub(crate) main_static: StaticAssets,
-    pub(crate) cv_static: StaticAssets,
+    pub(crate) main_static: Arc<StaticAssets>,
+    pub(crate) cv_static: Arc<StaticAssets>,
     pub(crate) default_site: SiteKind,
     pub(crate) environment: Environment,
-    pub(crate) asset_version: String,
-    pub(crate) generator: String,
-    pub(crate) mailer: Option<Mailer>,
+    pub(crate) asset_version: Arc<str>,
+    pub(crate) generator: Arc<str>,
+    pub(crate) mailer: Option<Arc<Mailer>>,
     pub(crate) show_credits: bool,
+    pub(crate) cv_pdf_cache: Arc<RwLock<HashMap<Language, Arc<Vec<u8>>>>>,
 }
 
 #[derive(Clone)]
@@ -50,10 +55,10 @@ pub(crate) struct LocalizationState {
 
 #[derive(Clone)]
 pub(crate) struct StaticAssets {
-    pub robots: String,
-    pub sitemap: String,
-    pub manifest: String,
-    pub security_txt: String,
+    pub robots: Arc<str>,
+    pub sitemap: Arc<str>,
+    pub manifest: Arc<str>,
+    pub security_txt: Arc<str>,
 }
 
 #[derive(Serialize)]
@@ -64,10 +69,31 @@ pub(crate) struct LanguageLink {
     pub is_current: bool,
 }
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum SiteKind {
     Main,
     Cv,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) enum SitePage {
+    Home,
+    Curriculum,
+    CurriculumPdf,
+    Menu,
+    Contact,
+}
+
+impl SitePage {
+    fn slug(self) -> &'static str {
+        match self {
+            Self::Home => "",
+            Self::Curriculum => "curriculum",
+            Self::CurriculumPdf => "curriculum.pdf",
+            Self::Menu => "menu",
+            Self::Contact => "contact",
+        }
+    }
 }
 
 impl AppState {
@@ -89,7 +115,7 @@ impl AppState {
 
         if snapshot.supported_languages.len() == 1 {
             let language = snapshot.supported_languages.first().cloned().unwrap_or_else(|| {
-                eprintln!("Supported languages missing; defaulting to English");
+                warn!("supported languages missing; defaulting to English");
                 Language::new("en")
             });
 
@@ -98,16 +124,10 @@ impl AppState {
             if let Some(first_segment) = segments.next()
                 && first_segment == language.as_code()
             {
-                let rest: String = segments.collect::<Vec<_>>().join("/");
-                let normalized = if rest.is_empty() { "/".to_string() } else { format!("/{rest}") };
-
-                return (language, normalized, String::new());
+                return (language, rooted_segments(segments), String::new());
             }
 
-            let normalized =
-                if clean_path.is_empty() { "/".to_string() } else { format!("/{clean_path}") };
-
-            return (language, normalized, String::new());
+            return (language, rooted_path(clean_path), String::new());
         }
 
         if clean_path.is_empty() {
@@ -119,13 +139,10 @@ impl AppState {
             && let Some(language) =
                 Language::from_code(first_segment, &snapshot.supported_languages)
         {
-            let rest: String = segments.collect::<Vec<_>>().join("/");
-            let normalized = if rest.is_empty() { "/".to_string() } else { format!("/{rest}") };
-
-            return (language, normalized, format!("/{first_segment}"));
+            return (language, rooted_segments(segments), format!("/{first_segment}"));
         }
 
-        (snapshot.default_language.clone(), format!("/{clean_path}"), String::new())
+        (snapshot.default_language.clone(), rooted_path(clean_path), String::new())
     }
 
     pub(crate) fn language_has_site(&self, language: &Language, site: SiteKind) -> bool {
@@ -140,60 +157,38 @@ impl AppState {
         site_available_in_snapshot(site, &snapshot)
     }
 
+    pub(crate) fn path_matches_page(&self, path: &str, page: SitePage) -> bool {
+        let snapshot = self.localization_snapshot();
+
+        path_matches_page(path, page, &snapshot.supported_languages)
+    }
+
     pub(crate) fn redirect_path_for_missing_language(&self, path: &str) -> Option<String> {
         let snapshot = self.localization_snapshot();
+        let clean = path.trim_matches('/');
 
         if snapshot.supported_languages.len() == 1 {
             let language = snapshot.supported_languages.first()?;
-            let mut segments = path.trim_matches('/').split('/');
+            let (prefix, suffix) = split_language_prefix(clean);
 
-            if let Some(first_segment) = segments.next()
-                && first_segment == language.as_code()
-            {
-                let rest: String = segments.collect::<Vec<_>>().join("/");
-
-                return Some(if rest.is_empty() { "/".to_string() } else { format!("/{rest}") });
+            if prefix == Some(language.as_code()) && is_known_page_suffix(suffix) {
+                return Some(page_path(suffix));
             }
 
             return None;
         }
 
-        if path.trim_matches('/').is_empty() {
+        if clean.is_empty() {
             return Some(format!("/{}", snapshot.default_language.as_code()));
         }
 
-        let (_, normalized_path, language_prefix) = self.language_from_path(path);
-
-        if language_prefix.is_empty() {
-            let default_code = snapshot.default_language.as_code();
-            let mut target_suffix =
-                if normalized_path == "/" { "".to_string() } else { normalized_path };
-
-            if let Some(first_segment) = target_suffix.trim_start_matches('/').split('/').next()
-                && !first_segment.is_empty()
-                && !snapshot
-                    .supported_languages
-                    .iter()
-                    .any(|language| language.as_code() == first_segment)
-            {
-                let remainder: Vec<_> =
-                    target_suffix.trim_start_matches('/').split('/').skip(1).collect();
-
-                target_suffix = if remainder.is_empty() {
-                    "/".to_string()
-                } else {
-                    format!("/{}", remainder.join("/"))
-                };
-            }
-
-            if target_suffix == "/" {
-                target_suffix.clear();
-            }
-
-            Some(format!("/{default_code}{target_suffix}"))
-        } else {
-            None
+        let (prefix, _) = split_language_prefix(clean);
+        if prefix.is_some_and(|prefix| language_code_is_supported(prefix, &snapshot)) {
+            return None;
         }
+
+        is_known_page_suffix(clean)
+            .then(|| format!("/{}/{}", snapshot.default_language.as_code(), clean))
     }
 
     pub(crate) fn language_links(
@@ -214,24 +209,24 @@ impl AppState {
             return Vec::new();
         }
 
-        let (_, normalized_path, _) = self.language_from_path(request_path);
-        let path_suffix = if normalized_path == "/" { "/".to_string() } else { normalized_path };
+        let (_, path_suffix, _) = self.language_from_path(request_path);
 
         available_languages
             .into_iter()
-            .map(|language| LanguageLink {
-                code: language.as_code().to_string(),
-                label: snapshot
-                    .language_names
-                    .get(language)
-                    .cloned()
-                    .unwrap_or_else(|| language.as_code().to_string()),
-                url: format!(
-                    "{}{}",
-                    language.url_prefix(&snapshot.default_language, true),
-                    path_suffix
-                ),
-                is_current: language == current_language,
+            .map(|language| {
+                let mut url = language.url_prefix(&snapshot.default_language, true);
+                url.push_str(&path_suffix);
+
+                LanguageLink {
+                    code: language.as_code().to_string(),
+                    label: snapshot
+                        .language_names
+                        .get(language)
+                        .cloned()
+                        .unwrap_or_else(|| language.as_code().to_string()),
+                    url,
+                    is_current: language == current_language,
+                }
             })
             .collect()
     }
@@ -240,7 +235,7 @@ impl AppState {
         if self.should_refresh_localizations()
             && let Err(error) = self.try_refresh_localizations()
         {
-            eprintln!("Failed to refresh localization data: {error:#?}");
+            error!(error = ?error, "failed to refresh localization data");
         }
 
         self.localization_state.read().unwrap_or_else(|error| error.into_inner()).clone()
@@ -250,7 +245,23 @@ impl AppState {
         matches!(self.environment, Environment::Development)
     }
 
+    fn localization_check_is_fresh(&self) -> bool {
+        self.localization_checked_at
+            .lock()
+            .unwrap_or_else(|error| error.into_inner())
+            .is_some_and(|checked_at| checked_at.elapsed() < LOCALIZATION_RECHECK_INTERVAL)
+    }
+
+    fn mark_localization_checked(&self) {
+        *self.localization_checked_at.lock().unwrap_or_else(|error| error.into_inner()) =
+            Some(Instant::now());
+    }
+
     fn try_refresh_localizations(&self) -> AppResult<()> {
+        if self.localization_check_is_fresh() {
+            return Ok(());
+        }
+
         let (available_languages, latest_change) = detect_languages_with_last_change()?;
 
         {
@@ -262,6 +273,7 @@ impl AppState {
                 == *self.data_last_modified.read().unwrap_or_else(|error| error.into_inner());
 
             if languages_unchanged && timestamp_unchanged {
+                self.mark_localization_checked();
                 return Ok(());
             }
         }
@@ -284,8 +296,22 @@ impl AppState {
         }
 
         *self.data_last_modified.write().unwrap_or_else(|error| error.into_inner()) = latest_change;
+        self.cv_pdf_cache.write().unwrap_or_else(|error| error.into_inner()).clear();
+        self.mark_localization_checked();
 
         Ok(())
+    }
+
+    pub(crate) fn cached_cv_pdf(&self, language: &Language) -> Option<Arc<Vec<u8>>> {
+        let _ = self.localization_snapshot();
+        self.cv_pdf_cache.read().unwrap_or_else(|error| error.into_inner()).get(language).cloned()
+    }
+
+    pub(crate) fn store_cv_pdf(&self, language: Language, bytes: Arc<Vec<u8>>) {
+        self.cv_pdf_cache
+            .write()
+            .unwrap_or_else(|error| error.into_inner())
+            .insert(language, bytes);
     }
 }
 
@@ -407,12 +433,19 @@ pub(crate) fn compile_static_assets(
     data: &SiteData,
 ) -> AppResult<StaticAssets> {
     let context = build_static_context(site, data)?;
+    let mut tera = Tera::default();
+    tera.autoescape_on(Vec::<&str>::new());
 
     Ok(StaticAssets {
-        robots: render_static_template(path, "robots.txt", &context)?,
-        sitemap: render_static_template(path, "sitemap.xml", &context)?,
-        manifest: render_static_template(path, "site.webmanifest", &context)?,
-        security_txt: render_static_template(path, ".well-known/security.txt", &context)?,
+        robots: render_static_template(&mut tera, path, "robots.txt", &context)?,
+        sitemap: render_static_template(&mut tera, path, "sitemap.xml", &context)?,
+        manifest: render_static_template(&mut tera, path, "site.webmanifest", &context)?,
+        security_txt: render_static_template(
+            &mut tera,
+            path,
+            ".well-known/security.txt",
+            &context,
+        )?,
     })
 }
 
@@ -430,7 +463,7 @@ fn build_static_context(site: SiteKind, data: &SiteData) -> AppResult<Context> {
     context.insert("description", site_data.2);
     context.insert("base_url", &format!("https://{}", site_data.0));
     let security_txt_expires = Utc
-        .with_ymd_and_hms(Utc::now().year() + 2, 1, 1, 0, 0, 0)
+        .with_ymd_and_hms(Utc::now().year().saturating_add(2), 1, 1, 0, 0, 0)
         .single()
         .ok_or_else(|| AppError::msg("invalid security.txt expiration date"))?
         .to_rfc3339_opts(SecondsFormat::Millis, true);
@@ -439,17 +472,95 @@ fn build_static_context(site: SiteKind, data: &SiteData) -> AppResult<Context> {
     Ok(context)
 }
 
-fn render_static_template(path: &str, template: &str, context: &Context) -> AppResult<String> {
+fn render_static_template(
+    tera: &mut Tera,
+    path: &str,
+    template: &str,
+    context: &Context,
+) -> AppResult<Arc<str>> {
     let full_path = format!("{path}/{template}");
     let contents =
         std::fs::read_to_string(&full_path).with_context(|| format!("reading {full_path}"))?;
 
-    let mut tera = Tera::default();
-    tera.autoescape_on(vec![]);
     tera.add_raw_template(template, &contents)
         .with_context(|| format!("adding {full_path} as template"))?;
 
-    tera.render(template, context).with_context(|| format!("rendering {full_path}"))
+    tera.render(template, context).with_context(|| format!("rendering {full_path}")).map(Arc::from)
+}
+
+fn path_matches_page(path: &str, page: SitePage, languages: &[Language]) -> bool {
+    let clean = path.trim_matches('/');
+    let slug = page.slug();
+
+    if clean == slug {
+        return true;
+    }
+
+    let Some((prefix, rest)) = clean.split_once('/') else {
+        return page == SitePage::Home
+            && languages.iter().any(|language| language.as_code() == clean);
+    };
+
+    languages.iter().any(|language| language.as_code() == prefix)
+        && rest.trim_end_matches('/') == slug
+}
+
+fn language_code_is_supported(code: &str, snapshot: &LocalizationState) -> bool {
+    snapshot.supported_languages.iter().any(|language| language.as_code() == code)
+}
+
+fn is_known_page_suffix(suffix: &str) -> bool {
+    [
+        SitePage::Home,
+        SitePage::Curriculum,
+        SitePage::CurriculumPdf,
+        SitePage::Menu,
+        SitePage::Contact,
+    ]
+    .into_iter()
+    .any(|page| page.slug() == suffix)
+}
+
+fn split_language_prefix(clean: &str) -> (Option<&str>, &str) {
+    if clean.is_empty() {
+        return (None, "");
+    }
+
+    match clean.split_once('/') {
+        Some((prefix, rest)) => (Some(prefix), rest.trim_end_matches('/')),
+        None => (Some(clean), ""),
+    }
+}
+
+fn page_path(suffix: &str) -> String {
+    if suffix.is_empty() { "/".to_string() } else { format!("/{suffix}") }
+}
+
+fn rooted_path(path: &str) -> String {
+    if path.is_empty() {
+        return "/".to_string();
+    }
+
+    let mut rooted = String::with_capacity(path.len() + 1);
+    rooted.push('/');
+    rooted.push_str(path);
+    rooted
+}
+
+fn rooted_segments<'a>(segments: impl Iterator<Item = &'a str>) -> String {
+    let mut rooted = String::from("/");
+    let mut has_segment = false;
+
+    for segment in segments {
+        if has_segment {
+            rooted.push('/');
+        }
+
+        rooted.push_str(segment);
+        has_segment = true;
+    }
+
+    rooted
 }
 
 #[cfg(test)]
@@ -470,36 +581,94 @@ mod tests {
         assert!(!state.should_refresh_localizations());
     }
 
-    fn app_state_for_environment(environment: Environment) -> AppState {
+    #[test]
+    fn unknown_single_segment_is_not_the_homepage() {
+        let state = app_state_with_languages(&["it"]);
+
+        assert!(!state.path_matches_page("/asdas", SitePage::Home));
+        assert!(!state.path_matches_page("/asdas/", SitePage::Home));
+        assert!(state.redirect_path_for_missing_language("/asdas").is_none());
+    }
+
+    #[test]
+    fn unknown_language_prefix_does_not_match_a_real_page() {
+        let state = app_state_with_languages(&["it"]);
+
+        assert!(!state.path_matches_page("/en/curriculum", SitePage::Curriculum));
+        assert!(!state.path_matches_page("/foo/menu", SitePage::Menu));
+        assert!(state.redirect_path_for_missing_language("/it/asdas").is_none());
+    }
+
+    #[test]
+    fn single_language_prefix_redirects_only_known_pages() {
+        let state = app_state_with_languages(&["it"]);
+
+        assert_eq!(state.redirect_path_for_missing_language("/it"), Some("/".to_string()));
+        assert_eq!(
+            state.redirect_path_for_missing_language("/it/curriculum"),
+            Some("/curriculum".to_string())
+        );
+        assert!(state.path_matches_page("/", SitePage::Home));
+        assert!(state.path_matches_page("/curriculum", SitePage::Curriculum));
+        assert!(state.path_matches_page("/it/menu/", SitePage::Menu));
+    }
+
+    #[test]
+    fn multilingual_unknown_path_is_not_rewritten_to_the_homepage() {
+        let state = app_state_with_languages(&["en", "it"]);
+
+        assert!(state.redirect_path_for_missing_language("/asdas").is_none());
+        assert!(state.redirect_path_for_missing_language("/zz/curriculum").is_none());
+        assert_eq!(state.redirect_path_for_missing_language("/"), Some("/en".to_string()));
+        assert_eq!(
+            state.redirect_path_for_missing_language("/curriculum"),
+            Some("/en/curriculum".to_string())
+        );
+        assert!(state.redirect_path_for_missing_language("/en/curriculum").is_none());
+        assert!(state.path_matches_page("/en", SitePage::Home));
+        assert!(state.path_matches_page("/it/curriculum", SitePage::Curriculum));
+    }
+
+    fn empty_static_assets() -> StaticAssets {
+        StaticAssets {
+            robots: Arc::from(""),
+            sitemap: Arc::from(""),
+            manifest: Arc::from(""),
+            security_txt: Arc::from(""),
+        }
+    }
+
+    fn app_state_with_languages(codes: &[&str]) -> AppState {
+        let supported_languages = codes.iter().copied().map(Language::new).collect::<Vec<_>>();
+        let default_language =
+            supported_languages.first().cloned().unwrap_or_else(|| Language::new("en"));
         let localization_state = Arc::new(LocalizationState::new(
             Localizations::new(),
-            Language::new("en"),
-            vec![Language::new("en")],
+            default_language,
+            supported_languages,
             HashMap::new(),
         ));
 
         AppState {
             localization_state: Arc::new(RwLock::new(localization_state)),
             data_last_modified: Arc::new(RwLock::new(None)),
+            localization_checked_at: Arc::new(Mutex::new(None)),
             tera: Arc::new(Tera::default()),
-            main_static: StaticAssets {
-                robots: String::new(),
-                sitemap: String::new(),
-                manifest: String::new(),
-                security_txt: String::new(),
-            },
-            cv_static: StaticAssets {
-                robots: String::new(),
-                sitemap: String::new(),
-                manifest: String::new(),
-                security_txt: String::new(),
-            },
+            main_static: Arc::new(empty_static_assets()),
+            cv_static: Arc::new(empty_static_assets()),
             default_site: SiteKind::Main,
-            environment,
-            asset_version: String::new(),
-            generator: String::new(),
+            environment: Environment::Production,
+            asset_version: Arc::from(""),
+            generator: Arc::from(""),
             mailer: None,
             show_credits: true,
+            cv_pdf_cache: Arc::new(RwLock::new(HashMap::new())),
         }
+    }
+
+    fn app_state_for_environment(environment: Environment) -> AppState {
+        let mut state = app_state_with_languages(&["en"]);
+        state.environment = environment;
+        state
     }
 }

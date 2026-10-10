@@ -147,61 +147,13 @@
 </head>
 
 <body id="{% block body_id %}{% endblock body_id %}">
-  <a class="skip-link" href="#main-content">{{ translations.accessibility.skip_to_content }}</a>
+  {{ <chrome.skip_link /> }}
   {% block aside %}{% endblock aside %}
-  <section>
-    <header>
-      <nav>
-        {% if languages | length > 1 %}
-        <div class="language-switcher" role="navigation" aria-label="{{ translations.nav.language_selector_label }}">
-          {% for language in languages %}
-          {% set language_label = translations.nav.language_selector_label ~ ': ' ~ language.label %}
-          {% if language.is_current %}
-          <span class="language-switcher__current" lang="{{ language.code }}" aria-current="page">
-            <span aria-hidden="true">{{ language.code }}</span>
-            <span class="sr-only">{{ language_label }} ({{ translations.nav.current_language }})</span>
-          </span>
-          {% else %}
-          <a href="{{ language.url }}" lang="{{ language.code }}">
-            <span aria-hidden="true">{{ language.code }}</span>
-            <span class="sr-only">{{ language_label }}</span>
-          </a>
-          {% endif %}
-          {% endfor %}
-        </div>
-        {% endif %}
-        <button type="button" id="theme-switch" aria-label="{{ translations.nav.theme_switch }}"
-          title="{{ translations.nav.theme_switch }}">
-          <svg aria-hidden="true" focusable="false">
-            <use xlink:href="/assets/icons/main/website/sprites.svg#moon-auto" />
-          </svg>
-        </button>
-      </nav>
-    </header>
+  <div class="page-shell">
+    {{ <chrome.site_header site="main" /> }}
     {% block content %}{% endblock content %}
-    <footer>
-      <p>
-        <svg aria-hidden="true" focusable="false">
-          <use xlink:href="/assets/icons/cv/website/sprites.svg#copyright" />
-        </svg>
-        {% if has_website_main %}
-        {{ current_year }} - <a href="https://{{ website_main.domain }}" target="_blank" rel="noopener noreferrer">{{ first_name }} {{ last_name }}</a>
-        {% else %}
-        {{ current_year }} - {{ first_name }} {{ last_name }}
-        {% endif %}
-      </p>
-      {% if show_credits %}
-      <p>
-        &#60;&#47;&#62; with
-        <svg aria-hidden="true" focusable="false">
-          <use xlink:href="/assets/icons/cv/website/sprites.svg#love" />
-        </svg>
-        by <a href="https://github.com/GiorgioReale/folio-vitae" target="_blank" rel="noopener noreferrer">Giorgio
-          Reale</a>
-      </p>
-      {% endif %}
-    </footer>
-  </section>
+    {{ <chrome.site_footer site="main" /> }}
+  </div>
 </body>
 
 </html>

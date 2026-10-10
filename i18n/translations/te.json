@@ -7,14 +7,25 @@
     "direction": "ltr"
   },
   "accessibility": {
-    "skip_to_content": "ప్రధాన విషయానికి వెళ్లండి"
+    "skip_to_content": "ప్రధాన విషయానికి వెళ్లండి",
+    "new_window": "కొత్త ట్యాబ్‌లో తెరుచుకుంటుంది",
+    "profile": "ప్రొఫైల్",
+    "copyright": "కాపీరైట్",
+    "love": "love",
+    "portrait": "{name} చిత్రపటం",
+    "required": "తప్పనిసరి"
   },
   "nav": {
     "home": "హోమ్",
     "menu": "మెను",
     "theme_switch": "లైట్/డార్క్ మోడ్",
     "language_selector_label": "భాష",
-    "current_language": "ప్రస్తుత భాష"
+    "current_language": "ప్రస్తుత భాష",
+    "close_menu": "మెనూను మూసివేయి",
+    "primary": "సైట్",
+    "theme_light": "లేత థీమ్",
+    "theme_dark": "ముదురు థీమ్",
+    "theme_auto": "సిస్టమ్ థీమ్"
   },
   "main_page": {
     "websites": "వెబ్‌సైట్లు",
@@ -54,7 +65,16 @@
     },
     "curriculum_link": "సీవీ",
     "vote": "గ్రేడ్",
-    "project_link": "లింక్"
+    "project_link": "లింక్",
+    "pdf_heading": "PDF డౌన్‌లోడ్",
+    "pdf_description": "సీవీ యొక్క PDF కాపీ.",
+    "pdf_action": "PDF డౌన్‌లోడ్",
+    "contact_hints": {
+      "full_name": "3 నుండి 120 అక్షరాలు.",
+      "company": "2 నుండి 120 అక్షరాలు.",
+      "email": "చెల్లుబాటు అయ్యే ఈమెయిల్ ఇవ్వండి, ఉదాహరణకు name@example.com.",
+      "message": "10 నుండి 2000 అక్షరాలు."
+    }
   },
   "cv_menu": {
     "title": "మెను",
@@ -63,7 +83,8 @@
     "education": "విద్య",
     "skills": "నైపుణ్యాలు",
     "courses": "కోర్సులు & సర్టిఫికేట్‌లు",
-    "contact": "సంప్రదించండి"
+    "contact": "సంప్రదించండి",
+    "download": "PDF డౌన్‌లోడ్"
   },
   "contact": {
     "feedback_success": "సందేశం విజయవంతంగా పంపబడింది.",
@@ -74,7 +95,11 @@
     "full_name_length": "పూర్తి పేరు 3 నుండి 120 అక్షరాల మధ్య ఉండాలి.",
     "company_length": "కంపెనీ పేరు 2 నుండి 120 అక్షరాల మధ్య ఉండాలి.",
     "email": "దయచేసి సరైన ఇమెయిల్ చిరునామాను నమోదు చేయండి.",
-    "message_length": "సందేశం 10 నుండి 2000 అక్షరాల మధ్య ఉండాలి."
+    "message_length": "సందేశం 10 నుండి 2000 అక్షరాల మధ్య ఉండాలి.",
+    "full_name_required": "పూర్తి పేరు ఇవ్వండి.",
+    "company_required": "కంపెనీ పేరు ఇవ్వండి.",
+    "email_required": "మీ ఈమెయిల్ ఇవ్వండి.",
+    "message_required": "సందేశం ఇవ్వండి."
   },
   "errors": {
     "title": "లోపం",
@@ -116,6 +141,7 @@
     "year": "సంవత్సరం",
     "years": "సంవత్సరాలు",
     "month": "నెల",
-    "months": "నెలలు"
+    "months": "నెలలు",
+    "and": "మరియు"
   }
 }

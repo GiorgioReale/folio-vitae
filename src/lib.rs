@@ -124,7 +124,7 @@ pub async fn run_servers<T>(
     shutdown_signal: impl std::future::Future<Output = AppResult<T>>,
 ) -> AppResult<T> {
     let PreparedApplication { main_state, cv_state, build_cache, .. } =
-        prepare_application_state(environment)?;
+        run_blocking(move || prepare_application_state(environment)).await?;
 
     build_cache.save()?;
 
@@ -232,7 +232,8 @@ pub async fn run_servers_with_watch(
     let env_file = env_file.as_ref().to_path_buf();
 
     loop {
-        let watch_snapshot = read_watch_snapshot(&env_file)?;
+        let watched_env = env_file.clone();
+        let watch_snapshot = run_blocking(move || read_watch_snapshot(&watched_env)).await?;
         let lifecycle = run_servers(environment, host, main_port, cv_port, async {
             tokio::select! {
                 result = tokio::signal::ctrl_c() => {
@@ -250,7 +251,8 @@ pub async fn run_servers_with_watch(
         match lifecycle {
             ServerLifecycle::Restart => {
                 info!("Project files changed. Restarting development servers...");
-                load_env_file(&env_file.to_string_lossy())?;
+                let env_path = env_file.to_string_lossy().into_owned();
+                run_blocking(move || load_env_file(&env_path)).await?;
             },
             ServerLifecycle::Stop => return Ok(()),
         }
@@ -272,12 +274,26 @@ fn read_watch_snapshot(env_file: &Path) -> AppResult<WatchSnapshot> {
 
 #[cfg(feature = "serve")]
 async fn wait_for_project_change(env_file: &Path, baseline: WatchSnapshot) -> AppResult<()> {
+    let env_file = env_file.to_path_buf();
+
     loop {
         tokio::time::sleep(Duration::from_millis(750)).await;
 
-        if read_watch_snapshot(env_file)? != baseline {
+        let watched_env = env_file.clone();
+        if run_blocking(move || read_watch_snapshot(&watched_env)).await? != baseline {
             return Ok(());
         }
+    }
+}
+
+#[cfg(feature = "serve")]
+async fn run_blocking<T>(task: impl FnOnce() -> AppResult<T> + Send + 'static) -> AppResult<T>
+where
+    T: Send + 'static,
+{
+    match tokio::task::spawn_blocking(task).await {
+        Ok(result) => result,
+        Err(error) => Err(AppError::msg(format!("background task failed: {error}"))),
     }
 }
 
