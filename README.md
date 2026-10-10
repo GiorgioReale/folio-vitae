@@ -32,8 +32,8 @@ folio-vitae dev
 
 Then open:
 
-- main site: <http://127.0.0.1:8080>
-- CV site: <http://127.0.0.1:8081>
+- main site: <http://127.0.0.1:36546>
+- CV site: <http://127.0.0.1:36547>
 
 Edit `data/data.en.yaml` (and `data/data.it.yaml` if you use Italian). The servers reload when files change.
 
@@ -73,8 +73,8 @@ Language files are named `data/data.<code>.yaml` (for example `data.en.yaml`, `d
 Copy `.env.example` to `.env` if you need custom ports or other options:
 
 ```env
-MAIN_PORT=8080
-CV_PORT=8081
+MAIN_PORT=36546
+CV_PORT=36547
 DEFAULT_LANGUAGE=en
 ```
 
