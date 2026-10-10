@@ -1,0 +1,20 @@
+services:
+  folio-vitae:
+    image: ghcr.io/giorgioreale/folio-vitae:latest
+    # Or pin a version: ghcr.io/giorgioreale/folio-vitae:0.1.2
+    # Or build from this repo instead of pulling:
+    # build: .
+    container_name: folio-vitae
+    restart: unless-stopped
+    ports:
+      - "36546:36546" # main site
+      - "36547:36547" # CV site
+    volumes:
+      # Your YAML content and images (read-only is fine)
+      - ./data:/app/data:ro
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      APP_ENV: production
+      DATA_DIR: /app/data

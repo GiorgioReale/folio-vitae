@@ -217,16 +217,35 @@ async fn serve_command(options: ServeCommandOptions) -> AppResult<()> {
             .await?;
         },
         RuntimeMode::Production => {
-            let shutdown = async {
-                tokio::signal::ctrl_c().await.with_context(|| "listening for shutdown signal")?;
-                Ok(())
-            };
-
-            run_servers(environment, options.host, main_port, cv_port, shutdown).await?;
+            run_servers(environment, options.host, main_port, cv_port, wait_for_shutdown()).await?;
         },
     }
 
     Ok(())
+}
+
+#[cfg(feature = "serve")]
+async fn wait_for_shutdown() -> AppResult<()> {
+    let ctrl_c = async {
+        tokio::signal::ctrl_c().await.with_context(|| "listening for ctrl-c")?;
+        Ok(())
+    };
+
+    #[cfg(unix)]
+    let terminate = async {
+        let mut signal = tokio::signal::unix::signal(tokio::signal::unix::SignalKind::terminate())
+            .with_context(|| "installing SIGTERM handler")?;
+        signal.recv().await;
+        Ok(())
+    };
+
+    #[cfg(not(unix))]
+    let terminate = std::future::pending::<AppResult<()>>();
+
+    tokio::select! {
+        result = ctrl_c => result,
+        result = terminate => result,
+    }
 }
 
 fn default_command() -> Commands {

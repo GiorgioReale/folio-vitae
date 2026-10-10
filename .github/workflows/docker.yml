@@ -1,0 +1,144 @@
+name: Docker
+
+on:
+  pull_request:
+    paths:
+      - Dockerfile
+      - .dockerignore
+      - .github/workflows/docker.yml
+      - Cargo.toml
+      - Cargo.lock
+      - rust-toolchain.toml
+      - src/**
+      - assets/**
+      - templates/**
+      - static/**
+      - i18n/**
+      - data_example/**
+  push:
+    branches:
+      - main
+    paths:
+      - Dockerfile
+      - .dockerignore
+      - .github/workflows/docker.yml
+      - Cargo.toml
+      - Cargo.lock
+      - rust-toolchain.toml
+      - src/**
+      - assets/**
+      - templates/**
+      - static/**
+      - i18n/**
+      - data_example/**
+  release:
+    types:
+      - published
+  workflow_dispatch:
+    inputs:
+      git_ref:
+        description: Git ref to build (branch, tag, or SHA). Empty uses the default branch.
+        required: false
+        type: string
+        default: ""
+      update_latest:
+        description: Tag the image as latest
+        required: false
+        type: boolean
+        default: true
+      update_version_tags:
+        description: Also tag with the Cargo.toml app version (e.g. 0.1.2 and 0.1), without a new GitHub Release
+        required: false
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: docker-${{ github.event.release.tag_name || github.ref }}
+  cancel-in-progress: true
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Resolve checkout ref
+        id: checkout_ref
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            echo "ref=${{ github.event.release.tag_name }}" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ -n "${{ inputs.git_ref }}" ]; then
+            echo "ref=${{ inputs.git_ref }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "ref=${{ github.sha }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          ref: ${{ steps.checkout_ref.outputs.ref }}
+
+      - name: Set image name
+        run: echo "IMAGE_NAME=${REGISTRY}/$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_ENV"
+
+      - name: Read Cargo.toml version
+        id: cargo_version
+        run: |
+          CARGO_VERSION="$(awk '
+            /^\[package\]$/ { in_package=1; next }
+            /^\[/ && $0 != "[package]" { in_package=0 }
+            in_package && /^version = / {
+              gsub(/"/, "", $3)
+              print $3
+              exit
+            }
+          ' Cargo.toml)"
+
+          if [ -z "$CARGO_VERSION" ]; then
+            echo "Unable to determine package version from Cargo.toml"
+            exit 1
+          fi
+
+          echo "version=$CARGO_VERSION" >> "$GITHUB_OUTPUT"
+          echo "major_minor=$(echo "$CARGO_VERSION" | cut -d. -f1-2)" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=edge,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+            type=sha,prefix=sha-,format=short,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+            type=raw,value=latest,enable=${{ github.event_name == 'release' || (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && inputs.update_latest) }}
+            type=raw,value=${{ steps.cargo_version.outputs.version }},enable=${{ github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.update_version_tags) }}
+            type=raw,value=${{ steps.cargo_version.outputs.major_minor }},enable=${{ github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.update_version_tags) }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
