@@ -736,14 +736,14 @@ mod tests {
 
     #[test]
     fn same_host_origin_is_allowed() {
-        let headers = headers_with("cv.example.com:8081", "https://cv.example.com");
+        let headers = headers_with("cv.example.com:36547", "https://cv.example.com");
 
         assert!(request_origin_is_allowed(&headers, &app_state()));
     }
 
     #[test]
     fn configured_site_origin_is_allowed() {
-        let headers = headers_with("127.0.0.1:8081", "https://cv.example.com");
+        let headers = headers_with("127.0.0.1:36547", "https://cv.example.com");
 
         assert!(request_origin_is_allowed(&headers, &app_state()));
     }
@@ -757,7 +757,7 @@ mod tests {
 
     #[test]
     fn mixed_case_host_matches_configured_domain() {
-        let headers = headers_with("CV.Example.com:8081", "https://cv.example.com");
+        let headers = headers_with("CV.Example.com:36547", "https://cv.example.com");
 
         assert!(request_origin_is_allowed(&headers, &app_state()));
         assert_eq!(site_from_host(&headers, &app_state()), Some(SiteKind::Cv));

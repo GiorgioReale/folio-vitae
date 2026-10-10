@@ -10,10 +10,10 @@ pub const ENV_CV_PORT: &str = "CV_PORT";
 pub const ENV_DATA_DIR: &str = "DATA_DIR";
 
 /// Default port used when the main website port is not provided.
-pub const DEFAULT_MAIN_PORT: u16 = 8080;
+pub const DEFAULT_MAIN_PORT: u16 = 36546;
 
 /// Default port used when the CV website port is not provided.
-pub const DEFAULT_CV_PORT: u16 = 8081;
+pub const DEFAULT_CV_PORT: u16 = 36547;
 
 /// Default directory used for localized content and source images.
 pub const DEFAULT_DATA_DIR: &str = "data";
