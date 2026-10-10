@@ -13,7 +13,8 @@
     "copyright": "Copyright",
     "love": "love",
     "portrait": "Retrato de {name}",
-    "required": "obrigatório"
+    "required": "obrigatório",
+    "social_card_alt": "Cartão social do site de {name}"
   },
   "nav": {
     "home": "Início",

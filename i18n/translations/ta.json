@@ -13,7 +13,8 @@
     "copyright": "பதிப்புரிமை",
     "love": "love",
     "portrait": "{name} உருவப்படம்",
-    "required": "கட்டாயம்"
+    "required": "கட்டாயம்",
+    "social_card_alt": "{name} தளத்தின் சமூக அட்டை"
   },
   "nav": {
     "home": "முகப்பு",

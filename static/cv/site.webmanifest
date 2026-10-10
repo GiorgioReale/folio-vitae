@@ -1,5 +1,5 @@
 {
-  "lang": "it",
+  "lang": "{{ lang }}",
   "name": "{{ title }}",
   "short_name": "{{ title }}",
   "description": "{{ description }}",

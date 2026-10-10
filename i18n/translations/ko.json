@@ -13,7 +13,8 @@
     "copyright": "저작권",
     "love": "love",
     "portrait": "{name}의 초상",
-    "required": "필수"
+    "required": "필수",
+    "social_card_alt": "{name} 사이트의 소셜 카드"
   },
   "nav": {
     "home": "홈",

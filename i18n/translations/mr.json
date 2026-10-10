@@ -13,7 +13,8 @@
     "copyright": "कॉपीराइट",
     "love": "love",
     "portrait": "{name} यांचे व्यक्तिचित्र",
-    "required": "आवश्यक"
+    "required": "आवश्यक",
+    "social_card_alt": "{name} साइटचे सोशल कार्ड"
   },
   "nav": {
     "home": "मुख्यपृष्ठ",

@@ -13,7 +13,8 @@
     "copyright": "版权",
     "love": "love",
     "portrait": "{name}的肖像",
-    "required": "必填"
+    "required": "必填",
+    "social_card_alt": "{name} 的网站社交卡片"
   },
   "nav": {
     "home": "主页",

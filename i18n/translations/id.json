@@ -13,7 +13,8 @@
     "copyright": "Hak cipta",
     "love": "love",
     "portrait": "Potret {name}",
-    "required": "wajib"
+    "required": "wajib",
+    "social_card_alt": "Kartu sosial situs {name}"
   },
   "nav": {
     "home": "Beranda",
