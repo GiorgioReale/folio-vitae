@@ -6,6 +6,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.5] - 2026-10-11
+
+### Fixed
+- Contact form requires `Origin`, rate-limits submissions, keeps message newlines, and sets `Reply-To`
+- Package upgrades no longer overwrite customized templates, assets, static files, or i18n
+- Multilingual sitemaps/`hreflang`, localized social-card alts, and complete CV menu section links
+- Accessibility and UX polish for the contact form, theme flash, hero LCP, and control hit targets
+
+### Changed
+- SMTP is enabled in the default feature set
+- Bare `folio-vitae` requires an explicit subcommand (`init`, `dev`, or `prod`)
+- `init` also scaffolds Spanish starter data
+
+### Performance
+- PDF render singleflight, production HTML page cache, and less aggressive localization recheck
+
 ## [0.1.4] - 2026-10-10
 
 ### Fixed
