@@ -13,7 +13,8 @@
     "copyright": "حقوق النشر",
     "love": "love",
     "portrait": "صورة شخصية لـ {name}",
-    "required": "مطلوب"
+    "required": "مطلوب",
+    "social_card_alt": "بطاقة التواصل الاجتماعي لموقع {name}"
   },
   "nav": {
     "home": "الرئيسية",

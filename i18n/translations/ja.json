@@ -13,7 +13,8 @@
     "copyright": "著作権",
     "love": "love",
     "portrait": "{name}の肖像",
-    "required": "必須"
+    "required": "必須",
+    "social_card_alt": "{name} のサイトのソーシャルカード"
   },
   "nav": {
     "home": "ホーム",

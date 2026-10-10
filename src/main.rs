@@ -14,23 +14,23 @@ use folio_vitae::{logging::init_tracing, resources::ensure_runtime_assets};
 #[cfg(feature = "serve")]
 use serde::Serialize;
 #[cfg(feature = "serve")]
-use std::net::{IpAddr, Ipv4Addr, SocketAddr};
+use std::net::{IpAddr, SocketAddr};
 #[cfg(feature = "serve")]
 use tracing::warn;
 #[cfg(feature = "serve")]
 use tracing_subscriber::EnvFilter;
 
 #[derive(Parser)]
-#[command(author, version, about = "Run folio-vitae websites in development or production")]
+#[command(
+    author,
+    version,
+    about = "Run folio-vitae websites in development or production",
+    subcommand_required = true,
+    arg_required_else_help = true
+)]
 struct Cli {
     #[command(subcommand)]
-    command: Option<Commands>,
-}
-
-impl Cli {
-    fn command_or_default(self) -> Commands {
-        self.command.unwrap_or_else(default_command)
-    }
+    command: Commands,
 }
 
 #[derive(Subcommand)]
@@ -89,7 +89,7 @@ enum Commands {
 
 #[tokio::main]
 async fn main() -> AppResult<()> {
-    match Cli::parse().command_or_default() {
+    match Cli::parse().command {
         Commands::Init { force } => init_command(force),
         #[cfg(feature = "serve")]
         Commands::Dev { main_port, cv_port, env_file, host, quiet, json } => {
@@ -245,25 +245,6 @@ async fn wait_for_shutdown() -> AppResult<()> {
     tokio::select! {
         result = ctrl_c => result,
         result = terminate => result,
-    }
-}
-
-fn default_command() -> Commands {
-    // Running the binary without a subcommand should feel useful for local development.
-    #[cfg(feature = "serve")]
-    {
-        Commands::Dev {
-            main_port: None,
-            cv_port: None,
-            env_file: ".env".to_string(),
-            host: IpAddr::V4(Ipv4Addr::LOCALHOST),
-            quiet: false,
-            json: false,
-        }
-    }
-    #[cfg(not(feature = "serve"))]
-    {
-        Commands::Init { force: false }
     }
 }
 

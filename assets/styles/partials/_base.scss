@@ -304,8 +304,10 @@ html {
 
             > li > a,
             > li > span.language-switcher__current {
-              width: 2rem;
-              height: 2rem;
+              width: 2.75rem;
+              height: 2.75rem;
+              min-width: 2.75rem;
+              min-height: 2.75rem;
               aspect-ratio: 1;
               border: 0.2rem solid var(--color-links);
               font-family: var(--font-family-monospace);
@@ -342,11 +344,16 @@ html {
           > a,
           > button {
             line-height: 0;
+            min-width: 2.75rem;
+            min-height: 2.75rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
 
             > svg {
               fill: var(--color-links);
-              width: 2rem;
-              height: 2rem;
+              width: 2.75rem;
+              height: 2.75rem;
 
               &:hover {
                 fill: var(--color-links-hover);

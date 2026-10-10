@@ -1,4 +1,4 @@
-use std::{env, num::ParseIntError, path::PathBuf};
+use std::{env, num::ParseIntError};
 
 use thiserror::Error;
 
@@ -54,11 +54,6 @@ pub enum AppError {
     #[cfg(feature = "serve")]
     #[error(transparent)]
     Grass(#[from] Box<grass::Error>),
-
-    #[error("Unsupported image format for {0:?}")]
-    // Kept for future explicit image format validation.
-    #[allow(dead_code)]
-    UnsupportedImageFormat(PathBuf),
 
     #[error("{context}: {source}")]
     Contextual {

@@ -38,7 +38,7 @@ use app::{
     state::AppState,
 };
 use app::{compression, images, scripts, styles};
-use config::{TEMPLATES_PATTERN, data_dir};
+use config::data_dir;
 use dotenvy::from_path_override;
 #[cfg(feature = "serve")]
 use http::build_router;
@@ -76,7 +76,6 @@ pub fn prepare_application_state(environment: Environment) -> AppResult<Prepared
 
     let (available_languages, data_last_modified) = detect_languages_with_last_change()?;
     let assets_last_modified = latest_modification(&["assets/styles", "assets/scripts"])?;
-    let templates_last_modified = latest_modification(&["templates"])?;
     let images_last_modified = latest_modification(&[data_directory.join("images")])?;
     let images_outputs_missing = images::generated_outputs_missing()?;
     let minify_assets = environment.should_minify_assets();
@@ -93,12 +92,9 @@ pub fn prepare_application_state(environment: Environment) -> AppResult<Prepared
         build_cache.record_assets(assets_last_modified, minify_assets);
     }
 
-    build_cache.record_templates(templates_last_modified);
-    build_cache.record_data(data_last_modified);
-
     let data = load_localizations(&available_languages)?;
     let language_names = load_language_names(&available_languages)?;
-    let tera = load_templates(TEMPLATES_PATTERN)?;
+    let tera = load_templates()?;
 
     build_app_states(
         available_languages,

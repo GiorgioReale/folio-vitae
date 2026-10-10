@@ -18,11 +18,12 @@ use crate::{
             load_language_names, load_localizations,
         },
         models::SiteData,
+        rate_limit::ContactRateLimiter,
     },
     error::{AppError, AppResult, ResultExt},
 };
 
-const LOCALIZATION_RECHECK_INTERVAL: Duration = Duration::from_millis(2);
+const LOCALIZATION_RECHECK_INTERVAL: Duration = Duration::from_secs(1);
 
 #[derive(Clone)]
 pub struct AppState {
@@ -39,6 +40,17 @@ pub struct AppState {
     pub(crate) mailer: Option<Arc<Mailer>>,
     pub(crate) show_credits: bool,
     pub(crate) cv_pdf_cache: Arc<RwLock<HashMap<Language, Arc<Vec<u8>>>>>,
+    pub(crate) cv_pdf_locks: Arc<Mutex<HashMap<Language, Arc<tokio::sync::Mutex<()>>>>>,
+    pub(crate) html_page_cache: Arc<RwLock<HashMap<HtmlCacheKey, Arc<str>>>>,
+    pub(crate) contact_rate_limiter: Arc<ContactRateLimiter>,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+pub(crate) struct HtmlCacheKey {
+    pub site: SiteKind,
+    pub language: Language,
+    pub template: &'static str,
+    pub request_path: String,
 }
 
 #[derive(Clone)]
@@ -69,7 +81,7 @@ pub(crate) struct LanguageLink {
     pub is_current: bool,
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum SiteKind {
     Main,
     Cv,
@@ -297,6 +309,7 @@ impl AppState {
 
         *self.data_last_modified.write().unwrap_or_else(|error| error.into_inner()) = latest_change;
         self.cv_pdf_cache.write().unwrap_or_else(|error| error.into_inner()).clear();
+        self.html_page_cache.write().unwrap_or_else(|error| error.into_inner()).clear();
         self.mark_localization_checked();
 
         Ok(())
@@ -312,6 +325,30 @@ impl AppState {
             .write()
             .unwrap_or_else(|error| error.into_inner())
             .insert(language, bytes);
+    }
+
+    pub(crate) fn pdf_render_lock(&self, language: &Language) -> Arc<tokio::sync::Mutex<()>> {
+        let mut locks = self.cv_pdf_locks.lock().unwrap_or_else(|error| error.into_inner());
+        locks
+            .entry(language.clone())
+            .or_insert_with(|| Arc::new(tokio::sync::Mutex::new(())))
+            .clone()
+    }
+
+    pub(crate) fn cached_html_page(&self, key: &HtmlCacheKey) -> Option<Arc<str>> {
+        if !matches!(self.environment, Environment::Production) {
+            return None;
+        }
+
+        self.html_page_cache.read().unwrap_or_else(|error| error.into_inner()).get(key).cloned()
+    }
+
+    pub(crate) fn store_html_page(&self, key: HtmlCacheKey, html: Arc<str>) {
+        if !matches!(self.environment, Environment::Production) {
+            return;
+        }
+
+        self.html_page_cache.write().unwrap_or_else(|error| error.into_inner()).insert(key, html);
     }
 }
 
@@ -431,14 +468,15 @@ pub(crate) fn compile_static_assets(
     path: &str,
     site: SiteKind,
     data: &SiteData,
+    localization: &LocalizationState,
 ) -> AppResult<StaticAssets> {
-    let context = build_static_context(site, data)?;
+    let context = build_static_context(site, data, localization)?;
     let mut tera = Tera::default();
     tera.autoescape_on(Vec::<&str>::new());
 
     Ok(StaticAssets {
         robots: render_static_template(&mut tera, path, "robots.txt", &context)?,
-        sitemap: render_static_template(&mut tera, path, "sitemap.xml", &context)?,
+        sitemap: Arc::from(render_sitemap(site, data, localization)?),
         manifest: render_static_template(&mut tera, path, "site.webmanifest", &context)?,
         security_txt: render_static_template(
             &mut tera,
@@ -449,7 +487,11 @@ pub(crate) fn compile_static_assets(
     })
 }
 
-fn build_static_context(site: SiteKind, data: &SiteData) -> AppResult<Context> {
+fn build_static_context(
+    site: SiteKind,
+    data: &SiteData,
+    localization: &LocalizationState,
+) -> AppResult<Context> {
     let main_site = data.sites.resolved_main();
     let cv_site = data.sites.resolved_cv();
     let site_data = match site {
@@ -461,6 +503,7 @@ fn build_static_context(site: SiteKind, data: &SiteData) -> AppResult<Context> {
     context.insert("domain", site_data.0);
     context.insert("title", site_data.1);
     context.insert("description", site_data.2);
+    context.insert("lang", localization.default_language.as_code());
     context.insert("base_url", &format!("https://{}", site_data.0));
     let security_txt_expires = Utc
         .with_ymd_and_hms(Utc::now().year().saturating_add(2), 1, 1, 0, 0, 0)
@@ -470,6 +513,102 @@ fn build_static_context(site: SiteKind, data: &SiteData) -> AppResult<Context> {
     context.insert("security_txt_expires", &security_txt_expires);
 
     Ok(context)
+}
+
+fn render_sitemap(
+    site: SiteKind,
+    data: &SiteData,
+    localization: &LocalizationState,
+) -> AppResult<String> {
+    let domain = match site {
+        SiteKind::Main => data.sites.resolved_main().domain.clone(),
+        SiteKind::Cv => data.sites.resolved_cv().domain.clone(),
+    };
+    let base_url = format!("https://{domain}");
+    let pages: &[(&str, &str)] = match site {
+        SiteKind::Main => &[("", "1.00")],
+        SiteKind::Cv => &[("", "1.00"), ("curriculum", "0.90")],
+    };
+
+    let languages: Vec<&Language> = localization
+        .supported_languages
+        .iter()
+        .filter(|language| language_has_site_in_snapshot(language, site, localization))
+        .collect();
+
+    let multilingual = languages.len() > 1;
+    let mut output = String::from(
+        r#"<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+"#,
+    );
+
+    for (page, priority) in pages {
+        for language in &languages {
+            let path = language_prefixed_path(
+                language,
+                page,
+                &localization.default_language,
+                multilingual,
+            );
+            let loc = format!("{base_url}{path}");
+            output.push_str("  <url>\n");
+            output.push_str(&format!("    <loc>{loc}</loc>\n"));
+            output.push_str(&format!("    <priority>{priority}</priority>\n"));
+
+            if multilingual {
+                for alternate in &languages {
+                    let alternate_path = language_prefixed_path(
+                        alternate,
+                        page,
+                        &localization.default_language,
+                        true,
+                    );
+                    output.push_str(&format!(
+                        "    <xhtml:link rel=\"alternate\" hreflang=\"{}\" href=\"{base_url}{alternate_path}\" />\n",
+                        alternate.as_code()
+                    ));
+                }
+                let default_path = language_prefixed_path(
+                    &localization.default_language,
+                    page,
+                    &localization.default_language,
+                    true,
+                );
+                output.push_str(&format!(
+                    "    <xhtml:link rel=\"alternate\" hreflang=\"x-default\" href=\"{base_url}{default_path}\" />\n"
+                ));
+            }
+
+            output.push_str("  </url>\n");
+        }
+    }
+
+    output.push_str("</urlset>\n");
+    Ok(output)
+}
+
+fn language_prefixed_path(
+    language: &Language,
+    page: &str,
+    default_language: &Language,
+    multilingual: bool,
+) -> String {
+    let prefix = if multilingual {
+        format!("/{}", language.as_code())
+    } else if language == default_language {
+        String::new()
+    } else {
+        format!("/{}", language.as_code())
+    };
+
+    if page.is_empty() {
+        if prefix.is_empty() { "/".to_string() } else { format!("{prefix}/") }
+    } else if prefix.is_empty() {
+        format!("/{page}")
+    } else {
+        format!("{prefix}/{page}")
+    }
 }
 
 fn render_static_template(
@@ -663,6 +802,9 @@ mod tests {
             mailer: None,
             show_credits: true,
             cv_pdf_cache: Arc::new(RwLock::new(HashMap::new())),
+            cv_pdf_locks: Arc::new(Mutex::new(HashMap::new())),
+            html_page_cache: Arc::new(RwLock::new(HashMap::new())),
+            contact_rate_limiter: Arc::new(ContactRateLimiter::default()),
         }
     }
 

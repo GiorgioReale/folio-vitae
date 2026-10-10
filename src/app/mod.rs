@@ -12,6 +12,7 @@ pub mod email;
 pub mod environment;
 pub mod localization;
 pub mod models;
+pub mod rate_limit;
 pub mod setup;
 pub mod state;
 

@@ -13,7 +13,8 @@
     "copyright": "కాపీరైట్",
     "love": "love",
     "portrait": "{name} చిత్రపటం",
-    "required": "తప్పనిసరి"
+    "required": "తప్పనిసరి",
+    "social_card_alt": "{name} సైట్ సోషల్ కార్డ్"
   },
   "nav": {
     "home": "హోమ్",

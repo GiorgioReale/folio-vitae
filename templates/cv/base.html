@@ -46,9 +46,6 @@
   <meta name="url" content="https://{{ site_domain }}{{ resolved_page_url }}" />
   <meta name="identifier-URL" content="https://{{ site_domain }}{{ resolved_page_url }}" />
   {% endif %}
-  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
-  <meta http-equiv="Pragma" content="no-cache" />
-  <meta http-equiv="Expires" content="0" />
   {% if page_title_content != "" %}
   <meta property="og:title" content="{{ page_title_content }}" />
   {% endif %}
@@ -61,7 +58,7 @@
   <meta property="og:image:type" content="image/png" />
   <meta property="og:image:width" content="1920" />
   <meta property="og:image:height" content="1080" />
-  <meta property="og:image:alt" content="Social card del sito di {{ first_name }} {{ last_name }}" />
+  <meta property="og:image:alt" content="{{ social_card_alt }}" />
   {% endif %}
   {% if has_site_title %}
   <meta property="og:site_name" content="{{ site_title }}" />
@@ -93,11 +90,11 @@
   {% if position.longitude | trim | length > 0 %}
   <meta property="og:longitude" content="{{ position.longitude }}" />
   {% endif %}
-  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:card" content="summary_large_image" />
   {% if has_site_domain %}
   <meta name="twitter:url" content="https://{{ site_domain }}{{ resolved_page_url }}" />
   <meta name="twitter:image" content="https://{{ site_domain }}/assets/images/cv/social-card/social-card.png" />
-  <meta name="twitter:image:alt" content="Social card del sito di {{ first_name }} {{ last_name }}" />
+  <meta name="twitter:image:alt" content="{{ social_card_alt }}" />
   {% endif %}
   {% if page_title_content != "" %}
   <meta name="twitter:title" content="{{ page_title_content }}" />
@@ -127,6 +124,12 @@
   {% if has_site_domain %}
   <link rel="canonical" href="https://{{ site_domain }}{{ resolved_page_url }}" />
   {% endif %}
+  {% if has_site_domain and languages | length > 1 %}
+  {% for language in languages %}
+  <link rel="alternate" hreflang="{{ language.code }}" href="https://{{ site_domain }}{{ language.url }}" />
+  {% endfor %}
+  <link rel="alternate" hreflang="x-default" href="https://{{ site_domain }}{{ hreflang_default_url }}" />
+  {% endif %}
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/cv/logos/apple-touch-icon.png" />
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/cv/logos/favicon-32x32.png" />
   <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/cv/logos/favicon-16x16.png" />
@@ -138,14 +141,18 @@
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="#000000" />
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000" />
   <meta name="view-transition" content="same-origin" />
+  {% if minify_assets %}
+  <script src="/assets/scripts/light-dark-mode.min.js?v={{ asset_version }}" charset="utf-8" data-sprite-prefix="/assets/icons/cv/website/sprites.svg#"></script>
+  {% else %}
+  <script src="/assets/scripts/light-dark-mode.js?v={{ asset_version }}" charset="utf-8" data-sprite-prefix="/assets/icons/cv/website/sprites.svg#"></script>
+  {% endif %}
   <link rel="preload" href="/assets/styles/cv.css?v={{ asset_version }}" as="style" />
+  <link rel="preload" as="image" href="/assets/images/cv/home-background/home-background.avif" type="image/avif" imagesrcset="/assets/images/cv/home-background/home-background-mobile.avif 1024w, /assets/images/cv/home-background/home-background.avif 1920w" imagesizes="(max-width: 1024px) 100vw, 40vw" />
   <link rel="stylesheet" href="/assets/styles/cv.css?v={{ asset_version }}" type="text/css" fetchpriority="high" />
   {% if minify_assets %}
-  <script src="/assets/scripts/light-dark-mode.min.js?v={{ asset_version }}" charset="utf-8" defer data-sprite-prefix="/assets/icons/cv/website/sprites.svg#"></script>
   <script src="/assets/scripts/cv/open-close-menu.min.js?v={{ asset_version }}" charset="utf-8" defer></script>
   <script src="/assets/scripts/cv/contact-form.min.js?v={{ asset_version }}" charset="utf-8" defer></script>
   {% else %}
-  <script src="/assets/scripts/light-dark-mode.js?v={{ asset_version }}" charset="utf-8" defer data-sprite-prefix="/assets/icons/cv/website/sprites.svg#"></script>
   <script src="/assets/scripts/cv/open-close-menu.js?v={{ asset_version }}" charset="utf-8" defer></script>
   <script src="/assets/scripts/cv/contact-form.js?v={{ asset_version }}" charset="utf-8" defer></script>
   {% endif %}

@@ -42,19 +42,21 @@
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://{{ base_domain }}{{ resolved_page_url }}" />
   <meta property="og:image" content="https://{{ base_domain }}{{ social_card_path }}" />
-  <meta property="og:image:alt" content="Social card del sito di {{ first_name }} {{ last_name }}" />
+  <meta property="og:image:alt" content="{{ social_card_alt }}" />
   <meta property="og:image:type" content="image/png" />
   <meta property="og:image:width" content="1920" />
   <meta property="og:image:height" content="1080" />
   <meta property="og:site_name" content="{{ website.title }}" />
   <meta property="og:description" content="{{ website.description }}" />
-  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:url" content="https://{{ base_domain }}{{ resolved_page_url }}" />
   <meta name="twitter:title" content="{{ resolved_page_title }} · {{ website.title }}" />
   <meta name="twitter:description" content="{{ website.description }}" />
   <meta name="twitter:image" content="https://{{ base_domain }}{{ social_card_path }}" />
-  <meta name="twitter:image:alt" content="Social card del sito di {{ first_name }} {{ last_name }}" />
+  <meta name="twitter:image:alt" content="{{ social_card_alt }}" />
+  {% if twitter_handle != "" %}
   <meta name="twitter:creator" content="@{{ twitter_handle }}" />
+  {% endif %}
   <title>{{ resolved_page_title }} · {{ website.title }}</title>
   <link rel="canonical" href="https://{{ base_domain }}{{ resolved_page_url }}" />
   <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/{{ site }}/logos/apple-touch-icon.png" />
@@ -66,6 +68,11 @@
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="#000000" />
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000" />
   <meta name="view-transition" content="same-origin" />
+  {% if minify_assets %}
+  <script src="/assets/scripts/light-dark-mode.min.js?v={{ asset_version }}" charset="utf-8" data-sprite-prefix="{{ sprite_prefix }}"></script>
+  {% else %}
+  <script src="/assets/scripts/light-dark-mode.js?v={{ asset_version }}" charset="utf-8" data-sprite-prefix="{{ sprite_prefix }}"></script>
+  {% endif %}
   <link rel="preload" href="{{ stylesheet }}" as="style" />
   <link rel="stylesheet" href="{{ stylesheet }}" type="text/css" fetchpriority="high" />
 </head>
@@ -83,14 +90,12 @@
     {{ <chrome.site_footer site={site} /> }}
   </div>
   {% if minify_assets %}
-  <script src="/assets/scripts/light-dark-mode.min.js?v={{ asset_version }}" charset="utf-8" data-sprite-prefix="{{ sprite_prefix }}"></script>
   {% if site == "cv" %}
-  <script src="/assets/scripts/cv/open-close-menu.min.js?v={{ asset_version }}" charset="utf-8"></script>
+  <script src="/assets/scripts/cv/open-close-menu.min.js?v={{ asset_version }}" charset="utf-8" defer></script>
   {% endif %}
   {% else %}
-  <script src="/assets/scripts/light-dark-mode.js?v={{ asset_version }}" charset="utf-8" data-sprite-prefix="{{ sprite_prefix }}"></script>
   {% if site == "cv" %}
-  <script src="/assets/scripts/cv/open-close-menu.js?v={{ asset_version }}" charset="utf-8"></script>
+  <script src="/assets/scripts/cv/open-close-menu.js?v={{ asset_version }}" charset="utf-8" defer></script>
   {% endif %}
   {% endif %}
 </body>

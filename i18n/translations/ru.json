@@ -13,7 +13,8 @@
     "copyright": "Авторское право",
     "love": "love",
     "portrait": "Портрет: {name}",
-    "required": "обязательно"
+    "required": "обязательно",
+    "social_card_alt": "Социальная карточка сайта {name}"
   },
   "nav": {
     "home": "Главная",

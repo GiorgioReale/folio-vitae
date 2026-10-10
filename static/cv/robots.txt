@@ -1,4 +1,3 @@
 User-agent: *
 Disallow: /menu
 Sitemap: https://{{ domain }}/sitemap.xml
-Sitemap: http://{{ domain }}/sitemap.xml

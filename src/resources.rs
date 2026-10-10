@@ -1,6 +1,7 @@
 use std::{fs, path::Path};
 
 use include_dir::{Dir, include_dir};
+use tracing::info;
 
 use crate::error::{AppError, AppResult, ResultExt};
 
@@ -12,6 +13,7 @@ const EMBEDDED_ASSETS_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 const INIT_DATA_IT: &str = include_str!("../data_example/data.it.yaml");
 const INIT_DATA_EN: &str = include_str!("../data_example/data.en.yaml");
+const INIT_DATA_ES: &str = include_str!("../data_example/data.es.yaml");
 const INIT_ENV: &str = include_str!("../data_example/.env.example");
 
 pub fn ensure_runtime_assets() -> AppResult<()> {
@@ -19,14 +21,19 @@ pub fn ensure_runtime_assets() -> AppResult<()> {
     let current_version =
         fs::read_to_string(version_path).ok().map(|value| value.trim().to_owned());
     let should_update = current_version.as_deref() != Some(EMBEDDED_ASSETS_VERSION);
-    let force = should_update;
 
-    write_dir(&EMBEDDED_ASSETS, Path::new("assets"), force)?;
-    write_dir(&EMBEDDED_TEMPLATES, Path::new("templates"), force)?;
-    write_dir(&EMBEDDED_STATIC, Path::new("static"), force)?;
-    write_dir(&EMBEDDED_I18N, Path::new("i18n"), force)?;
+    // Never overwrite existing user customizations. Only fill in missing files.
+    write_dir(&EMBEDDED_ASSETS, Path::new("assets"), false)?;
+    write_dir(&EMBEDDED_TEMPLATES, Path::new("templates"), false)?;
+    write_dir(&EMBEDDED_STATIC, Path::new("static"), false)?;
+    write_dir(&EMBEDDED_I18N, Path::new("i18n"), false)?;
 
     if should_update {
+        info!(
+            previous = current_version.as_deref().unwrap_or("none"),
+            current = EMBEDDED_ASSETS_VERSION,
+            "Asset package version changed; existing templates/assets/static/i18n were left untouched"
+        );
         fs::write(version_path, EMBEDDED_ASSETS_VERSION)
             .with_context(|| format!("writing {version_path:?}"))?;
     }
@@ -39,6 +46,7 @@ pub fn init_project_files(force: bool) -> AppResult<()> {
 
     write_file(Path::new("data/data.it.yaml"), INIT_DATA_IT, force)?;
     write_file(Path::new("data/data.en.yaml"), INIT_DATA_EN, force)?;
+    write_file(Path::new("data/data.es.yaml"), INIT_DATA_ES, force)?;
     write_file(Path::new(".env.example"), INIT_ENV, force)?;
 
     Ok(())

@@ -13,7 +13,8 @@
     "copyright": "Bản quyền",
     "love": "love",
     "portrait": "Chân dung của {name}",
-    "required": "bắt buộc"
+    "required": "bắt buộc",
+    "social_card_alt": "Thẻ mạng xã hội của trang {name}"
   },
   "nav": {
     "home": "Trang chủ",

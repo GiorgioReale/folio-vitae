@@ -1,9 +1,9 @@
-use std::sync::Arc;
+use std::{net::SocketAddr, sync::Arc};
 
 use axum::{
     Form,
     body::Bytes,
-    extract::State,
+    extract::{ConnectInfo, State},
     http::{
         HeaderMap, HeaderValue, StatusCode, Uri,
         header::{CACHE_CONTROL, CONTENT_DISPOSITION, CONTENT_TYPE, HOST, ORIGIN},
@@ -23,34 +23,32 @@ use crate::app::{
     state::{AppState, SiteKind, SitePage},
 };
 
+struct ResolvedRequest {
+    language: Language,
+    site: SiteKind,
+    path: String,
+}
+
+enum ResolveOutcome {
+    Ready(ResolvedRequest),
+    Respond(Response),
+}
+
 pub(crate) async fn homepage(
     State(state): State<AppState>,
     headers: HeaderMap,
     uri: Uri,
 ) -> Response {
-    if let Some(response) = reject_unknown_page(&state, &headers, &uri, SitePage::Home) {
-        return response;
-    }
-
-    if let Some(redirect) = redirect_missing_language(&state, &uri) {
-        return redirect;
-    }
-
-    let (language, _, _) = state.language_from_path(uri.path());
-
-    let Some(site) = site_from_host(&headers, &state) else {
-        return site_not_available(&state, uri.path(), &language);
+    let resolved = match resolve_request(&state, &headers, &uri, SitePage::Home, None) {
+        ResolveOutcome::Ready(resolved) => resolved,
+        ResolveOutcome::Respond(response) => return response,
     };
-    if !state.language_has_site(&language, site) {
-        return render_error(&state, site, StatusCode::NOT_FOUND, uri.path(), &language)
-            .map(|html| (StatusCode::NOT_FOUND, Html(html)).into_response())
-            .unwrap_or_else(|status| status.into_response());
-    }
-    match site {
-        SiteKind::Main => render_main_homepage(&state, &language, uri.path())
+
+    match resolved.site {
+        SiteKind::Main => render_main_homepage(&state, &resolved.language, &resolved.path)
             .map(Html)
             .map(IntoResponse::into_response),
-        SiteKind::Cv => render_cv_homepage(&state, &language, uri.path())
+        SiteKind::Cv => render_cv_homepage(&state, &resolved.language, &resolved.path)
             .map(Html)
             .map(IntoResponse::into_response),
     }
@@ -62,33 +60,13 @@ pub(crate) async fn curriculum(
     headers: HeaderMap,
     uri: Uri,
 ) -> Response {
-    if let Some(response) = reject_unknown_page(&state, &headers, &uri, SitePage::Curriculum) {
-        return response;
-    }
+    let resolved =
+        match resolve_request(&state, &headers, &uri, SitePage::Curriculum, Some(SiteKind::Cv)) {
+            ResolveOutcome::Ready(resolved) => resolved,
+            ResolveOutcome::Respond(response) => return response,
+        };
 
-    if let Some(redirect) = redirect_missing_language(&state, &uri) {
-        return redirect;
-    }
-
-    let (language, _, _) = state.language_from_path(uri.path());
-
-    let Some(site) = site_from_host(&headers, &state) else {
-        return site_not_available(&state, uri.path(), &language);
-    };
-
-    if site != SiteKind::Cv {
-        return render_error(&state, SiteKind::Main, StatusCode::NOT_FOUND, uri.path(), &language)
-            .map(|html| (StatusCode::NOT_FOUND, Html(html)).into_response())
-            .unwrap_or_else(|status| status.into_response());
-    }
-
-    if !state.language_has_site(&language, SiteKind::Cv) {
-        return render_error(&state, SiteKind::Cv, StatusCode::NOT_FOUND, uri.path(), &language)
-            .map(|html| (StatusCode::NOT_FOUND, Html(html)).into_response())
-            .unwrap_or_else(|status| status.into_response());
-    }
-
-    render_cv_curriculum(&state, None, &language, uri.path())
+    render_cv_curriculum(&state, None, &resolved.language, &resolved.path)
         .map(Html)
         .map(IntoResponse::into_response)
         .unwrap_or_else(|status| status.into_response())
@@ -99,38 +77,30 @@ pub(crate) async fn curriculum_pdf(
     headers: HeaderMap,
     uri: Uri,
 ) -> Response {
-    if let Some(response) = reject_unknown_page(&state, &headers, &uri, SitePage::CurriculumPdf) {
-        return response;
-    }
-
-    if let Some(redirect) = redirect_missing_language(&state, &uri) {
-        return redirect;
-    }
-
-    let (language, _, _) = state.language_from_path(uri.path());
-
-    let Some(site) = site_from_host(&headers, &state) else {
-        return site_not_available(&state, uri.path(), &language);
+    let resolved = match resolve_request(
+        &state,
+        &headers,
+        &uri,
+        SitePage::CurriculumPdf,
+        Some(SiteKind::Cv),
+    ) {
+        ResolveOutcome::Ready(resolved) => resolved,
+        ResolveOutcome::Respond(response) => return response,
     };
 
-    if site != SiteKind::Cv {
-        return render_error(&state, SiteKind::Main, StatusCode::NOT_FOUND, uri.path(), &language)
-            .map(|html| (StatusCode::NOT_FOUND, Html(html)).into_response())
-            .unwrap_or_else(|status| status.into_response());
+    if let Some(bytes) = state.cached_cv_pdf(&resolved.language) {
+        return pdf_response(&state, &resolved.language, bytes);
     }
 
-    if !state.language_has_site(&language, SiteKind::Cv) {
-        return render_error(&state, SiteKind::Cv, StatusCode::NOT_FOUND, uri.path(), &language)
-            .map(|html| (StatusCode::NOT_FOUND, Html(html)).into_response())
-            .unwrap_or_else(|status| status.into_response());
-    }
+    let render_lock = state.pdf_render_lock(&resolved.language);
+    let _guard = render_lock.lock().await;
 
-    if let Some(bytes) = state.cached_cv_pdf(&language) {
-        return pdf_response(&state, &language, bytes);
+    if let Some(bytes) = state.cached_cv_pdf(&resolved.language) {
+        return pdf_response(&state, &resolved.language, bytes);
     }
 
     let render_state = state.clone();
-    let render_language = language.clone();
+    let render_language = resolved.language.clone();
     let bytes =
         match tokio::task::spawn_blocking(move || render_cv_pdf(&render_state, &render_language))
             .await
@@ -142,8 +112,8 @@ pub(crate) async fn curriculum_pdf(
                 return StatusCode::INTERNAL_SERVER_ERROR.into_response();
             },
         };
-    state.store_cv_pdf(language.clone(), Arc::clone(&bytes));
-    pdf_response(&state, &language, bytes)
+    state.store_cv_pdf(resolved.language.clone(), Arc::clone(&bytes));
+    pdf_response(&state, &resolved.language, bytes)
 }
 
 fn pdf_response(state: &AppState, language: &Language, bytes: Arc<Vec<u8>>) -> Response {
@@ -206,38 +176,23 @@ const MESSAGE_MAX: usize = 2_000;
 
 pub(crate) async fn contact_cv(
     State(state): State<AppState>,
+    ConnectInfo(addr): ConnectInfo<SocketAddr>,
     headers: HeaderMap,
     uri: Uri,
     Form(form): Form<CvContactForm>,
 ) -> Response {
-    if let Some(response) = reject_unknown_page(&state, &headers, &uri, SitePage::Contact) {
-        return response;
-    }
-
-    if let Some(redirect) = redirect_missing_language(&state, &uri) {
-        return redirect;
-    }
-
-    let (language, _, _) = state.language_from_path(uri.path());
-
-    let Some(site) = site_from_host(&headers, &state) else {
-        return site_not_available(&state, uri.path(), &language);
-    };
-
-    if site != SiteKind::Cv {
-        return render_error(&state, SiteKind::Main, StatusCode::NOT_FOUND, uri.path(), &language)
-            .map(|html| (StatusCode::NOT_FOUND, Html(html)).into_response())
-            .unwrap_or_else(|status| status.into_response());
-    }
-
-    if !state.language_has_site(&language, SiteKind::Cv) {
-        return render_error(&state, SiteKind::Cv, StatusCode::NOT_FOUND, uri.path(), &language)
-            .map(|html| (StatusCode::NOT_FOUND, Html(html)).into_response())
-            .unwrap_or_else(|status| status.into_response());
-    }
+    let resolved =
+        match resolve_request(&state, &headers, &uri, SitePage::Contact, Some(SiteKind::Cv)) {
+            ResolveOutcome::Ready(resolved) => resolved,
+            ResolveOutcome::Respond(response) => return response,
+        };
 
     if !request_origin_is_allowed(&headers, &state) {
         return StatusCode::FORBIDDEN.into_response();
+    }
+
+    if !state.contact_rate_limiter.check_and_record(addr.ip()) {
+        return StatusCode::TOO_MANY_REQUESTS.into_response();
     }
 
     let form_data = FormData {
@@ -247,7 +202,7 @@ pub(crate) async fn contact_cv(
         message: normalize_field(&form.message, MESSAGE_MAX),
     };
 
-    let translations = match state.resources_for(&language) {
+    let translations = match state.resources_for(&resolved.language) {
         Ok(resources) => resources.translations,
         Err(error) => {
             error!(error = ?error, "Failed to load translations for contact form");
@@ -264,7 +219,7 @@ pub(crate) async fn contact_cv(
             feedback: Some(error_feedback),
         };
 
-        return render_cv_curriculum(&state, Some(context), &language, uri.path())
+        return render_cv_curriculum(&state, Some(context), &resolved.language, &resolved.path)
             .map(|html| (StatusCode::BAD_REQUEST, Html(html)).into_response())
             .unwrap_or_else(|status| status.into_response());
     }
@@ -283,15 +238,20 @@ pub(crate) async fn contact_cv(
                 &state,
                 SiteKind::Cv,
                 StatusCode::NOT_FOUND,
-                uri.path(),
-                &language,
+                &resolved.path,
+                &resolved.language,
             )
             .map(|html| (StatusCode::NOT_FOUND, Html(html)).into_response())
             .unwrap_or_else(|status| status.into_response());
         },
     };
 
-    let (status, feedback) = match mailer.send_cv_contact(payload).await {
+    let to_override = state
+        .resources_for(&resolved.language)
+        .ok()
+        .map(|resources| resources.data.contact.emails.resolved_cv().to_string());
+
+    let (status, feedback) = match mailer.send_cv_contact(payload, to_override.as_deref()).await {
         Ok(_) => (
             StatusCode::OK,
             ContactFeedback {
@@ -328,39 +288,19 @@ pub(crate) async fn contact_cv(
         feedback: Some(feedback),
     };
 
-    render_cv_curriculum(&state, Some(context), &language, uri.path())
+    render_cv_curriculum(&state, Some(context), &resolved.language, &resolved.path)
         .map(|html| (status, Html(html)).into_response())
         .unwrap_or_else(|render_status| render_status.into_response())
 }
 
 pub(crate) async fn menu(State(state): State<AppState>, headers: HeaderMap, uri: Uri) -> Response {
-    if let Some(response) = reject_unknown_page(&state, &headers, &uri, SitePage::Menu) {
-        return response;
-    }
-
-    if let Some(redirect) = redirect_missing_language(&state, &uri) {
-        return redirect;
-    }
-
-    let (language, _, _) = state.language_from_path(uri.path());
-
-    let Some(site) = site_from_host(&headers, &state) else {
-        return site_not_available(&state, uri.path(), &language);
+    let resolved = match resolve_request(&state, &headers, &uri, SitePage::Menu, Some(SiteKind::Cv))
+    {
+        ResolveOutcome::Ready(resolved) => resolved,
+        ResolveOutcome::Respond(response) => return response,
     };
 
-    if site != SiteKind::Cv {
-        return render_error(&state, SiteKind::Main, StatusCode::NOT_FOUND, uri.path(), &language)
-            .map(|html| (StatusCode::NOT_FOUND, Html(html)).into_response())
-            .unwrap_or_else(|status| status.into_response());
-    }
-
-    if !state.language_has_site(&language, SiteKind::Cv) {
-        return render_error(&state, SiteKind::Cv, StatusCode::NOT_FOUND, uri.path(), &language)
-            .map(|html| (StatusCode::NOT_FOUND, Html(html)).into_response())
-            .unwrap_or_else(|status| status.into_response());
-    }
-
-    render_cv_menu(&state, &language, uri.path())
+    render_cv_menu(&state, &resolved.language, &resolved.path)
         .map(Html)
         .map(IntoResponse::into_response)
         .unwrap_or_else(|status| status.into_response())
@@ -464,6 +404,48 @@ pub(crate) async fn not_found(
     }
 
     not_found_response(&state, &headers, uri.path())
+}
+
+fn resolve_request(
+    state: &AppState,
+    headers: &HeaderMap,
+    uri: &Uri,
+    page: SitePage,
+    required_site: Option<SiteKind>,
+) -> ResolveOutcome {
+    if let Some(response) = reject_unknown_page(state, headers, uri, page) {
+        return ResolveOutcome::Respond(response);
+    }
+
+    if let Some(redirect) = redirect_missing_language(state, uri) {
+        return ResolveOutcome::Respond(redirect);
+    }
+
+    let (language, _, _) = state.language_from_path(uri.path());
+
+    let Some(site) = site_from_host(headers, state) else {
+        return ResolveOutcome::Respond(site_not_available(state, uri.path(), &language));
+    };
+
+    if let Some(required_site) = required_site
+        && site != required_site
+    {
+        return ResolveOutcome::Respond(
+            render_error(state, SiteKind::Main, StatusCode::NOT_FOUND, uri.path(), &language)
+                .map(|html| (StatusCode::NOT_FOUND, Html(html)).into_response())
+                .unwrap_or_else(|status| status.into_response()),
+        );
+    }
+
+    if !state.language_has_site(&language, site) {
+        return ResolveOutcome::Respond(
+            render_error(state, site, StatusCode::NOT_FOUND, uri.path(), &language)
+                .map(|html| (StatusCode::NOT_FOUND, Html(html)).into_response())
+                .unwrap_or_else(|status| status.into_response()),
+        );
+    }
+
+    ResolveOutcome::Ready(ResolvedRequest { language, site, path: uri.path().to_string() })
 }
 
 fn reject_unknown_page(
@@ -645,8 +627,15 @@ fn domain_list_contains(domains: &[String], host: &str) -> bool {
 }
 
 fn request_origin_is_allowed(headers: &HeaderMap, state: &AppState) -> bool {
+    if let Some(sec_fetch_site) =
+        headers.get("sec-fetch-site").and_then(|value| value.to_str().ok())
+        && sec_fetch_site.eq_ignore_ascii_case("cross-site")
+    {
+        return false;
+    }
+
     let Some(origin) = headers.get(ORIGIN) else {
-        return true;
+        return false;
     };
 
     let Some(origin) = origin.to_str().ok() else {
@@ -729,9 +718,10 @@ mod tests {
     use crate::app::{
         environment::Environment,
         localization::{Language, Localizations},
+        rate_limit::ContactRateLimiter,
         state::{LocalizationState, StaticAssets},
     };
-    use std::sync::{Arc, RwLock};
+    use std::sync::{Arc, Mutex, RwLock};
     use tera::Tera;
 
     #[test]
@@ -751,6 +741,22 @@ mod tests {
     #[test]
     fn malformed_origin_is_rejected() {
         let headers = headers_with("cv.example.com", "not-a-valid-origin");
+
+        assert!(!request_origin_is_allowed(&headers, &app_state()));
+    }
+
+    #[test]
+    fn missing_origin_is_rejected() {
+        let mut headers = HeaderMap::new();
+        headers.insert(HOST, "cv.example.com".parse().unwrap());
+
+        assert!(!request_origin_is_allowed(&headers, &app_state()));
+    }
+
+    #[test]
+    fn cross_site_sec_fetch_is_rejected() {
+        let mut headers = headers_with("cv.example.com", "https://cv.example.com");
+        headers.insert("sec-fetch-site", "cross-site".parse().unwrap());
 
         assert!(!request_origin_is_allowed(&headers, &app_state()));
     }
@@ -787,30 +793,6 @@ mod tests {
     }
 
     fn app_state() -> AppState {
-        let localizations = Localizations::new();
-        let localization_state = Arc::new(LocalizationState::new(
-            localizations,
-            Language::new("en"),
-            vec![Language::new("en")],
-            std::collections::HashMap::new(),
-        ));
-
-        let mut state = AppState {
-            localization_state: Arc::new(RwLock::new(localization_state)),
-            data_last_modified: Arc::new(RwLock::new(None)),
-            localization_checked_at: Arc::new(std::sync::Mutex::new(None)),
-            tera: Arc::new(Tera::default()),
-            main_static: Arc::new(empty_static_assets()),
-            cv_static: Arc::new(empty_static_assets()),
-            default_site: SiteKind::Cv,
-            environment: Environment::Production,
-            asset_version: Arc::from(""),
-            generator: Arc::from(""),
-            mailer: None,
-            show_credits: true,
-            cv_pdf_cache: Arc::new(RwLock::new(std::collections::HashMap::new())),
-        };
-
         let localization_state = Arc::new(LocalizationState {
             localizations: Localizations::new(),
             default_language: Language::new("en"),
@@ -821,8 +803,24 @@ mod tests {
             main_available: true,
             cv_available: true,
         });
-        state.localization_state = Arc::new(RwLock::new(localization_state));
 
-        state
+        AppState {
+            localization_state: Arc::new(RwLock::new(localization_state)),
+            data_last_modified: Arc::new(RwLock::new(None)),
+            localization_checked_at: Arc::new(Mutex::new(None)),
+            tera: Arc::new(Tera::default()),
+            main_static: Arc::new(empty_static_assets()),
+            cv_static: Arc::new(empty_static_assets()),
+            default_site: SiteKind::Cv,
+            environment: Environment::Production,
+            asset_version: Arc::from(""),
+            generator: Arc::from(""),
+            mailer: None,
+            show_credits: true,
+            cv_pdf_cache: Arc::new(RwLock::new(std::collections::HashMap::new())),
+            cv_pdf_locks: Arc::new(Mutex::new(std::collections::HashMap::new())),
+            html_page_cache: Arc::new(RwLock::new(std::collections::HashMap::new())),
+            contact_rate_limiter: Arc::new(ContactRateLimiter::default()),
+        }
     }
 }

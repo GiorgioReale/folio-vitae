@@ -13,7 +13,8 @@
     "copyright": "Hakimiliki",
     "love": "love",
     "portrait": "Picha ya {name}",
-    "required": "lazima"
+    "required": "lazima",
+    "social_card_alt": "Kadi ya kijamii ya tovuti ya {name}"
   },
   "nav": {
     "home": "Nyumbani",

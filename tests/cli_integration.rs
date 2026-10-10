@@ -17,7 +17,13 @@ fn init_creates_scaffold_files() {
 
     temp.child("data/data.it.yaml").assert(predicate::path::is_file());
     temp.child("data/data.en.yaml").assert(predicate::path::is_file());
+    temp.child("data/data.es.yaml").assert(predicate::path::is_file());
     temp.child(".env.example").assert(predicate::path::is_file());
+}
+
+#[test]
+fn bare_binary_requires_a_subcommand() {
+    Command::new(assert_cmd::cargo::cargo_bin!("folio-vitae")).assert().failure().code(2);
 }
 
 #[test]

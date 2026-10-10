@@ -11,23 +11,11 @@ use crate::error::{AppError, AppResult, ResultExt};
 
 const CACHE_PATH: &str = ".folio-cache.json";
 
-#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq, Eq)]
-pub struct InputSnapshot {
-    pub data: Option<u64>,
-    pub assets: Option<u64>,
-    pub templates: Option<u64>,
-    pub images: Option<u64>,
-    pub minify_assets: bool,
-}
-
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct BuildCache {
     pub assets_last_modified: Option<u64>,
-    pub templates_last_modified: Option<u64>,
     pub images_last_modified: Option<u64>,
-    pub data_last_modified: Option<u64>,
     pub minify_assets: bool,
-    pub last_build_inputs: Option<InputSnapshot>,
 }
 
 impl BuildCache {
@@ -75,16 +63,8 @@ impl BuildCache {
         self.minify_assets = minify_assets;
     }
 
-    pub(crate) fn record_templates(&mut self, templates_last_modified: Option<SystemTime>) {
-        self.templates_last_modified = system_time_to_timestamp(templates_last_modified);
-    }
-
     pub(crate) fn record_images(&mut self, images_last_modified: Option<SystemTime>) {
         self.images_last_modified = system_time_to_timestamp(images_last_modified);
-    }
-
-    pub(crate) fn record_data(&mut self, data_last_modified: Option<SystemTime>) {
-        self.data_last_modified = system_time_to_timestamp(data_last_modified);
     }
 }
 

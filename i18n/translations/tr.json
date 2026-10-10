@@ -13,7 +13,8 @@
     "copyright": "Telif hakkı",
     "love": "love",
     "portrait": "{name} portresi",
-    "required": "zorunlu"
+    "required": "zorunlu",
+    "social_card_alt": "{name} sitesinin sosyal kartı"
   },
   "nav": {
     "home": "Ana Sayfa",

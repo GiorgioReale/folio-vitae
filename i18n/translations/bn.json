@@ -13,7 +13,8 @@
     "copyright": "কপিরাইট",
     "love": "love",
     "portrait": "{name}-এর প্রতিকৃতি",
-    "required": "আবশ্যক"
+    "required": "আবশ্যক",
+    "social_card_alt": "{name}-এর সাইটের সোশ্যাল কার্ড"
   },
   "nav": {
     "home": "হোম",

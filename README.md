@@ -42,7 +42,9 @@ Then open:
 - main site: <http://127.0.0.1:36546>
 - CV site: <http://127.0.0.1:36547>
 
-Edit `data/data.en.yaml` (and `data/data.it.yaml` if you use Italian). The servers reload when files change.
+Edit `data/data.en.yaml` (and other `data/data.<code>.yaml` files you keep). The servers reload when files change.
+
+`folio-vitae` without a subcommand prints help; use `init`, `dev`, or `prod` explicitly.
 
 ## Commands
 
@@ -151,7 +153,8 @@ Notes:
 - Put source images under `data/images/` when your YAML references them.
 - Pin a version in Compose (`image: ...:0.1.4`) if you do not want `latest` to move.
 - For a public deploy, put a reverse proxy (Caddy, Traefik, nginx) in front and point your domains at the two ports.
-- SMTP variables in `.env` enable the CV contact form.
+- SMTP variables in `.env` enable the CV contact form (built into the default binary).
+- Upgrading the crate fills in missing `assets/`, `templates/`, `static/`, and `i18n/` files but does not overwrite local edits.
 
 ### Image tags
 

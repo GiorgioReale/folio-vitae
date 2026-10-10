@@ -23,6 +23,9 @@
       "SameSite=Lax",
       `Max-Age=${ONE_YEAR_IN_SECONDS}`,
     ];
+    if (window.location.protocol === "https:") {
+      cookieSegments.push("Secure");
+    }
     const cookieDomain = getCookieDomain();
     if (cookieDomain) {
       cookieSegments.push(`Domain=${cookieDomain}`);
@@ -43,6 +46,24 @@
     window.matchMedia("(prefers-color-scheme: dark)").matches
       ? "dark"
       : "light";
+  const resolveTheme = (theme) => {
+    if (theme === "dark" || theme === "light") {
+      return theme;
+    }
+    return getPreferredTheme();
+  };
+  const getInitialTheme = () => {
+    const cookieTheme = getThemeCookie();
+    if (cookieTheme === "dark" || cookieTheme === "light" || cookieTheme === "auto") {
+      return cookieTheme;
+    }
+    return "auto";
+  };
+
+  // Apply theme as early as possible to avoid a flash of the wrong palette.
+  let currentTheme = getInitialTheme();
+  document.documentElement.setAttribute("data-theme", resolveTheme(currentTheme));
+
   const setIcon = (icon, name) => {
     if (!icon) {
       return;
@@ -85,21 +106,12 @@
         setIcon(iconButtonThemeSwitch, "sun");
         break;
       default: {
-        const preferredTheme = getPreferredTheme();
-        document.documentElement.setAttribute("data-theme", preferredTheme);
+        document.documentElement.setAttribute("data-theme", getPreferredTheme());
         setIcon(iconButtonThemeSwitch, "moon-auto");
       }
     }
     describeTheme(theme, button, announce);
   };
-  const getInitialTheme = () => {
-    const cookieTheme = getThemeCookie();
-    if (cookieTheme === "dark" || cookieTheme === "light") {
-      return cookieTheme;
-    }
-    return "auto";
-  };
-  let currentTheme = "auto";
   const syncThemeWithCookie = (iconButtonThemeSwitch, button) => {
     const storedTheme = getThemeCookie();
     if (!storedTheme || storedTheme === currentTheme) {
@@ -146,16 +158,10 @@
         audioThemeSwitch.play().catch(() => {});
       }
     });
-    const syncInterval = window.setInterval(() => {
-      syncThemeWithCookie(iconButtonThemeSwitch, buttonThemeSwitch);
-    }, 2000);
     document.addEventListener("visibilitychange", () => {
       if (document.visibilityState === "visible") {
         syncThemeWithCookie(iconButtonThemeSwitch, buttonThemeSwitch);
       }
-    });
-    window.addEventListener("beforeunload", () => {
-      window.clearInterval(syncInterval);
     });
   });
 })();
