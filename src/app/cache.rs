@@ -7,7 +7,7 @@ use std::{
 use serde::{Deserialize, Serialize};
 use walkdir::WalkDir;
 
-use crate::error::{AppResult, ResultExt};
+use crate::error::{AppError, AppResult, ResultExt};
 
 const CACHE_PATH: &str = ".folio-cache.json";
 
@@ -93,13 +93,17 @@ pub(crate) fn latest_modification<P: AsRef<Path>>(paths: &[P]) -> AppResult<Opti
 
     for path in paths {
         let path = path.as_ref();
+        let metadata = match fs::metadata(path) {
+            Ok(metadata) => metadata,
+            Err(_) => continue,
+        };
 
-        if !path.exists() {
+        if metadata.is_file() {
+            record_modified(&mut latest, path, &metadata)?;
             continue;
         }
 
-        if path.is_file() {
-            update_latest(&mut latest, path)?;
+        if !metadata.is_dir() {
             continue;
         }
 
@@ -108,15 +112,21 @@ pub(crate) fn latest_modification<P: AsRef<Path>>(paths: &[P]) -> AppResult<Opti
                 continue;
             }
 
-            update_latest(&mut latest, entry.path())?;
+            let file_metadata = entry.metadata().map_err(|error| {
+                AppError::msg(format!("reading metadata for {}: {error}", entry.path().display()))
+            })?;
+            record_modified(&mut latest, entry.path(), &file_metadata)?;
         }
     }
 
     Ok(latest)
 }
 
-fn update_latest(latest: &mut Option<SystemTime>, path: &Path) -> AppResult<()> {
-    let metadata = fs::metadata(path).with_context(|| format!("reading metadata for {path:?}"))?;
+fn record_modified(
+    latest: &mut Option<SystemTime>,
+    path: &Path,
+    metadata: &fs::Metadata,
+) -> AppResult<()> {
     let modified = metadata
         .modified()
         .or_else(|_| metadata.created())

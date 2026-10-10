@@ -1,6 +1,5 @@
 use std::{
     fs,
-    io::Write,
     path::{Path, PathBuf},
 };
 
@@ -106,60 +105,31 @@ fn generate_cv_assets(root: &Path) -> AppResult<()> {
     let home_background = find_supported_image(&images_root, &["cv"], "home-background")?;
     let home_background_mobile =
         find_supported_image(&images_root, &["cv"], "home-background-mobile")?;
-    let cv_icon = favicon_path.clone();
     let cv_profile_picture = find_supported_image(&images_root, &["cv"], "profile-picture")?;
     let cv_social_card = find_supported_image(&images_root, &["cv"], "social-card")?;
-    let cv_favicon = cv_icon.clone();
 
-    resize_image(
-        &home_background,
-        &outputs.image(&["home-background"], "home-background.avif"),
-        1440,
-        1920,
-    )?;
+    let home_avif = outputs.image(&["home-background"], "home-background.avif");
+    let home_jpg = outputs.image(&["home-background"], "home-background.jpg");
+    export_resized(&home_background, &[(&home_avif, 1440, 1920), (&home_jpg, 1440, 1920)])?;
 
-    resize_image(
-        &home_background,
-        &outputs.image(&["home-background"], "home-background.jpg"),
-        1440,
-        1920,
-    )?;
-
-    resize_image(
+    let mobile_avif = outputs.image(&["home-background"], "home-background-mobile.avif");
+    let mobile_jpg = outputs.image(&["home-background"], "home-background-mobile.jpg");
+    export_resized(
         &home_background_mobile,
-        &outputs.image(&["home-background"], "home-background-mobile.avif"),
-        1440,
-        810,
+        &[(&mobile_avif, 1440, 810), (&mobile_jpg, 1440, 810)],
     )?;
 
-    resize_image(
-        &home_background_mobile,
-        &outputs.image(&["home-background"], "home-background-mobile.jpg"),
-        1440,
-        810,
-    )?;
+    let chrome_192 = outputs.icon(&["logos"], "android-chrome-192x192.png");
+    let chrome_512 = outputs.icon(&["logos"], "android-chrome-512x512.png");
+    export_resized(&favicon_path, &[(&chrome_192, 192, 192), (&chrome_512, 512, 512)])?;
 
-    resize_image(&cv_icon, &outputs.icon(&["logos"], "android-chrome-192x192.png"), 192, 192)?;
-
-    resize_image(&cv_icon, &outputs.icon(&["logos"], "android-chrome-512x512.png"), 512, 512)?;
-
-    resize_image(
-        &cv_profile_picture,
-        &outputs.image(&["profile-pictures"], "profile-picture.avif"),
-        512,
-        512,
-    )?;
-
-    resize_image(
-        &cv_profile_picture,
-        &outputs.image(&["profile-pictures"], "profile-picture.jpg"),
-        512,
-        512,
-    )?;
+    let profile_avif = outputs.image(&["profile-pictures"], "profile-picture.avif");
+    let profile_jpg = outputs.image(&["profile-pictures"], "profile-picture.jpg");
+    export_resized(&cv_profile_picture, &[(&profile_avif, 512, 512), (&profile_jpg, 512, 512)])?;
 
     copy_image(&cv_social_card, &outputs.image(&["social-card"], "social-card.png"))?;
 
-    generate_favicon_set(&cv_favicon, &outputs.logos_dir())?;
+    generate_favicon_set(&favicon_path, &outputs.logos_dir())?;
 
     Ok(())
 }
@@ -174,29 +144,18 @@ fn generate_main_assets(root: &Path) -> AppResult<()> {
     let main_icon = find_supported_image(&images_root, &["main"], "icon")?;
     let main_profile_picture = find_supported_image(&images_root, &["main"], "profile-picture")?;
     let main_social_card = find_supported_image(&images_root, &["main"], "social-card")?;
-    let main_favicon = favicon_path.clone();
 
-    resize_image(&main_icon, &outputs.icon(&["logos"], "android-chrome-192x192.png"), 192, 192)?;
+    let chrome_192 = outputs.icon(&["logos"], "android-chrome-192x192.png");
+    let chrome_512 = outputs.icon(&["logos"], "android-chrome-512x512.png");
+    export_resized(&main_icon, &[(&chrome_192, 192, 192), (&chrome_512, 512, 512)])?;
 
-    resize_image(&main_icon, &outputs.icon(&["logos"], "android-chrome-512x512.png"), 512, 512)?;
-
-    resize_image(
-        &main_profile_picture,
-        &outputs.image(&["profile-pictures"], "profile-picture.avif"),
-        512,
-        512,
-    )?;
-
-    resize_image(
-        &main_profile_picture,
-        &outputs.image(&["profile-pictures"], "profile-picture.jpg"),
-        512,
-        512,
-    )?;
+    let profile_avif = outputs.image(&["profile-pictures"], "profile-picture.avif");
+    let profile_jpg = outputs.image(&["profile-pictures"], "profile-picture.jpg");
+    export_resized(&main_profile_picture, &[(&profile_avif, 512, 512), (&profile_jpg, 512, 512)])?;
 
     copy_image(&main_social_card, &outputs.image(&["social-card"], "social-card.png"))?;
 
-    generate_favicon_set(&main_favicon, &outputs.logos_dir())?;
+    generate_favicon_set(&favicon_path, &outputs.logos_dir())?;
 
     Ok(())
 }
@@ -289,47 +248,67 @@ fn copy_image(input: &Path, output: &Path) -> AppResult<()> {
     Ok(())
 }
 
-fn resize_image(input: &Path, output: &Path, width: u32, height: u32) -> AppResult<()> {
-    if is_up_to_date(input, output)? {
+struct DecodedImage {
+    pixels: Vec<u8>,
+    width: u32,
+    height: u32,
+}
+
+fn export_resized(input: &Path, outputs: &[(&Path, u32, u32)]) -> AppResult<()> {
+    let mut pending = Vec::new();
+
+    for &(output, width, height) in outputs {
+        if !is_up_to_date(input, output)? {
+            pending.push((output, width, height));
+        }
+    }
+
+    if pending.is_empty() {
         return Ok(());
     }
 
-    let image = load_dynamic_image(input)?;
-    save_resized_image(&image, output, width, height)
-}
+    let mut decoded = decode_image(input)?;
 
-fn save_resized_image(
-    image: &DynamicImage,
-    output: &Path,
-    width: u32,
-    height: u32,
-) -> AppResult<()> {
-    let resized = resize_with_fast_image(image, width, height)?;
-    ensure_parent_directory(output)?;
-    resized.save(output).with_context(|| format!("writing {output:?}"))?;
+    for (output, width, height) in pending {
+        let resized =
+            resize_pixels(&mut decoded.pixels, decoded.width, decoded.height, width, height)?;
+        ensure_parent_directory(output)?;
+        resized.save(output).with_context(|| format!("writing {output:?}"))?;
+    }
+
     Ok(())
 }
 
 fn load_dynamic_image(input: &Path) -> AppResult<DynamicImage> {
-    match input.extension().and_then(|ext| ext.to_str()).map(|ext| ext.to_lowercase()).as_deref() {
-        Some("svg") => rasterize_svg(input),
-        _ => image::open(input).with_context(|| format!("opening {input:?}")),
+    if input
+        .extension()
+        .and_then(|ext| ext.to_str())
+        .is_some_and(|ext| ext.eq_ignore_ascii_case("svg"))
+    {
+        rasterize_svg(input)
+    } else {
+        image::open(input).with_context(|| format!("opening {input:?}"))
     }
 }
 
-fn resize_with_fast_image(
-    image: &DynamicImage,
+fn decode_image(input: &Path) -> AppResult<DecodedImage> {
+    let rgba = load_dynamic_image(input)?.into_rgba8();
+    let (width, height) = rgba.dimensions();
+
+    Ok(DecodedImage { pixels: rgba.into_raw(), width, height })
+}
+
+fn resize_pixels(
+    pixels: &mut [u8],
+    src_width: u32,
+    src_height: u32,
     width: u32,
     height: u32,
 ) -> AppResult<DynamicImage> {
-    let rgba = image.to_rgba8();
-
-    let src_image =
-        Image::from_vec_u8(rgba.width(), rgba.height(), rgba.into_raw(), PixelType::U8x4)
-            .map_err(|err| AppError::msg(format!("creating source image for resize: {err}")))?;
+    let src_image = Image::from_slice_u8(src_width, src_height, pixels, PixelType::U8x4)
+        .map_err(|err| AppError::msg(format!("creating source image for resize: {err}")))?;
 
     let mut dst_image = Image::new(width, height, PixelType::U8x4);
-
     let mut resizer = Resizer::new();
     let options = ResizeOptions::new().resize_alg(ResizeAlg::Convolution(FilterType::Bilinear));
 
@@ -349,13 +328,12 @@ fn generate_favicon_set(source: &Path, output_dir: &Path) -> AppResult<()> {
     let favicon_32 = output_dir.join("favicon-32x32.png");
     let ico_output = output_dir.join("favicon.ico");
 
-    let mut base_image: Option<DynamicImage> = None;
+    let mut decoded: Option<DecodedImage> = None;
 
     if source
         .extension()
         .and_then(|ext| ext.to_str())
-        .map(|ext| ext.eq_ignore_ascii_case("svg"))
-        .unwrap_or(false)
+        .is_some_and(|ext| ext.eq_ignore_ascii_case("svg"))
     {
         let svg_output = output_dir.join("favicon.svg");
         copy_svg(source, &svg_output)?;
@@ -364,15 +342,20 @@ fn generate_favicon_set(source: &Path, output_dir: &Path) -> AppResult<()> {
     for (output, width, height) in
         [(&apple_touch, 180, 180), (&favicon_16, 16, 16), (&favicon_32, 32, 32)]
     {
-        if !is_up_to_date(source, output)? {
-            if base_image.is_none() {
-                base_image = Some(load_dynamic_image(source)?);
-            }
-
-            if let Some(image) = base_image.as_ref() {
-                save_resized_image(image, output, width, height)?;
-            }
+        if is_up_to_date(source, output)? {
+            continue;
         }
+
+        if decoded.is_none() {
+            decoded = Some(decode_image(source)?);
+        }
+
+        let Some(image) = decoded.as_mut() else {
+            continue;
+        };
+        let resized = resize_pixels(&mut image.pixels, image.width, image.height, width, height)?;
+        ensure_parent_directory(output)?;
+        resized.save(output).with_context(|| format!("writing {output:?}"))?;
     }
 
     if !is_up_to_date(&favicon_16, &ico_output)? || !is_up_to_date(&favicon_32, &ico_output)? {
@@ -430,9 +413,7 @@ fn copy_svg(input: &Path, output: &Path) -> AppResult<()> {
     }
 
     ensure_parent_directory(output)?;
-    let contents = fs::read(input).with_context(|| format!("reading {input:?}"))?;
-    let mut file = fs::File::create(output).with_context(|| format!("creating {output:?}"))?;
-    file.write_all(&contents).with_context(|| format!("writing {output:?}"))?;
+    fs::copy(input, output).with_context(|| format!("copying {input:?} to {output:?}"))?;
     Ok(())
 }
 

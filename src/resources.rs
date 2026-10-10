@@ -68,11 +68,7 @@ fn write_dir(dir: &Dir, target: &Path, force: bool) -> AppResult<()> {
             fs::create_dir_all(parent).with_context(|| format!("creating directory {parent:?}"))?;
         }
 
-        let contents = file
-            .contents_utf8()
-            .map_or_else(|| file.contents().to_vec(), |value| value.as_bytes().to_vec());
-
-        fs::write(&destination, contents)
+        fs::write(&destination, file.contents())
             .with_context(|| format!("writing file {destination:?}"))?;
     }
 

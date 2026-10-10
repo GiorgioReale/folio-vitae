@@ -26,12 +26,11 @@ mod implementation {
         to: Mailbox,
     }
 
-    #[derive(Clone)]
-    pub(crate) struct CvContactPayload {
-        pub full_name: String,
-        pub company: String,
-        pub email: String,
-        pub message: String,
+    pub(crate) struct CvContactPayload<'a> {
+        pub full_name: &'a str,
+        pub company: &'a str,
+        pub email: &'a str,
+        pub message: &'a str,
     }
 
     pub(crate) fn build_mailer(site_data: &SiteData) -> AppResult<Option<Mailer>> {
@@ -40,7 +39,7 @@ mod implementation {
             None => return Ok(None),
         };
         let port: u16 = match env_var("SMTP_PORT")? {
-            Some(value) => value.parse().with_context(|| "parsing SMTP_PORT".to_string())?,
+            Some(value) => value.parse().with_context(|| "parsing SMTP_PORT")?,
             None => DEFAULT_SMTP_PORT,
         };
         let username = match env_var("SMTP_USERNAME")? {
@@ -75,16 +74,16 @@ mod implementation {
     }
 
     impl Mailer {
-        pub(crate) async fn send_cv_contact(&self, payload: CvContactPayload) -> AppResult<()> {
-            let subject_name = sanitize_header_value(&payload.full_name, MAX_SUBJECT_NAME_LENGTH);
+        pub(crate) async fn send_cv_contact(&self, payload: CvContactPayload<'_>) -> AppResult<()> {
+            let subject_name = sanitize_header_value(payload.full_name, MAX_SUBJECT_NAME_LENGTH);
             let subject = format!("Nuovo contatto dal CV - {subject_name}");
 
             let body = format!(
                 "Nuovo messaggio inviato dal form CV.\n\nNome completo: {}\nAzienda: {}\nEmail: {}\n\nMessaggio:\n{}\n",
-                sanitize_body_value(&payload.full_name, MAX_SUBJECT_NAME_LENGTH),
-                sanitize_body_value(&payload.company, MAX_COMPANY_LENGTH),
-                sanitize_body_value(&payload.email, MAX_EMAIL_LENGTH),
-                sanitize_body_value(&payload.message, MAX_MESSAGE_LENGTH)
+                sanitize_body_value(payload.full_name, MAX_SUBJECT_NAME_LENGTH),
+                sanitize_body_value(payload.company, MAX_COMPANY_LENGTH),
+                sanitize_body_value(payload.email, MAX_EMAIL_LENGTH),
+                sanitize_body_value(payload.message, MAX_MESSAGE_LENGTH)
             );
 
             let email = Message::builder()
@@ -93,11 +92,7 @@ mod implementation {
                 .subject(subject)
                 .singlepart(SinglePart::builder().header(ContentType::TEXT_PLAIN).body(body))?;
 
-            self.transport
-                .send(email)
-                .await
-                .with_context(|| "sending contact email".to_string())
-                .map(|_| ())
+            self.transport.send(email).await.with_context(|| "sending contact email").map(|_| ())
         }
     }
 
@@ -137,12 +132,11 @@ mod implementation {
     #[derive(Clone)]
     pub(crate) struct Mailer;
 
-    #[derive(Clone)]
-    pub(crate) struct CvContactPayload {
-        pub full_name: String,
-        pub company: String,
-        pub email: String,
-        pub message: String,
+    pub(crate) struct CvContactPayload<'a> {
+        pub full_name: &'a str,
+        pub company: &'a str,
+        pub email: &'a str,
+        pub message: &'a str,
     }
 
     pub(crate) fn build_mailer(_site_data: &SiteData) -> AppResult<Option<Mailer>> {
@@ -150,7 +144,10 @@ mod implementation {
     }
 
     impl Mailer {
-        pub(crate) async fn send_cv_contact(&self, _payload: CvContactPayload) -> AppResult<()> {
+        pub(crate) async fn send_cv_contact(
+            &self,
+            _payload: CvContactPayload<'_>,
+        ) -> AppResult<()> {
             Ok(())
         }
     }

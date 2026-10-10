@@ -19,7 +19,7 @@ pub enum AppError {
     Template(#[from] tera::Error),
 
     #[error(transparent)]
-    SerdeYaml(#[from] serde_yaml::Error),
+    SerdeYaml(#[from] serde_norway::Error),
 
     #[error(transparent)]
     SerdeJson(#[from] serde_json::Error),
