@@ -7,14 +7,25 @@
     "direction": "ltr"
   },
   "accessibility": {
-    "skip_to_content": "주요 콘텐츠로 건너뛰기"
+    "skip_to_content": "주요 콘텐츠로 건너뛰기",
+    "new_window": "새 탭에서 열림",
+    "profile": "프로필",
+    "copyright": "저작권",
+    "love": "love",
+    "portrait": "{name}의 초상",
+    "required": "필수"
   },
   "nav": {
     "home": "홈",
     "menu": "메뉴",
     "theme_switch": "라이트/다크 모드",
     "language_selector_label": "언어",
-    "current_language": "현재 언어"
+    "current_language": "현재 언어",
+    "close_menu": "메뉴 닫기",
+    "primary": "사이트",
+    "theme_light": "라이트 테마",
+    "theme_dark": "다크 테마",
+    "theme_auto": "시스템 테마"
   },
   "main_page": {
     "websites": "웹사이트",
@@ -54,7 +65,16 @@
     },
     "curriculum_link": "이력서",
     "vote": "성적",
-    "project_link": "링크"
+    "project_link": "링크",
+    "pdf_heading": "PDF 다운로드",
+    "pdf_description": "이력서의 PDF 사본입니다.",
+    "pdf_action": "PDF 다운로드",
+    "contact_hints": {
+      "full_name": "3자 이상 120자 이하.",
+      "company": "2자 이상 120자 이하.",
+      "email": "유효한 이메일을 입력하세요. 예: name@example.com",
+      "message": "10자 이상 2000자 이하."
+    }
   },
   "cv_menu": {
     "title": "메뉴",
@@ -63,7 +83,8 @@
     "education": "학력",
     "skills": "기술",
     "courses": "교육 과정 & 인증",
-    "contact": "연락처"
+    "contact": "연락처",
+    "download": "PDF 다운로드"
   },
   "contact": {
     "feedback_success": "메시지가 성공적으로 전송되었습니다.",
@@ -74,7 +95,11 @@
     "full_name_length": "성명은 3~120자 사이여야 합니다.",
     "company_length": "회사명은 2~120자 사이여야 합니다.",
     "email": "유효한 이메일 주소를 입력해주세요.",
-    "message_length": "메시지는 10~2000자 사이여야 합니다."
+    "message_length": "메시지는 10~2000자 사이여야 합니다.",
+    "full_name_required": "이름을 입력하세요.",
+    "company_required": "회사 이름을 입력하세요.",
+    "email_required": "이메일을 입력하세요.",
+    "message_required": "메시지를 입력하세요."
   },
   "errors": {
     "title": "오류",
@@ -116,6 +141,7 @@
     "year": "년",
     "years": "년",
     "month": "개월",
-    "months": "개월"
+    "months": "개월",
+    "and": "및"
   }
 }

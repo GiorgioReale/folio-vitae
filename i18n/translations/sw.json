@@ -7,14 +7,25 @@
     "direction": "ltr"
   },
   "accessibility": {
-    "skip_to_content": "Ruka hadi kwenye maudhui kuu"
+    "skip_to_content": "Ruka hadi kwenye maudhui kuu",
+    "new_window": "Hufunguka kwenye kichupo kipya",
+    "profile": "Wasifu",
+    "copyright": "Hakimiliki",
+    "love": "love",
+    "portrait": "Picha ya {name}",
+    "required": "lazima"
   },
   "nav": {
     "home": "Nyumbani",
     "menu": "Menyu",
     "theme_switch": "Hali ya Mwangaza/Giza",
     "language_selector_label": "Lugha",
-    "current_language": "Lugha ya sasa"
+    "current_language": "Lugha ya sasa",
+    "close_menu": "Funga menyu",
+    "primary": "Tovuti",
+    "theme_light": "Mandhari meupe",
+    "theme_dark": "Mandhari meusi",
+    "theme_auto": "Mandhari ya mfumo"
   },
   "main_page": {
     "websites": "Tovuti",
@@ -54,7 +65,16 @@
     },
     "curriculum_link": "CV",
     "vote": "Alama",
-    "project_link": "Kiungo"
+    "project_link": "Kiungo",
+    "pdf_heading": "Pakua PDF",
+    "pdf_description": "Nakala ya PDF ya CV.",
+    "pdf_action": "Pakua PDF",
+    "contact_hints": {
+      "full_name": "Kati ya herufi 3 na 120.",
+      "company": "Kati ya herufi 2 na 120.",
+      "email": "Weka barua pepe halali, kwa mfano name@example.com.",
+      "message": "Kati ya herufi 10 na 2000."
+    }
   },
   "cv_menu": {
     "title": "Menyu",
@@ -63,7 +83,8 @@
     "education": "Elimu",
     "skills": "Ujuzi",
     "courses": "Kozi & Vyeti",
-    "contact": "Mawasiliano"
+    "contact": "Mawasiliano",
+    "download": "Pakua PDF"
   },
   "contact": {
     "feedback_success": "Ujumbe umetumwa kwa mafanikio.",
@@ -74,7 +95,11 @@
     "full_name_length": "Jina kamili linapaswa kuwa kati ya herufi 3 na 120.",
     "company_length": "Jina la kampuni linapaswa kuwa kati ya herufi 2 na 120.",
     "email": "Tafadhali weka anwani ya barua pepe halali.",
-    "message_length": "Ujumbe unapaswa kuwa kati ya herufi 10 na 2000."
+    "message_length": "Ujumbe unapaswa kuwa kati ya herufi 10 na 2000.",
+    "full_name_required": "Weka jina lako kamili.",
+    "company_required": "Weka jina la kampuni.",
+    "email_required": "Weka barua pepe yako.",
+    "message_required": "Weka ujumbe."
   },
   "errors": {
     "title": "Hitilafu",
@@ -116,6 +141,7 @@
     "year": "mwaka",
     "years": "miaka",
     "month": "mwezi",
-    "months": "miezi"
+    "months": "miezi",
+    "and": "na"
   }
 }

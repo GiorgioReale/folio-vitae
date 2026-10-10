@@ -7,14 +7,25 @@
     "direction": "ltr"
   },
   "accessibility": {
-    "skip_to_content": "Ana içeriğe geç"
+    "skip_to_content": "Ana içeriğe geç",
+    "new_window": "Yeni sekmede açılır",
+    "profile": "Profil",
+    "copyright": "Telif hakkı",
+    "love": "love",
+    "portrait": "{name} portresi",
+    "required": "zorunlu"
   },
   "nav": {
     "home": "Ana Sayfa",
     "menu": "Menü",
     "theme_switch": "Açık/Koyu Mod",
     "language_selector_label": "Dil",
-    "current_language": "Geçerli dil"
+    "current_language": "Geçerli dil",
+    "close_menu": "Menüyü kapat",
+    "primary": "Site",
+    "theme_light": "Açık tema",
+    "theme_dark": "Koyu tema",
+    "theme_auto": "Sistem teması"
   },
   "main_page": {
     "websites": "Web Siteleri",
@@ -54,7 +65,16 @@
     },
     "curriculum_link": "CV",
     "vote": "Not",
-    "project_link": "Bağlantı"
+    "project_link": "Bağlantı",
+    "pdf_heading": "PDF indir",
+    "pdf_description": "CV'nin PDF kopyası.",
+    "pdf_action": "PDF indir",
+    "contact_hints": {
+      "full_name": "3 ile 120 karakter arasında.",
+      "company": "2 ile 120 karakter arasında.",
+      "email": "Geçerli bir e-posta girin, örneğin name@example.com.",
+      "message": "10 ile 2000 karakter arasında."
+    }
   },
   "cv_menu": {
     "title": "Menü",
@@ -63,7 +83,8 @@
     "education": "Eğitim",
     "skills": "Yetenekler",
     "courses": "Kurslar & Sertifikalar",
-    "contact": "İletişim"
+    "contact": "İletişim",
+    "download": "PDF indir"
   },
   "contact": {
     "feedback_success": "Mesaj başarıyla gönderildi.",
@@ -74,7 +95,11 @@
     "full_name_length": "Ad soyad 3 ile 120 karakter arasında olmalıdır.",
     "company_length": "Şirket adı 2 ile 120 karakter arasında olmalıdır.",
     "email": "Geçerli bir e-posta adresi girin.",
-    "message_length": "Mesaj 10 ile 2000 karakter arasında olmalıdır."
+    "message_length": "Mesaj 10 ile 2000 karakter arasında olmalıdır.",
+    "full_name_required": "Adınızı ve soyadınızı girin.",
+    "company_required": "Şirket adını girin.",
+    "email_required": "E-posta adresinizi girin.",
+    "message_required": "Bir mesaj girin."
   },
   "errors": {
     "title": "Hata",
@@ -116,6 +141,7 @@
     "year": "yıl",
     "years": "yıl",
     "month": "ay",
-    "months": "ay"
+    "months": "ay",
+    "and": "ve"
   }
 }

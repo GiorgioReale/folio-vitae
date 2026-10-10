@@ -7,14 +7,25 @@
     "direction": "ltr"
   },
   "accessibility": {
-    "skip_to_content": "প্রধান বিষয়বস্তুর দিকে যান"
+    "skip_to_content": "প্রধান বিষয়বস্তুর দিকে যান",
+    "new_window": "নতুন ট্যাবে খোলে",
+    "profile": "প্রোফাইল",
+    "copyright": "কপিরাইট",
+    "love": "love",
+    "portrait": "{name}-এর প্রতিকৃতি",
+    "required": "আবশ্যক"
   },
   "nav": {
     "home": "হোম",
     "menu": "মেনু",
     "theme_switch": "লাইট/ডার্ক মোড",
     "language_selector_label": "ভাষা",
-    "current_language": "বর্তমান ভাষা"
+    "current_language": "বর্তমান ভাষা",
+    "close_menu": "মেনু বন্ধ করুন",
+    "primary": "সাইট",
+    "theme_light": "হালকা থিম",
+    "theme_dark": "গাঢ় থিম",
+    "theme_auto": "সিস্টেম থিম"
   },
   "main_page": {
     "websites": "ওয়েবসাইট",
@@ -54,7 +65,16 @@
     },
     "curriculum_link": "সিভি",
     "vote": "গ্রেড",
-    "project_link": "লিঙ্ক"
+    "project_link": "লিঙ্ক",
+    "pdf_heading": "পিডিএফ ডাউনলোড",
+    "pdf_description": "সিভির একটি পিডিএফ কপি।",
+    "pdf_action": "পিডিএফ ডাউনলোড",
+    "contact_hints": {
+      "full_name": "৩ থেকে ১২০ অক্ষর।",
+      "company": "২ থেকে ১২০ অক্ষর।",
+      "email": "বৈধ ইমেইল লিখুন, যেমন name@example.com।",
+      "message": "১০ থেকে ২০০০ অক্ষর।"
+    }
   },
   "cv_menu": {
     "title": "মেনু",
@@ -63,7 +83,8 @@
     "education": "শিক্ষা",
     "skills": "দক্ষতা",
     "courses": "কোর্স ও সার্টিফিকেশন",
-    "contact": "যোগাযোগ"
+    "contact": "যোগাযোগ",
+    "download": "পিডিএফ ডাউনলোড"
   },
   "contact": {
     "feedback_success": "বার্তাটি সফলভাবে পাঠানো হয়েছে।",
@@ -74,7 +95,11 @@
     "full_name_length": "পূর্ণ নাম ৩ থেকে ১২০ অক্ষরের মধ্যে হতে হবে।",
     "company_length": "কোম্পানির নাম ২ থেকে ১২০ অক্ষরের মধ্যে হতে হবে।",
     "email": "একটি বৈধ ই-মেইল ঠিকানা লিখুন।",
-    "message_length": "বার্তা ১০ থেকে ২০০০ অক্ষরের মধ্যে হতে হবে।"
+    "message_length": "বার্তা ১০ থেকে ২০০০ অক্ষরের মধ্যে হতে হবে।",
+    "full_name_required": "আপনার পুরো নাম লিখুন।",
+    "company_required": "কোম্পানির নাম লিখুন।",
+    "email_required": "আপনার ইমেইল লিখুন।",
+    "message_required": "একটি বার্তা লিখুন।"
   },
   "errors": {
     "title": "ত্রুটি",
@@ -116,6 +141,7 @@
     "year": "বছর",
     "years": "বছর",
     "month": "মাস",
-    "months": "মাস"
+    "months": "মাস",
+    "and": "এবং"
   }
 }

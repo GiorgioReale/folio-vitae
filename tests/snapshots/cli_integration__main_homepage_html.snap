@@ -230,8 +230,7 @@ expression: main_homepage
         <svg aria-hidden="true" focusable="false">
           <use xlink:href="/assets/icons/cv/website/sprites.svg#love" />
         </svg>
-        by <a href="https://github.com/GiorgioReale/folio-vitae" target="_blank" rel="noopener noreferrer">Giorgio
-          Reale</a>
+        by <a href="https://github.com/GiorgioReale/folio-vitae" target="_blank" rel="noopener noreferrer">folio-vitae</a>
       </p>
       
     </footer>

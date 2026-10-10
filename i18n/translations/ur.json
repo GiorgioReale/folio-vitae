@@ -4,17 +4,28 @@
     "tag": "ur-PK",
     "meta_language": "UR",
     "dc_language": "urd",
-    "direction": "ltr"
+    "direction": "rtl"
   },
   "accessibility": {
-    "skip_to_content": "اہم مواد پر جائیں"
+    "skip_to_content": "اہم مواد پر جائیں",
+    "new_window": "نئے ٹیب میں کھلتا ہے",
+    "profile": "پروفائل",
+    "copyright": "کاپی رائٹ",
+    "love": "love",
+    "portrait": "{name} کا پورٹریٹ",
+    "required": "ضروری"
   },
   "nav": {
     "home": "ہوم",
     "menu": "مینو",
     "theme_switch": "لائٹ/ڈارک موڈ",
     "language_selector_label": "زبان",
-    "current_language": "موجودہ زبان"
+    "current_language": "موجودہ زبان",
+    "close_menu": "مینو بند کریں",
+    "primary": "سائٹ",
+    "theme_light": "ہلکی تھیم",
+    "theme_dark": "گہری تھیم",
+    "theme_auto": "سسٹم تھیم"
   },
   "main_page": {
     "websites": "ویب سائٹس",
@@ -54,7 +65,16 @@
     },
     "curriculum_link": "سی وی",
     "vote": "گریڈ",
-    "project_link": "لنک"
+    "project_link": "لنک",
+    "pdf_heading": "PDF ڈاؤن لوڈ کریں",
+    "pdf_description": "سی وی کی PDF نقل۔",
+    "pdf_action": "PDF ڈاؤن لوڈ کریں",
+    "contact_hints": {
+      "full_name": "3 سے 120 حروف۔",
+      "company": "2 سے 120 حروف۔",
+      "email": "درست ای میل درج کریں، جیسے name@example.com۔",
+      "message": "10 سے 2000 حروف۔"
+    }
   },
   "cv_menu": {
     "title": "مینو",
@@ -63,7 +83,8 @@
     "education": "تعلیم",
     "skills": "مہارتیں",
     "courses": "کورسز اور سرٹیفیکیشن",
-    "contact": "رابطہ"
+    "contact": "رابطہ",
+    "download": "PDF ڈاؤن لوڈ کریں"
   },
   "contact": {
     "feedback_success": "پیغام کامیابی سے بھیج دیا گیا ہے۔",
@@ -74,7 +95,11 @@
     "full_name_length": "پورا نام 3 سے 120 حروف کے درمیان ہونا چاہیے۔",
     "company_length": "کمپنی کا نام 2 سے 120 حروف کے درمیان ہونا چاہیے۔",
     "email": "براہ کرم درست ای میل درج کریں۔",
-    "message_length": "پیغام 10 سے 2000 حروف کے درمیان ہونا چاہیے۔"
+    "message_length": "پیغام 10 سے 2000 حروف کے درمیان ہونا چاہیے۔",
+    "full_name_required": "اپنا پورا نام درج کریں۔",
+    "company_required": "کمپنی کا نام درج کریں۔",
+    "email_required": "اپنا ای میل درج کریں۔",
+    "message_required": "پیغام درج کریں۔"
   },
   "errors": {
     "title": "غلطی",
@@ -116,6 +141,7 @@
     "year": "سال",
     "years": "سال",
     "month": "مہینہ",
-    "months": "مہینے"
+    "months": "مہینے",
+    "and": "اور"
   }
 }

@@ -7,14 +7,25 @@
     "direction": "ltr"
   },
   "accessibility": {
-    "skip_to_content": "Skip to main content"
+    "skip_to_content": "Skip to main content",
+    "new_window": "Opens in a new tab",
+    "profile": "Profile",
+    "copyright": "Copyright",
+    "love": "love",
+    "portrait": "Portrait of {name}",
+    "required": "required"
   },
   "nav": {
     "home": "Home",
     "menu": "Menu",
     "theme_switch": "Light/Dark Mode",
     "language_selector_label": "Language",
-    "current_language": "Current language"
+    "current_language": "Current language",
+    "close_menu": "Close menu",
+    "primary": "Site",
+    "theme_light": "Light theme",
+    "theme_dark": "Dark theme",
+    "theme_auto": "System theme"
   },
   "main_page": {
     "websites": "Websites",
@@ -54,7 +65,16 @@
     },
     "curriculum_link": "Curriculum",
     "vote": "Vote",
-    "project_link": "Link"
+    "project_link": "Link",
+    "pdf_heading": "Download the CV",
+    "pdf_description": "A PDF copy of the CV.",
+    "pdf_action": "Download PDF",
+    "contact_hints": {
+      "full_name": "Between 3 and 120 characters.",
+      "company": "Between 2 and 120 characters.",
+      "email": "Use a valid email address, such as name@example.com.",
+      "message": "Between 10 and 2000 characters."
+    }
   },
   "cv_menu": {
     "title": "Menu",
@@ -63,7 +83,8 @@
     "education": "Education",
     "skills": "Skills",
     "courses": "Courses & Certifications",
-    "contact": "Contact Me"
+    "contact": "Contact Me",
+    "download": "Download PDF"
   },
   "contact": {
     "feedback_success": "Message successfully sent.",
@@ -74,7 +95,11 @@
     "full_name_length": "The full name must contain between 3 and 120 characters.",
     "company_length": "The company name must contain between 2 and 120 characters.",
     "email": "Enter a valid email address.",
-    "message_length": "The message must contain between 10 and 2000 characters."
+    "message_length": "The message must contain between 10 and 2000 characters.",
+    "full_name_required": "Enter your full name.",
+    "company_required": "Enter the company name.",
+    "email_required": "Enter your email address.",
+    "message_required": "Enter a message."
   },
   "errors": {
     "title": "Error",
@@ -116,6 +141,7 @@
     "year": "year",
     "years": "years",
     "month": "month",
-    "months": "months"
+    "months": "months",
+    "and": "and"
   }
 }

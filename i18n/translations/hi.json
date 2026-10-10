@@ -7,14 +7,25 @@
     "direction": "ltr"
   },
   "accessibility": {
-    "skip_to_content": "मुख्य सामग्री पर जाएँ"
+    "skip_to_content": "मुख्य सामग्री पर जाएँ",
+    "new_window": "नए टैब में खुलता है",
+    "profile": "प्रोफ़ाइल",
+    "copyright": "कॉपीराइट",
+    "love": "love",
+    "portrait": "{name} का चित्र",
+    "required": "आवश्यक"
   },
   "nav": {
     "home": "होम",
     "menu": "मेनू",
     "theme_sawitch": "लाइट/डार्क मोड",
     "language_selector_label": "भाषा",
-    "current_language": "वर्तमान भाषा"
+    "current_language": "वर्तमान भाषा",
+    "close_menu": "मेनू बंद करें",
+    "primary": "साइट",
+    "theme_light": "हल्की थीम",
+    "theme_dark": "गहरी थीम",
+    "theme_auto": "सिस्टम थीम"
   },
   "main_page": {
     "websites": "वेबसाइट्स",
@@ -54,7 +65,16 @@
     },
     "curriculum_link": "सीवी",
     "vote": "अंक",
-    "project_link": "लिंक"
+    "project_link": "लिंक",
+    "pdf_heading": "PDF डाउनलोड करें",
+    "pdf_description": "सीवी की एक PDF प्रति।",
+    "pdf_action": "PDF डाउनलोड करें",
+    "contact_hints": {
+      "full_name": "3 से 120 वर्ण।",
+      "company": "2 से 120 वर्ण।",
+      "email": "मान्य ईमेल दर्ज करें, जैसे name@example.com.",
+      "message": "10 से 2000 वर्ण।"
+    }
   },
   "cv_menu": {
     "title": "मेनू",
@@ -63,7 +83,8 @@
     "education": "शिक्षा",
     "skills": "कौशल",
     "courses": "कोर्स एवं प्रमाणपत्र",
-    "contact": "संपर्क"
+    "contact": "संपर्क",
+    "download": "PDF डाउनलोड करें"
   },
   "contact": {
     "feedback_success": "संदेश सफलतापूर्वक भेजा गया।",
@@ -74,7 +95,11 @@
     "full_name_length": "पूरा नाम 3 से 120 अक्षरों के बीच होना चाहिए।",
     "company_length": "कंपनी का नाम 2 से 120 अक्षरों के बीच होना चाहिए।",
     "email": "कृपया एक मान्य ई-मेल दर्ज करें।",
-    "message_length": "संदेश 10 से 2000 अक्षरों के बीच होना चाहिए।"
+    "message_length": "संदेश 10 से 2000 अक्षरों के बीच होना चाहिए।",
+    "full_name_required": "अपना पूरा नाम दर्ज करें।",
+    "company_required": "कंपनी का नाम दर्ज करें।",
+    "email_required": "अपना ईमेल दर्ज करें।",
+    "message_required": "संदेश दर्ज करें।"
   },
   "errors": {
     "title": "त्रुटि",
@@ -116,6 +141,7 @@
     "year": "वर्ष",
     "years": "वर्ष",
     "month": "महीना",
-    "months": "महीने"
+    "months": "महीने",
+    "and": "और"
   }
 }

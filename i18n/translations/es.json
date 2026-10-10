@@ -7,14 +7,25 @@
     "direction": "ltr"
   },
   "accessibility": {
-    "skip_to_content": "Saltar al contenido principal"
+    "skip_to_content": "Saltar al contenido principal",
+    "new_window": "Se abre en una pestaña nueva",
+    "profile": "Perfil",
+    "copyright": "Copyright",
+    "love": "love",
+    "portrait": "Retrato de {name}",
+    "required": "obligatorio"
   },
   "nav": {
     "home": "Inicio",
     "menu": "Menú",
     "theme_switch": "Modo claro/oscuro",
     "language_selector_label": "Idioma",
-    "current_language": "Idioma actual"
+    "current_language": "Idioma actual",
+    "close_menu": "Cerrar menú",
+    "primary": "Sitio",
+    "theme_light": "Tema claro",
+    "theme_dark": "Tema oscuro",
+    "theme_auto": "Tema del sistema"
   },
   "main_page": {
     "websites": "Sitios web",
@@ -54,7 +65,16 @@
     },
     "curriculum_link": "Currículum",
     "vote": "Nota",
-    "project_link": "Enlace"
+    "project_link": "Enlace",
+    "pdf_heading": "Descargar el PDF",
+    "pdf_description": "Una copia del CV en PDF.",
+    "pdf_action": "Descargar PDF",
+    "contact_hints": {
+      "full_name": "Entre 3 y 120 caracteres.",
+      "company": "Entre 2 y 120 caracteres.",
+      "email": "Introduce un correo válido, por ejemplo nombre@example.com.",
+      "message": "Entre 10 y 2000 caracteres."
+    }
   },
   "cv_menu": {
     "title": "Menú",
@@ -63,7 +83,8 @@
     "education": "Formación",
     "skills": "Skills",
     "courses": "Cursos y certificaciones",
-    "contact": "Contáctame"
+    "contact": "Contáctame",
+    "download": "Descargar PDF"
   },
   "contact": {
     "feedback_success": "Mensaje enviado correctamente.",
@@ -74,7 +95,11 @@
     "full_name_length": "El nombre y los apellidos deben tener entre 3 y 120 caracteres.",
     "company_length": "El nombre de la empresa debe tener entre 2 y 120 caracteres.",
     "email": "Introduce una dirección de correo electrónico válida.",
-    "message_length": "El mensaje debe tener entre 10 y 2000 caracteres."
+    "message_length": "El mensaje debe tener entre 10 y 2000 caracteres.",
+    "full_name_required": "Introduce tu nombre completo.",
+    "company_required": "Introduce el nombre de la empresa.",
+    "email_required": "Introduce tu correo electrónico.",
+    "message_required": "Introduce un mensaje."
   },
   "errors": {
     "title": "Error",
@@ -116,6 +141,7 @@
     "year": "año",
     "years": "años",
     "month": "mes",
-    "months": "meses"
+    "months": "meses",
+    "and": "y"
   }
 }

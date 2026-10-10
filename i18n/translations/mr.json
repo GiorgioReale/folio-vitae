@@ -7,14 +7,25 @@
     "direction": "ltr"
   },
   "accessibility": {
-    "skip_to_content": "मुख्य सामग्रीकडे जा"
+    "skip_to_content": "मुख्य सामग्रीकडे जा",
+    "new_window": "नवीन टॅबमध्ये उघडते",
+    "profile": "प्रोफाइल",
+    "copyright": "कॉपीराइट",
+    "love": "love",
+    "portrait": "{name} यांचे व्यक्तिचित्र",
+    "required": "आवश्यक"
   },
   "nav": {
     "home": "मुख्यपृष्ठ",
     "menu": "मेनू",
     "theme_switch": "लाइट/डार्क मोड",
     "language_selector_label": "भाषा",
-    "current_language": "सध्याची भाषा"
+    "current_language": "सध्याची भाषा",
+    "close_menu": "मेनू बंद करा",
+    "primary": "साइट",
+    "theme_light": "फिकट थीम",
+    "theme_dark": "गडद थीम",
+    "theme_auto": "सिस्टम थीम"
   },
   "main_page": {
     "websites": "वेबसाईट्स",
@@ -54,7 +65,16 @@
     },
     "curriculum_link": "CV",
     "vote": "गुण",
-    "project_link": "लिंक"
+    "project_link": "लिंक",
+    "pdf_heading": "PDF डाउनलोड करा",
+    "pdf_description": "CV ची PDF प्रत.",
+    "pdf_action": "PDF डाउनलोड करा",
+    "contact_hints": {
+      "full_name": "३ ते १२० वर्ण.",
+      "company": "२ ते १२० वर्ण.",
+      "email": "वैध ईमेल टाका, उदाहरणार्थ name@example.com.",
+      "message": "१० ते २००० वर्ण."
+    }
   },
   "cv_menu": {
     "title": "मेनू",
@@ -63,7 +83,8 @@
     "education": "शिक्षण",
     "skills": "कौशल्ये",
     "courses": "कोर्सेस व सर्टिफिकेशन्स",
-    "contact": "संपर्क"
+    "contact": "संपर्क",
+    "download": "PDF डाउनलोड करा"
   },
   "contact": {
     "feedback_success": "संदेश यशस्वीपणे पाठवला गेला.",
@@ -74,7 +95,11 @@
     "full_name_length": "पूर्ण नाव 3 ते 120 अक्षरांच्या दरम्यान असावे.",
     "company_length": "कंपनीचे नाव 2 ते 120 अक्षरांच्या दरम्यान असावे.",
     "email": "कृपया वैध ई-मेल पत्ता प्रविष्ट करा.",
-    "message_length": "संदेश 10 ते 2000 अक्षरांच्या दरम्यान असावा."
+    "message_length": "संदेश 10 ते 2000 अक्षरांच्या दरम्यान असावा.",
+    "full_name_required": "पूर्ण नाव टाका.",
+    "company_required": "कंपनीचे नाव टाका.",
+    "email_required": "तुमचा ईमेल टाका.",
+    "message_required": "संदेश टाका."
   },
   "errors": {
     "title": "त्रुटी",
@@ -116,6 +141,7 @@
     "year": "वर्ष",
     "years": "वर्षे",
     "month": "महिना",
-    "months": "महिने"
+    "months": "महिने",
+    "and": "आणि"
   }
 }

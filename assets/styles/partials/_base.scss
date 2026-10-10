@@ -5,9 +5,11 @@
   --background-main-reverse: #000;
   --color-text-primary: #444;
   --color-text-primary-reverse: #bbb;
-  --color-text-secondary: #808080;
+  --color-text-secondary: #595959;
+  --color-text-muted: #595959;
+  --color-border: #767676;
   --color-links: #444;
-  --color-links-hover: #bbb;
+  --color-links-hover: #5c5c5c;
   --color-buttons-primary: #444;
   --background-buttons-primary: #bbb;
   --color-buttons-primary-hover: #bbb;
@@ -32,11 +34,13 @@
     --color-text-primary: #000;
     --color-text-primary-reverse: #fff;
     --color-links: #000;
-    --color-links-hover: #808080;
+    --color-links-hover: #595959;
+    --color-text-muted: #000;
+    --color-border: #000;
     --color-buttons-primary: #fff;
     --background-buttons-primary: #000;
     --color-buttons-primary-hover: #fff;
-    --background-buttons-primary-hover: #808080;
+    --background-buttons-primary-hover: #595959;
     --color-buttons-primary-reverse: #000;
     --background-buttons-primary-reverse: #fff;
     --color-buttons-primary-hover-reverse: #000;
@@ -56,9 +60,11 @@ html[data-theme='dark'] {
   --background-main-reverse: #fff;
   --color-text-primary: #bbb;
   --color-text-primary-reverse: #444;
-  --color-text-secondary: #808080;
+  --color-text-secondary: #a3a3a3;
+  --color-text-muted: #a3a3a3;
+  --color-border: #8a8a8a;
   --color-links: #bbb;
-  --color-links-hover: #444;
+  --color-links-hover: #8a8a8a;
   --color-buttons-primary: #bbb;
   --background-buttons-primary: #444;
   --color-buttons-primary-hover: #444;
@@ -77,7 +83,9 @@ html[data-theme='dark'] {
     --color-text-primary: #fff;
     --color-text-primary-reverse: #000;
     --color-links: #fff;
-    --color-links-hover: #808080;
+    --color-links-hover: #a3a3a3;
+    --color-text-muted: #fff;
+    --color-border: #fff;
     --color-buttons-primary: #000;
     --background-buttons-primary: #fff;
     --color-buttons-primary-hover: #000;
@@ -85,7 +93,7 @@ html[data-theme='dark'] {
     --color-buttons-primary-reverse: #fff;
     --background-buttons-primary-reverse: #000;
     --color-buttons-primary-hover-reverse: #fff;
-    --background-buttons-primary-hover-reverse: #808080;
+    --background-buttons-primary-hover-reverse: #595959;
   }
 }
 
@@ -109,7 +117,10 @@ html[data-theme='dark'] {
 
   @media (prefers-reduced-motion: reduce) {
     transition: none;
-    transform: translateY(-150%);
+
+    &:focus-visible {
+      transform: translateY(0);
+    }
   }
 }
 
@@ -121,6 +132,7 @@ html[data-theme='dark'] {
   margin: -1px;
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
+  clip-path: inset(50%);
   white-space: nowrap;
   border: 0;
 }
@@ -193,6 +205,21 @@ html {
       }
     }
 
+    main a,
+    footer a,
+    aside a {
+      text-decoration: underline;
+      text-underline-offset: 0.15em;
+    }
+
+    .social a,
+    .socials a,
+    .pdf-download a,
+    .language-switcher a,
+    .site-controls > a {
+      text-decoration: none;
+    }
+
     button,
     [type='button'],
     [type='reset'],
@@ -212,7 +239,8 @@ html {
       border-radius: 0px;
     }
 
-    > aside {
+    > aside,
+    > .hero-media {
       flex: 2;
       position: sticky;
       top: 0;
@@ -226,10 +254,10 @@ html {
       justify-content: center;
       align-items: center;
       gap: 1rem;
-      border-right: 1px solid var(--color-text-primary);
+      border-inline-end: 1px solid var(--color-text-primary);
     }
 
-    > section {
+    > .page-shell {
       min-height: 100vh;
       min-height: 100dvh;
       flex: 5;
@@ -252,23 +280,30 @@ html {
         > nav {
           display: flex;
           flex-direction: row;
-          flex-wrap: nowrap;
+          flex-wrap: wrap;
           align-content: center;
-          justify-content: center;
+          justify-content: flex-end;
           align-items: center;
           gap: 1rem;
+          max-width: 100%;
 
-          > div.language-switcher {
+          > ul.language-switcher {
             display: flex;
             flex-direction: row;
-            flex-wrap: nowrap;
+            flex-wrap: wrap;
             align-content: center;
-            justify-content: center;
+            justify-content: flex-end;
             align-items: center;
             gap: 1rem;
+            max-width: 100%;
+            list-style: none;
 
-            > a,
-            > span.language-switcher__current {
+            > li {
+              display: flex;
+            }
+
+            > li > a,
+            > li > span.language-switcher__current {
               width: 2rem;
               height: 2rem;
               aspect-ratio: 1;
@@ -286,12 +321,12 @@ html {
               align-items: center;
             }
 
-            > a:hover {
+            > li > a:hover {
               border-color: var(--color-links-hover);
             }
 
-            > a[aria-current='page'],
-            > span[aria-current='page'] {
+            > li > a[aria-current='page'],
+            > li > span[aria-current='true'] {
               background-color: var(--color-links);
               color: var(--background-main);
             }
@@ -358,12 +393,13 @@ html {
 
   @media screen and (max-width: $breakpoint-lg) {
     > body {
-      > aside {
-        border-right: none;
+      > aside,
+      > .hero-media {
+        border-inline-end: none;
         border-bottom: 1px solid var(--color-text-primary);
       }
 
-      > section {
+      > .page-shell {
         > header,
         > main,
         > footer {
@@ -386,7 +422,60 @@ html {
   color: var(--color-selection);
 }
 
+ul.inline-list {
+  display: inline;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+
+  > li {
+    display: inline;
+  }
+
+  > li:not(:last-child)::after {
+    content: ", ";
+  }
+}
+
+main,
+footer {
+  overflow-wrap: break-word;
+}
+
+main :where(section, article) {
+  scroll-margin-block-start: 1rem;
+}
+
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation-duration: 0s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none;
+  }
+}
+
+@media (forced-colors: active) {
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  .skip-link:focus-visible {
+    outline: 2px solid CanvasText;
+  }
+
+  input,
+  textarea,
+  .language-switcher a,
+  .language-switcher__current {
+    border-color: ButtonText;
+  }
 }

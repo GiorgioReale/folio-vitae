@@ -7,14 +7,25 @@
     "direction": "ltr"
   },
   "accessibility": {
-    "skip_to_content": "跳到主要内容"
+    "skip_to_content": "跳到主要内容",
+    "new_window": "在新标签页中打开",
+    "profile": "个人资料",
+    "copyright": "版权",
+    "love": "love",
+    "portrait": "{name}的肖像",
+    "required": "必填"
   },
   "nav": {
     "home": "主页",
     "menu": "菜单",
     "theme_switch": "明暗模式切换",
     "language_selector_label": "语言",
-    "current_language": "当前语言"
+    "current_language": "当前语言",
+    "close_menu": "关闭菜单",
+    "primary": "网站",
+    "theme_light": "浅色主题",
+    "theme_dark": "深色主题",
+    "theme_auto": "系统主题"
   },
   "main_page": {
     "websites": "网站",
@@ -54,7 +65,16 @@
     },
     "curriculum_link": "简历",
     "vote": "成绩",
-    "project_link": "链接"
+    "project_link": "链接",
+    "pdf_heading": "下载 PDF",
+    "pdf_description": "一份简历 PDF。",
+    "pdf_action": "下载 PDF",
+    "contact_hints": {
+      "full_name": "3 到 120 个字符。",
+      "company": "2 到 120 个字符。",
+      "email": "请填写有效的电子邮箱，例如 name@example.com。",
+      "message": "10 到 2000 个字符。"
+    }
   },
   "cv_menu": {
     "title": "菜单",
@@ -63,7 +83,8 @@
     "education": "教育背景",
     "skills": "技能",
     "courses": "课程与认证",
-    "contact": "联系我"
+    "contact": "联系我",
+    "download": "下载 PDF"
   },
   "contact": {
     "feedback_success": "消息已成功发送。",
@@ -74,7 +95,11 @@
     "full_name_length": "姓名长度需为 3 至 120 个字符。",
     "company_length": "公司名称长度需为 2 至 120 个字符。",
     "email": "请输入有效的电子邮箱地址。",
-    "message_length": "消息内容需为 10 至 2000 个字符。"
+    "message_length": "消息内容需为 10 至 2000 个字符。",
+    "full_name_required": "请填写姓名。",
+    "company_required": "请填写公司名称。",
+    "email_required": "请填写电子邮箱。",
+    "message_required": "请填写留言。"
   },
   "errors": {
     "title": "错误",
@@ -116,6 +141,7 @@
     "year": "年",
     "years": "年",
     "month": "月",
-    "months": "个月"
+    "months": "个月",
+    "and": "又"
   }
 }

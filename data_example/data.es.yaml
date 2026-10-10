@@ -1,0 +1,304 @@
+# Spanish content for folio-vitae. Comments stay in English; the values are Spanish.
+#
+# Copy this file to data/data.es.yaml to enable the language.
+# Add one file per language, named data/data.<code>.yaml (for example data/data.en.yaml).
+#
+# How to edit
+# - Dates are calendar days, written YYYY-MM-DD and quoted.
+# - Lists appear in the order written. Put the newest item first.
+# - An end date of null, or a missing end date, means the item is still current.
+#   The page prints the localized label ("Presente" in Spanish). 9999-12-31 does the same.
+# - A `>-` block folds wrapped lines into one paragraph. A blank line starts
+#   a new paragraph in the PDF. The HTML page keeps the summary in a single paragraph.
+# - Optional text can be left out or set to an empty string.
+# - Unknown keys are rejected. Use only the fields shown here.
+# - At least one of sites.main.domain and sites.cv.domain is required.
+#   contact.emails.main is required too.
+
+# Identity shared by every page: name, role, age, and place.
+person:
+  first_name: Alex
+  last_name: Carter
+  # Job title under the name on the CV, and in the PDF header.
+  role: Desarrollador full stack sénior
+  date_of_birth: '1992-04-18'
+
+  # Place metadata. locality is the city printed on the CV.
+  # The other fields become Open Graph tags when they are not empty.
+  # locale uses the language_REGION form, such as es_ES, en_US, or it_IT.
+  position:
+    locale: es_ES
+    locality: Austin
+    region: Texas
+    postal_code: '78701'
+    country_name: Estados Unidos
+    latitude: '30.2672'
+    longitude: '-97.7431'
+
+# The two generated sites, plus any other sites to link from the homepage.
+sites:
+  # Public homepage. domain is the hostname, without https:// or a trailing slash.
+  main:
+    domain: alexcarter.dev
+    title: 'Alex Carter | Desarrollador full stack sénior'
+    description: >-
+      Sitio personal de Alex Carter, desarrollador full stack en Austin.
+      Notas, charlas y enlaces al CV.
+    # Stored with the site. The homepage keywords tag currently prints only the name.
+    keywords:
+      - Alex Carter
+      - desarrollador full stack
+      - ingeniero de software
+      - Austin
+
+  # CV site. profile below is the resume itself.
+  cv:
+    domain: cv.alexcarter.dev
+    title: 'Alex Carter | Currículum'
+    description: >-
+      Experiencia, proyectos seleccionados, formación y competencias de
+      Alex Carter, desarrollador full stack sénior.
+    # Appended after the full name in the CV keywords meta tag.
+    keywords:
+      - desarrollador full stack sénior
+      - Rust
+      - TypeScript
+      - React
+      - PostgreSQL
+      - sistemas distribuidos
+      - rendimiento web
+      - Austin
+
+    profile:
+      # Opening section of the CV and the PDF. Two or three short paragraphs is enough.
+      summary: >-
+        Desarrollador full stack sénior, centrado en productos que siguen
+        siendo rápidos y comprensibles a medida que crecen. Trabajo con
+        frontends en TypeScript, servicios en Rust y Node, y PostgreSQL, y
+        cuido tanto el camino hasta producción como la funcionalidad en sí.
+
+        El trabajo reciente ha sido en plataformas internas y herramientas de
+        cara al cliente: sustituir un panel de administración heredado, bajar
+        la latencia p95 de la API y dejar a un equipo pequeño un proceso de
+        despliegue en el que confía. Reviso el diseño con producto y diseño, y
+        dejo el código más fácil de cambiar de lo que estaba.
+
+      # One entry per company. Roles inside a company are newest first.
+      # The printed CV adds a "more on the website" line after four companies.
+      work_experiences:
+        - company:
+            name: BrightForge
+            location: En remoto
+          roles:
+            - title: Desarrollador full stack sénior
+              start_date: '2023-03-01'
+              # null: this role is current.
+              end_date: null
+              description: >-
+                Lidero el desarrollo de la plataforma de administración que
+                usan los equipos de soporte y de éxito del cliente. Reconstruí
+                los flujos más usados en React y TypeScript, pasé las
+                escrituras a un servicio en Rust con PostgreSQL y bajé la
+                latencia p95 de esos endpoints de unos 800 ms a menos de 200 ms.
+
+                Acoto el alcance con producto, reviso la mayoría de las pull
+                requests del equipo y mantengo el pipeline de despliegue
+                (Docker, GitHub Actions) lo bastante pequeño como para que
+                una persona nueva pueda publicar en la primera semana.
+
+            - title: Desarrollador full stack
+              start_date: '2021-02-15'
+              end_date: '2023-02-28'
+              description: >-
+                Publiqué la primera versión de las herramientas de facturación
+                y de cuenta sobre TypeScript y PostgreSQL. Introduje componentes
+                de interfaz compartidos, trazas por petición y una vía de
+                migración para salir de la aplicación de administración
+                anterior, hecha en PHP.
+
+        - company:
+            name: Northline Studio
+            location: Austin, Texas
+          roles:
+            - title: Desarrollador full stack
+              start_date: '2018-06-01'
+              end_date: '2021-01-29'
+              description: >-
+                Desarrollé aplicaciones web para clientes y una biblioteca de
+                componentes compartida, usada en cerca de una docena de
+                proyectos. Me ocupé de los presupuestos de rendimiento del
+                frontend, de las correcciones de accesibilidad y de las API en
+                Node que hay detrás de los sitios de marketing.
+
+                Acompañé a dos compañeros júnior y llevé la publicación semanal
+                de la cuenta más grande del estudio.
+
+        - company:
+            name: Harbor & Co.
+            location: Austin, Texas
+          roles:
+            - title: Desarrollador web
+              start_date: '2016-01-11'
+              end_date: '2018-05-18'
+              description: >-
+                Entregué sitios de presentación y pequeñas funcionalidades a
+                medida para negocios locales, con HTML, CSS, PHP y MySQL. Monté
+                el primer entorno de preproducción del estudio y una rutina
+                básica de copias de seguridad.
+
+      # Side projects, open source, talks, or freelance work.
+      # link is optional, but the CV prints an anchor for every project, so use a full URL.
+      other_projects:
+        - title: Starter Notes
+          start_date: '2023-09-01'
+          end_date: null
+          description: >-
+            Una aplicación web pequeña para tomar notas, hecha para probar la
+            sincronización offline-first y una edición solo con teclado. El
+            cliente es React; la API de sincronización está en Rust.
+          link: https://github.com/alexcarter/starter-notes
+
+        - title: Ledgerline
+          start_date: '2022-04-01'
+          end_date: '2022-11-30'
+          description: >-
+            Importador de código abierto que convierte exportaciones CSV de
+            bancos en ficheros de contabilidad por partida doble. Proyecto de
+            fin de semana para aprender el análisis estricto y las pruebas
+            basadas en propiedades.
+          link: https://github.com/alexcarter/ledgerline
+
+        - title: Civic Atlas
+          start_date: '2019-01-07'
+          end_date: '2019-06-14'
+          description: >-
+            Reconstrucción voluntaria del sitio de una asociación de barrio:
+            páginas estáticas, un calendario de eventos y un formulario de
+            contacto, sin scripts de seguimiento.
+          link: https://github.com/alexcarter/civic-atlas
+
+      # Newest program first. vote is optional; leave it out when there is no grade to show.
+      # date_end null means the program is still in progress.
+      educations:
+        - institute: University of Texas at Austin
+          educational_qualification: Máster en Ciencias
+          course_of_study: Estudios de la información
+          date_start: '2014-08-25'
+          date_end: '2016-05-20'
+          vote: '3.9 / 4.0'
+          description: >-
+            Asignaturas de gestión de datos, interacción persona-ordenador y
+            arquitectura de la información. Trabajo de fin de máster sobre cómo
+            hacer usable la búsqueda de registros públicos para quien no es
+            especialista.
+
+        - institute: University of Texas at Austin
+          educational_qualification: Grado en Ciencias
+          course_of_study: Informática
+          date_start: '2010-08-23'
+          date_end: '2014-05-17'
+          description: >-
+            Ingeniería de software, bases de datos y sistemas operativos.
+            Ayudante de la asignatura introductoria de programación en el
+            último curso.
+
+      # name is the accessible label. icon is a Simple Icons slug
+      # (https://simpleicons.org) and must match exactly, for example nextdotjs.
+      # The CV shows the icon; the name is read by screen readers. A short list
+      # keeps the row from wrapping into a wall of logos.
+      skills:
+        - name: Rust
+          icon: rust
+        - name: TypeScript
+          icon: typescript
+        - name: React
+          icon: react
+        - name: Next.js
+          icon: nextdotjs
+        - name: Node.js
+          icon: nodedotjs
+        - name: PostgreSQL
+          icon: postgresql
+        - name: Docker
+          icon: docker
+        - name: Linux
+          icon: linux
+
+      # Courses and certificates, newest first.
+      # The printed CV adds a "more on the website" line after four entries.
+      # link is printed for every entry, so point it at the credential or the course page.
+      courses_certifications:
+        - title: Fundamentos de la accesibilidad web
+          released_by: W3C
+          released_on: '2024-02-12'
+          link: https://www.w3.org/WAI/fundamentals/
+
+        - title: Fundamentos de Rust
+          released_by: socios de formación de la Rust Foundation
+          released_on: '2023-06-03'
+          link: https://www.rust-lang.org/learn
+
+        - title: PostgreSQL para desarrolladores
+          released_by: talleres de la comunidad PostgreSQL
+          released_on: '2021-10-18'
+          link: https://www.postgresql.org/docs/
+
+  # Extra hostnames listed on the homepage, after the CV link.
+  # Each entry needs a domain. title, description, and keywords are stored with it
+  # and are not required for that homepage list.
+  additional:
+    - domain: notes.alexcarter.dev
+      title: Notas de campo
+      description: Artículos breves sobre software web mantenible y disciplina de publicación.
+      keywords:
+        - blog
+        - software
+        - notas de ingeniería
+    - domain: talks.alexcarter.dev
+      title: Charlas
+      description: Diapositivas y resúmenes de meetups locales.
+      keywords:
+        - charlas
+        - diapositivas
+        - meetups
+
+# Addresses and profiles. The homepage lists every email and every social.
+# The CV uses contact.emails.cv, falling back to contact.emails.main when cv is empty.
+contact:
+  emails:
+    main: hello@alexcarter.dev
+    cv: work@alexcarter.dev
+    other:
+      - speaking@alexcarter.dev
+      - press@alexcarter.dev
+
+  # social_name selects the icon and must be a lowercase Simple Icons slug.
+  # linkedin is the exception: it uses the icon shipped with the templates.
+  # The CV sidebar shows only linkedin, github, gitlab, and stackoverflow.
+  # The homepage shows the full list.
+  # profile_nickname is the visible handle. link is the full profile URL.
+  socials:
+    - social_name: linkedin
+      social_full_name: LinkedIn
+      link: https://www.linkedin.com/in/alexcarter
+      profile_nickname: alexcarter
+    - social_name: github
+      social_full_name: GitHub
+      link: https://github.com/alexcarter
+      profile_nickname: alexcarter
+    - social_name: gitlab
+      social_full_name: GitLab
+      link: https://gitlab.com/alexcarter
+      profile_nickname: alexcarter
+    - social_name: stackoverflow
+      social_full_name: Stack Overflow
+      link: https://stackoverflow.com/users/0000000/alexcarter
+      profile_nickname: alexcarter
+    - social_name: mastodon
+      social_full_name: Mastodon
+      link: https://mastodon.social/@alexcarter
+      profile_nickname: '@alexcarter@mastodon.social'
+    - social_name: bluesky
+      social_full_name: Bluesky
+      link: https://bsky.app/profile/alexcarter.dev
+      profile_nickname: '@alexcarter.dev'

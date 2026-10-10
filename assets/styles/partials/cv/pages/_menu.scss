@@ -6,7 +6,7 @@
   justify-content: space-between;
   align-items: stretch;
 
-  > section {
+  > .page-shell {
     > main {
       display: flex;
       flex-direction: column;
@@ -15,18 +15,24 @@
       justify-content: center;
       align-items: center;
 
-      > a {
-        display: block;
+      > nav {
         width: 576px;
-        max-width: -webkit-fill-available;
-        max-width: -moz-available;
-        max-width: stretch;
-        border-top: 1px solid #bbb;
-        padding: 1rem 2rem 1rem 2rem;
+        max-width: 100%;
+      }
 
-        &:last-child {
-          border-bottom: 1px solid #bbb;
-        }
+      ul {
+        list-style: none;
+      }
+
+      a {
+        display: block;
+        border-top: 1px solid var(--color-border);
+        padding: 1rem 2rem 1rem 2rem;
+        text-decoration: none;
+      }
+
+      li:last-child a {
+        border-bottom: 1px solid var(--color-border);
       }
     }
   }

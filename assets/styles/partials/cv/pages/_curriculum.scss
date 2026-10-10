@@ -9,7 +9,11 @@ body#curriculum {
   align-items: flex-start;
 
   > aside {
+    overflow-y: auto;
+    justify-content: safe center;
+
     > picture {
+      flex-shrink: 0;
       width: 250px;
       max-width: 75%;
       aspect-ratio: 1;
@@ -43,50 +47,52 @@ body#curriculum {
         font-weight: 400;
         font-size: 1.602rem;
       }
+    }
 
-      &:nth-child(3) {
-        gap: 0.5rem;
+    > dl.profile-facts {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      text-align: center;
 
-        > div {
-          display: flex;
-          flex-direction: column;
-          flex-wrap: nowrap;
-          align-content: center;
-          justify-content: center;
-          align-items: center;
+      > div {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
 
-          > p {
-            &:nth-child(odd) {
-              font-variation-settings: 'wght' 700;
-              font-weight: 700;
-            }
-          }
+        > dt {
+          font-variation-settings: 'wght' 700;
+          font-weight: 700;
         }
       }
+    }
 
-      &:last-child {
-        flex-direction: row;
-        gap: 0.5rem;
+    ul.socials {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      list-style: none;
 
-        > a {
-          > svg {
-            fill: var(--color-buttons-primary);
-            background-color: var(--background-buttons-primary);
-            width: 2rem;
-            height: 2rem;
-            padding: 0.25rem;
+      > li > a > svg,
+      > li > a > span > svg {
+        fill: var(--color-buttons-primary);
+        background-color: var(--background-buttons-primary);
+        width: 2rem;
+        height: 2rem;
+        padding: 0.25rem;
 
-            &:hover {
-              fill: var(--color-buttons-primary-hover);
-              background-color: var(--background-buttons-primary-hover);
-            }
-          }
+        &:hover {
+          fill: var(--color-buttons-primary-hover);
+          background-color: var(--background-buttons-primary-hover);
         }
       }
     }
   }
 
-  > section {
+  > .page-shell {
     min-height: 100vh;
     min-height: 100dvh;
     display: flex;
@@ -97,7 +103,7 @@ body#curriculum {
     align-items: stretch;
 
     > main {
-      > div {
+      > section {
         > h3 {
           margin: 3rem 0 0.75rem 0;
         }
@@ -127,11 +133,13 @@ body#curriculum {
         &.other-projects,
         &.formation,
         &.training-courses {
-          > div {
-            margin: 1rem 0 0 1rem;
+          > article {
+            margin-block-start: 1rem;
+            margin-inline-start: 1rem;
 
             > div {
-              margin: 0.5rem 0 0 1rem;
+              margin-block-start: 0.5rem;
+              margin-inline-start: 1rem;
 
               > h5 {
                 font-size: 1.424rem;
@@ -153,38 +161,74 @@ body#curriculum {
           }
         }
 
+        &.pdf-download {
+          margin: 3rem -2rem 0 -2rem;
+          padding: 1.5rem 1.25rem 1.75rem 1.25rem;
+          background-color: var(--background-main-reverse);
+          color: var(--color-text-primary-reverse);
+          text-align: center;
+
+          > h3 {
+            margin: 0 0 0.75rem 0;
+          }
+
+          > a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            padding: 0.75rem 1.5rem 0.75rem 1.5rem;
+            background-color: var(--background-buttons-primary);
+            color: var(--color-buttons-primary);
+            text-decoration: none;
+            font-family: var(--font-family-display);
+            font-variation-settings: 'wght' 600;
+            font-weight: 600;
+            font-size: 0.9rem;
+
+            > svg {
+              width: 1.2rem;
+              height: 1.2rem;
+              fill: currentColor;
+            }
+
+            &:hover {
+              background-color: var(--background-buttons-primary-hover);
+              color: var(--color-buttons-primary-hover);
+            }
+          }
+        }
+
         &.skills {
-          > div {
-            margin: 0 0 0 0;
+          > ul {
+            margin: 0;
+            padding: 0;
             display: flex;
             justify-content: space-between;
+            list-style: none;
 
-            > div {
-              > svg {
-                width: 3rem;
-                max-width: 12vw;
-                aspect-ratio: 1;
-                fill: var(--color-text-primary);
-              }
+            > li svg {
+              width: 3rem;
+              max-width: 12vw;
+              aspect-ratio: 1;
+              fill: var(--color-text-primary);
             }
           }
         }
       }
 
-      > div.legal-notice {
-        > p {
-          font-size: 0.75rem;
-          margin: 3rem 0 1rem 0;
-        }
+      > p.legal-notice {
+        font-size: 0.75rem;
+        margin: 3rem 0 1rem 0;
       }
-    }
 
-    > div.contact-form {
+      > section.contact-form {
       display: flex;
       flex-direction: column;
       gap: 0.75rem;
-      padding: 2rem 2rem 2rem 2rem;
-      margin: 0 0 3rem 0;
+      padding: 0;
+      margin: 3rem 0 1rem 0;
 
       > form {
         display: grid;
@@ -222,7 +266,30 @@ body#curriculum {
           margin: 0.5rem 0 0 0;
         }
 
+        > .field-hint,
+        > .field-error {
+          margin: 0;
+          font-size: 0.8rem;
+          line-height: 1.4;
+          color: var(--color-text-primary);
+        }
+
+        > .field-error {
+          font-variation-settings: 'wght' 600;
+          font-weight: 600;
+        }
+
+        > label > .field-required {
+          font-variation-settings: 'wght' 400;
+          font-weight: 400;
+          font-size: 0.8rem;
+        }
+
         > button {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.5rem;
           justify-self: start;
           padding: 0.75rem 1.5rem 0.75rem 1.5rem;
           background-color: var(--background-buttons-primary);
@@ -232,6 +299,12 @@ body#curriculum {
           font-size: 0.9rem;
           font-family: var(--font-family-sans-serif);
           margin: 0.5rem 0 0 0;
+
+          > svg {
+            width: 1.2rem;
+            height: 1.2rem;
+            fill: currentColor;
+          }
 
           &:hover {
             background-color: var(--background-buttons-primary-hover);
@@ -265,6 +338,7 @@ body#curriculum {
         }
       }
     }
+    }
   }
 
   @media screen and (max-width: $breakpoint-lg) {
@@ -278,16 +352,57 @@ body#curriculum {
       padding: 0.5rem;
     }
 
-    > section {
+    > .page-shell {
       flex: none;
 
       > main {
-        > div {
+        > section {
           h3,
           h4,
           p {
             width: auto !important;
           }
+
+          &.pdf-download {
+            margin-inline: -0.5rem;
+          }
+        }
+      }
+    }
+  }
+
+  @media screen and (max-width: $breakpoint-lg) and (min-width: ($breakpoint-sm + 1px)) {
+    > aside {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      column-gap: 1.5rem;
+      row-gap: 0.75rem;
+      align-items: center;
+      justify-items: center;
+      justify-content: center;
+
+      > picture {
+        grid-column: 1;
+        grid-row: 1;
+        align-self: end;
+        width: min(10.5rem, 78%);
+      }
+
+      > div {
+        grid-column: 1;
+        grid-row: 2;
+        align-self: start;
+        width: 100%;
+      }
+
+      > dl.profile-facts {
+        grid-column: 2;
+        grid-row: 1 / span 2;
+        align-self: center;
+        width: 100%;
+
+        > div > dd {
+          overflow-wrap: anywhere;
         }
       }
     }

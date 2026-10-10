@@ -7,14 +7,25 @@
     "direction": "ltr"
   },
   "accessibility": {
-    "skip_to_content": "Lewati ke konten utama"
+    "skip_to_content": "Lewati ke konten utama",
+    "new_window": "Terbuka di tab baru",
+    "profile": "Profil",
+    "copyright": "Hak cipta",
+    "love": "love",
+    "portrait": "Potret {name}",
+    "required": "wajib"
   },
   "nav": {
     "home": "Beranda",
     "menu": "Menu",
     "theme_switch": "Mode Terang/Gelap",
     "language_selector_label": "Bahasa",
-    "current_language": "Bahasa saat ini"
+    "current_language": "Bahasa saat ini",
+    "close_menu": "Tutup menu",
+    "primary": "Situs",
+    "theme_light": "Tema terang",
+    "theme_dark": "Tema gelap",
+    "theme_auto": "Tema sistem"
   },
   "main_page": {
     "websites": "Situs Web",
@@ -54,7 +65,16 @@
     },
     "curriculum_link": "CV",
     "vote": "Nilai",
-    "project_link": "Tautan"
+    "project_link": "Tautan",
+    "pdf_heading": "Unduh PDF",
+    "pdf_description": "Salinan PDF dari CV.",
+    "pdf_action": "Unduh PDF",
+    "contact_hints": {
+      "full_name": "Antara 3 dan 120 karakter.",
+      "company": "Antara 2 dan 120 karakter.",
+      "email": "Masukkan email yang valid, misalnya name@example.com.",
+      "message": "Antara 10 dan 2000 karakter."
+    }
   },
   "cv_menu": {
     "title": "Menu",
@@ -63,7 +83,8 @@
     "education": "Pendidikan",
     "skills": "Keahlian",
     "courses": "Kursus & Sertifikasi",
-    "contact": "Kontak"
+    "contact": "Kontak",
+    "download": "Unduh PDF"
   },
   "contact": {
     "feedback_success": "Pesan berhasil dikirim.",
@@ -74,7 +95,11 @@
     "full_name_length": "Nama lengkap harus terdiri dari 3 hingga 120 karakter.",
     "company_length": "Nama perusahaan harus terdiri dari 2 hingga 120 karakter.",
     "email": "Masukkan alamat e-mail yang valid.",
-    "message_length": "Pesan harus terdiri dari 10 hingga 2000 karakter."
+    "message_length": "Pesan harus terdiri dari 10 hingga 2000 karakter.",
+    "full_name_required": "Masukkan nama lengkap.",
+    "company_required": "Masukkan nama perusahaan.",
+    "email_required": "Masukkan email Anda.",
+    "message_required": "Masukkan pesan."
   },
   "errors": {
     "title": "Kesalahan",
@@ -116,6 +141,7 @@
     "year": "tahun",
     "years": "tahun",
     "month": "bulan",
-    "months": "bulan"
+    "months": "bulan",
+    "and": "dan"
   }
 }

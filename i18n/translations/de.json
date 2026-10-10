@@ -7,14 +7,25 @@
     "direction": "ltr"
   },
   "accessibility": {
-    "skip_to_content": "Zum Hauptinhalt springen"
+    "skip_to_content": "Zum Hauptinhalt springen",
+    "new_window": "Öffnet in einem neuen Tab",
+    "profile": "Profil",
+    "copyright": "Copyright",
+    "love": "love",
+    "portrait": "Porträt von {name}",
+    "required": "Pflichtfeld"
   },
   "nav": {
     "home": "Startseite",
     "menu": "Menü",
     "theme_switch": "Hell/Dunkel-Modus",
     "language_selector_label": "Sprache",
-    "current_language": "Aktuelle Sprache"
+    "current_language": "Aktuelle Sprache",
+    "close_menu": "Menü schließen",
+    "primary": "Website",
+    "theme_light": "Helles Design",
+    "theme_dark": "Dunkles Design",
+    "theme_auto": "Systemdesign"
   },
   "main_page": {
     "websites": "Webseiten",
@@ -54,7 +65,16 @@
     },
     "curriculum_link": "Lebenslauf",
     "vote": "Note",
-    "project_link": "Link"
+    "project_link": "Link",
+    "pdf_heading": "PDF herunterladen",
+    "pdf_description": "Eine PDF-Kopie des Lebenslaufs.",
+    "pdf_action": "PDF herunterladen",
+    "contact_hints": {
+      "full_name": "Zwischen 3 und 120 Zeichen.",
+      "company": "Zwischen 2 und 120 Zeichen.",
+      "email": "Geben Sie eine gültige E-Mail-Adresse ein, zum Beispiel name@example.com.",
+      "message": "Zwischen 10 und 2000 Zeichen."
+    }
   },
   "cv_menu": {
     "title": "Menü",
@@ -63,7 +83,8 @@
     "education": "Ausbildung",
     "skills": "Fähigkeiten",
     "courses": "Kurse & Zertifikate",
-    "contact": "Kontakt aufnehmen"
+    "contact": "Kontakt aufnehmen",
+    "download": "PDF herunterladen"
   },
   "contact": {
     "feedback_success": "Nachricht erfolgreich gesendet.",
@@ -74,7 +95,11 @@
     "full_name_length": "Der Vor- und Nachname muss zwischen 3 und 120 Zeichen lang sein.",
     "company_length": "Der Firmenname muss zwischen 2 und 120 Zeichen lang sein.",
     "email": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
-    "message_length": "Die Nachricht muss zwischen 10 und 2000 Zeichen lang sein."
+    "message_length": "Die Nachricht muss zwischen 10 und 2000 Zeichen lang sein.",
+    "full_name_required": "Geben Sie Ihren vollständigen Namen ein.",
+    "company_required": "Geben Sie den Firmennamen ein.",
+    "email_required": "Geben Sie Ihre E-Mail-Adresse ein.",
+    "message_required": "Geben Sie eine Nachricht ein."
   },
   "errors": {
     "title": "Fehler",
@@ -116,6 +141,7 @@
     "year": "Jahr",
     "years": "Jahre",
     "month": "Monat",
-    "months": "Monate"
+    "months": "Monate",
+    "and": "und"
   }
 }

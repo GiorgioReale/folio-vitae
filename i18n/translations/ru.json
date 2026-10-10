@@ -7,14 +7,25 @@
     "direction": "ltr"
   },
   "accessibility": {
-    "skip_to_content": "Перейти к основному содержимому"
+    "skip_to_content": "Перейти к основному содержимому",
+    "new_window": "Открывается в новой вкладке",
+    "profile": "Профиль",
+    "copyright": "Авторское право",
+    "love": "love",
+    "portrait": "Портрет: {name}",
+    "required": "обязательно"
   },
   "nav": {
     "home": "Главная",
     "menu": "Меню",
     "theme_switch": "Светлая/тёмная тема",
     "language_selector_label": "Язык",
-    "current_language": "Текущий язык"
+    "current_language": "Текущий язык",
+    "close_menu": "Закрыть меню",
+    "primary": "Сайт",
+    "theme_light": "Светлая тема",
+    "theme_dark": "Тёмная тема",
+    "theme_auto": "Системная тема"
   },
   "main_page": {
     "websites": "Веб-сайты",
@@ -54,7 +65,16 @@
     },
     "curriculum_link": "Резюме",
     "vote": "Оценка",
-    "project_link": "Ссылка"
+    "project_link": "Ссылка",
+    "pdf_heading": "Скачать PDF",
+    "pdf_description": "PDF-копия резюме.",
+    "pdf_action": "Скачать PDF",
+    "contact_hints": {
+      "full_name": "От 3 до 120 символов.",
+      "company": "От 2 до 120 символов.",
+      "email": "Укажите действительный адрес email, например name@example.com.",
+      "message": "От 10 до 2000 символов."
+    }
   },
   "cv_menu": {
     "title": "Меню",
@@ -63,7 +83,8 @@
     "education": "Образование",
     "skills": "Навыки",
     "courses": "Курсы и сертификации",
-    "contact": "Контакты"
+    "contact": "Контакты",
+    "download": "Скачать PDF"
   },
   "contact": {
     "feedback_success": "Сообщение успешно отправлено.",
@@ -74,7 +95,11 @@
     "full_name_length": "Имя и фамилия должны содержать от 3 до 120 символов.",
     "company_length": "Название компании должно содержать от 2 до 120 символов.",
     "email": "Введите корректный адрес электронной почты.",
-    "message_length": "Сообщение должно содержать от 10 до 2000 символов."
+    "message_length": "Сообщение должно содержать от 10 до 2000 символов.",
+    "full_name_required": "Введите имя и фамилию.",
+    "company_required": "Введите название компании.",
+    "email_required": "Введите адрес email.",
+    "message_required": "Введите сообщение."
   },
   "errors": {
     "title": "Ошибка",
@@ -116,6 +141,7 @@
     "year": "год",
     "years": "лет",
     "month": "месяц",
-    "months": "месяцев"
+    "months": "месяцев",
+    "and": "и"
   }
 }

@@ -8,15 +8,15 @@ body#homepage {
   justify-content: space-between;
   align-items: stretch;
 
-  > aside {
+  > .hero-media {
     background-image: image-set(url('/assets/images/cv/home-background/home-background.avif') type('image/avif'), url('/assets/images/cv/home-background/home-background.jpg') type('image/jpeg'));
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
-    border-right: none;
+    border-inline-end: none;
   }
 
-  > section {
+  > .page-shell {
     flex: 5;
     display: flex;
     flex-direction: column;
@@ -33,6 +33,8 @@ body#homepage {
       }
 
       > a {
+        text-decoration: none;
+
         > svg {
           fill: var(--color-buttons-primary);
           background-color: var(--background-buttons-primary);
@@ -51,7 +53,7 @@ body#homepage {
   @media screen and (max-width: $breakpoint-lg) {
     flex-direction: column;
 
-    > aside {
+    > .hero-media {
       flex: none;
       position: relative;
       height: auto;
@@ -60,7 +62,7 @@ body#homepage {
       border-bottom: none;
     }
 
-    > section {
+    > .page-shell {
       flex: none;
       min-height: calc(100vh - (100vw / 2));
       min-height: calc(100dvh - (100vw / 2));

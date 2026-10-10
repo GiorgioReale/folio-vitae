@@ -7,14 +7,25 @@
     "direction": "ltr"
   },
   "accessibility": {
-    "skip_to_content": "メインコンテンツへスキップ"
+    "skip_to_content": "メインコンテンツへスキップ",
+    "new_window": "新しいタブで開きます",
+    "profile": "プロフィール",
+    "copyright": "著作権",
+    "love": "love",
+    "portrait": "{name}の肖像",
+    "required": "必須"
   },
   "nav": {
     "home": "ホーム",
     "menu": "メニュー",
     "theme_switch": "ライト／ダークモード",
     "language_selector_label": "言語",
-    "current_language": "現在の言語"
+    "current_language": "現在の言語",
+    "close_menu": "メニューを閉じる",
+    "primary": "サイト",
+    "theme_light": "ライトテーマ",
+    "theme_dark": "ダークテーマ",
+    "theme_auto": "システムテーマ"
   },
   "main_page": {
     "websites": "ウェブサイト",
@@ -54,7 +65,16 @@
     },
     "curriculum_link": "履歴書",
     "vote": "成績",
-    "project_link": "リンク"
+    "project_link": "リンク",
+    "pdf_heading": "PDFをダウンロード",
+    "pdf_description": "履歴書のPDFです。",
+    "pdf_action": "PDFをダウンロード",
+    "contact_hints": {
+      "full_name": "3文字以上120文字以下。",
+      "company": "2文字以上120文字以下。",
+      "email": "有効なメールアドレスを入力してください。例: name@example.com",
+      "message": "10文字以上2000文字以下。"
+    }
   },
   "cv_menu": {
     "title": "メニュー",
@@ -63,7 +83,8 @@
     "education": "学歴",
     "skills": "スキル",
     "courses": "コース・認定資格",
-    "contact": "お問い合わせ"
+    "contact": "お問い合わせ",
+    "download": "PDFをダウンロード"
   },
   "contact": {
     "feedback_success": "メッセージが正常に送信されました。",
@@ -74,7 +95,11 @@
     "full_name_length": "氏名は3〜120文字で入力してください。",
     "company_length": "会社名は2〜120文字で入力してください。",
     "email": "有効なEメールアドレスを入力してください。",
-    "message_length": "メッセージは10〜2000文字で入力してください。"
+    "message_length": "メッセージは10〜2000文字で入力してください。",
+    "full_name_required": "氏名を入力してください。",
+    "company_required": "会社名を入力してください。",
+    "email_required": "メールアドレスを入力してください。",
+    "message_required": "メッセージを入力してください。"
   },
   "errors": {
     "title": "エラー",
@@ -116,6 +141,7 @@
     "year": "年",
     "years": "年",
     "month": "か月",
-    "months": "か月"
+    "months": "か月",
+    "and": "と"
   }
 }
