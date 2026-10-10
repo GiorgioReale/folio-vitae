@@ -42,12 +42,11 @@ jobs:
             command: cargo verify-project --locked
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: 1.88.0
           components: rustfmt, clippy
 
       - name: Cache cargo
@@ -72,12 +71,10 @@ jobs:
             command: cargo deny check
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
-        with:
-          toolchain: 1.88.0
 
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
@@ -96,12 +93,12 @@ jobs:
     timeout-minutes: 20
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: 1.88.0
+          toolchain: 1.89.0
 
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
