@@ -933,6 +933,11 @@ mod tests {
 
     #[test]
     fn key_pages_render_with_tera_v2() {
+        if !std::path::Path::new("data").is_dir() {
+            // CI and fresh checkouts do not ship a local `data/` directory.
+            return;
+        }
+
         let prepared = prepare_application_state(Environment::Development)
             .expect("application state should prepare for template smoke tests");
         let language = Language::new("it");
@@ -950,7 +955,8 @@ mod tests {
             .expect("curriculum should render");
         assert!(curriculum.contains("main-content"));
 
-        let menu = render_cv_menu(&prepared.cv_state, &language, "/menu").expect("menu should render");
+        let menu =
+            render_cv_menu(&prepared.cv_state, &language, "/menu").expect("menu should render");
         assert!(menu.contains("menu-title"));
 
         let error = render_error(

@@ -418,7 +418,10 @@ fn parse_json_with_path<T: DeserializeOwned>(contents: &str, path: &str) -> AppR
     }
 }
 
-fn format_yaml_error(path: &str, error: &serde_path_to_error::Error<serde_norway::Error>) -> String {
+fn format_yaml_error(
+    path: &str,
+    error: &serde_path_to_error::Error<serde_norway::Error>,
+) -> String {
     let mut message = format!("Invalid {path}: {}", error.inner());
     if let Some(location) = error.inner().location() {
         message.push_str(&format!(" at line {}, column {}", location.line(), location.column()));

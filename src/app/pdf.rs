@@ -9,7 +9,7 @@ use resvg::{
     tiny_skia::{Pixmap, Transform},
     usvg,
 };
-use ttf_parser::Face;
+use skrifa::{FontRef, MetadataProvider, instance::LocationRef, instance::Size};
 
 use crate::error::{AppError, AppResult};
 
@@ -109,11 +109,11 @@ struct FontBytes {
 }
 
 struct Faces {
-    display_bold: Face<'static>,
-    display_regular: Face<'static>,
-    text_bold: Face<'static>,
-    text_regular: Face<'static>,
-    text_light: Face<'static>,
+    display_bold: FontRef<'static>,
+    display_regular: FontRef<'static>,
+    text_bold: FontRef<'static>,
+    text_regular: FontRef<'static>,
+    text_light: FontRef<'static>,
 }
 
 struct FontIds {
@@ -718,7 +718,7 @@ fn mask_circle(image: &mut RgbaImage) {
     }
 }
 
-fn wrap_text(face: &Face<'_>, text: &str, size: f32, max_width: f32) -> Vec<String> {
+fn wrap_text(face: &FontRef<'_>, text: &str, size: f32, max_width: f32) -> Vec<String> {
     let mut lines = Vec::new();
     for (index, paragraph) in text.replace("\r\n", "\n").split('\n').enumerate() {
         if index > 0 && paragraph.trim().is_empty() && lines.last().is_some_and(String::is_empty) {
@@ -736,7 +736,7 @@ fn wrap_text(face: &Face<'_>, text: &str, size: f32, max_width: f32) -> Vec<Stri
     lines
 }
 
-fn wrap_paragraph(face: &Face<'_>, text: &str, size: f32, max_width: f32) -> Vec<String> {
+fn wrap_paragraph(face: &FontRef<'_>, text: &str, size: f32, max_width: f32) -> Vec<String> {
     let mut lines = Vec::new();
     let mut current = String::new();
 
@@ -766,7 +766,7 @@ fn wrap_paragraph(face: &Face<'_>, text: &str, size: f32, max_width: f32) -> Vec
     lines
 }
 
-fn split_overflow(face: &Face<'_>, word: &str, size: f32, max_width: f32) -> Vec<String> {
+fn split_overflow(face: &FontRef<'_>, word: &str, size: f32, max_width: f32) -> Vec<String> {
     if text_width(face, word, size) <= max_width {
         return vec![word.to_string()];
     }
@@ -789,23 +789,25 @@ fn split_overflow(face: &Face<'_>, word: &str, size: f32, max_width: f32) -> Vec
     parts
 }
 
-fn text_width(face: &Face<'_>, text: &str, size: f32) -> f32 {
-    let units = f32::from(face.units_per_em());
+fn text_width(face: &FontRef<'_>, text: &str, size: f32) -> f32 {
+    let metrics = face.glyph_metrics(Size::new(size), LocationRef::default());
+    let charmap = face.charmap();
     let mut width = 0.0;
     for ch in text.chars() {
-        let Some(glyph) = face.glyph_index(ch) else {
+        let Some(glyph) = charmap.map(ch) else {
             continue;
         };
-        width += f32::from(face.glyph_hor_advance(glyph).unwrap_or(0));
+        width += metrics.advance_width(glyph).unwrap_or(0.0);
     }
-    width * size / units
+    width
 }
 
-fn visible_text(face: &Face<'_>, text: &str) -> String {
-    text.chars().filter(|ch| ch.is_whitespace() || face.glyph_index(*ch).is_some()).collect()
+fn visible_text(face: &FontRef<'_>, text: &str) -> String {
+    let charmap = face.charmap();
+    text.chars().filter(|ch| ch.is_whitespace() || charmap.map(*ch).is_some()).collect()
 }
 
-fn face(faces: &Faces, role: FontRole) -> &Face<'static> {
+fn face(faces: &Faces, role: FontRole) -> &FontRef<'static> {
     match role {
         FontRole::DisplayBold => &faces.display_bold,
         FontRole::DisplayRegular => &faces.display_regular,
@@ -861,8 +863,8 @@ fn cached_font(
     Ok(slot.get_or_init(|| decoded).as_slice())
 }
 
-fn parse_face(bytes: &'static [u8], name: &str) -> AppResult<Face<'static>> {
-    Face::parse(bytes, 0)
+fn parse_face(bytes: &'static [u8], name: &str) -> AppResult<FontRef<'static>> {
+    FontRef::new(bytes)
         .map_err(|error| AppError::Message(format!("reading the {name} font: {error}")))
 }
 

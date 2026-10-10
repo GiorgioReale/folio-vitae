@@ -36,9 +36,7 @@ pub(crate) fn process_scripts(environment: Environment) -> AppResult<()> {
         let source = fs::read_to_string(path).with_context(|| format!("reading {path:?}"))?;
 
         let minified = js::minify(&source)
-            .map_err(|error| {
-                crate::error::AppError::msg(format!("minifying {path:?}: {error}"))
-            })?
+            .map_err(|error| crate::error::AppError::msg(format!("minifying {path:?}: {error}")))?
             .to_string()
             .into_bytes();
 

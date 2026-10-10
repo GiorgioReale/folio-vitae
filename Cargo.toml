@@ -58,7 +58,7 @@ serve = [
   "dep:printpdf",
   "dep:tower",
   "dep:tower-http",
-  "dep:ttf-parser",
+  "dep:skrifa",
   "dep:wuff",
 ]
 smtp = ["dep:lettre"]
@@ -126,7 +126,7 @@ printpdf = { version = "0.12", default-features = false, features = [
   "png",
 ], optional = true }
 thiserror = "2.0"
-ttf-parser = { version = "0.25", optional = true }
+skrifa = { version = "0.48", optional = true }
 wuff = { version = "0.2", default-features = false, features = ["brotli"], optional = true }
 
 tracing = "0.1"
