@@ -314,7 +314,8 @@ mod tests {
     #[test]
     fn read_port_parses_valid_number() {
         let parsed =
-            read_port_from_source(config::ENV_MAIN_PORT, 3000, |_| Ok("36546".to_string())).unwrap();
+            read_port_from_source(config::ENV_MAIN_PORT, 3000, |_| Ok("36546".to_string()))
+                .unwrap();
 
         assert_eq!(parsed, 36546);
     }
