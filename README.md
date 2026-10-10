@@ -148,8 +148,7 @@ Notes:
 
 ### Image tags
 
-- `edge` and `sha-<short>` on pushes to `main` that touch image-relevant files
-- version tags (`0.1.4`, `0.1`) and `latest` on each GitHub Release
+- version tags (`0.1.4`, `0.1`) and `latest` after a successful crates.io publish on each GitHub Release
 - manual rebuild via Actions → Docker → Run workflow (refresh `latest` / version tags without a new app release)
 
 ### Build locally
