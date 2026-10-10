@@ -37,22 +37,31 @@ pub(crate) fn build_app_states(
         .cloned()
         .ok_or_else(|| crate::error::AppError::msg("loading default language resources"))?;
 
-    let main_static =
-        Arc::new(compile_static_assets("static/main", SiteKind::Main, &default_resources.data)?);
-    let cv_static =
-        Arc::new(compile_static_assets("static/cv", SiteKind::Cv, &default_resources.data)?);
+    let localization_state = LocalizationState::new(
+        localizations,
+        default_language.clone(),
+        supported_languages.clone(),
+        language_names,
+    );
+    let main_static = Arc::new(compile_static_assets(
+        "static/main",
+        SiteKind::Main,
+        &default_resources.data,
+        &localization_state,
+    )?);
+    let cv_static = Arc::new(compile_static_assets(
+        "static/cv",
+        SiteKind::Cv,
+        &default_resources.data,
+        &localization_state,
+    )?);
     let mailer = build_mailer(&default_resources.data)?.map(Arc::new);
 
     let asset_version = Arc::<str>::from(compute_asset_version()?);
     let show_credits = credits_enabled_from_env();
     let generator = Arc::<str>::from(format!("folio-vitae v{}", env!("CARGO_PKG_VERSION")));
 
-    let shared_localization_state = Arc::new(RwLock::new(Arc::new(LocalizationState::new(
-        localizations,
-        default_language,
-        supported_languages,
-        language_names,
-    ))));
+    let shared_localization_state = Arc::new(RwLock::new(Arc::new(localization_state)));
     let data_last_modified = Arc::new(RwLock::new(data_last_modified));
 
     let shared_state = AppState {
@@ -69,6 +78,9 @@ pub(crate) fn build_app_states(
         mailer,
         show_credits,
         cv_pdf_cache: Arc::new(RwLock::new(HashMap::new())),
+        cv_pdf_locks: Arc::new(std::sync::Mutex::new(HashMap::new())),
+        html_page_cache: Arc::new(RwLock::new(HashMap::new())),
+        contact_rate_limiter: Arc::new(crate::app::rate_limit::ContactRateLimiter::default()),
     };
 
     Ok((
@@ -77,7 +89,7 @@ pub(crate) fn build_app_states(
     ))
 }
 
-pub fn load_templates(_pattern: &str) -> AppResult<Tera> {
+pub fn load_templates() -> AppResult<Tera> {
     let mut templates = Vec::new();
 
     for entry in WalkDir::new("templates")
@@ -156,7 +168,7 @@ mod tests {
 
     #[test]
     fn templates_and_chrome_components_load() {
-        let tera = load_templates("templates/**/*").expect("templates should load under Tera 2");
+        let tera = load_templates().expect("templates should load under Tera 2");
         assert!(tera.contains_component("chrome.skip_link"));
         assert!(tera.contains_component("chrome.site_header"));
         assert!(tera.contains_component("chrome.site_footer"));

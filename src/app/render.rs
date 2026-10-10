@@ -1,4 +1,4 @@
-use std::borrow::Cow;
+use std::{borrow::Cow, sync::Arc};
 
 use chrono::{Datelike, NaiveDate, Utc};
 use http::StatusCode;
@@ -10,7 +10,7 @@ use tracing::error;
 
 use crate::app::{
     localization::{Language, Translations},
-    state::{AppState, SiteKind},
+    state::{AppState, HtmlCacheKey, SiteKind},
 };
 
 pub(crate) fn render_main_homepage(
@@ -23,7 +23,12 @@ pub(crate) fn render_main_homepage(
     let mut context = base_context(state, &resources, language, request_path, SiteKind::Main);
     context.insert("page_url", request_path);
     context.insert("robots", "index,follow");
-    render_template(state, "main/pages/homepage.html", context)
+    render_template(
+        state,
+        "main/pages/homepage.html",
+        context,
+        Some(cache_key(SiteKind::Main, language, "main/pages/homepage.html", request_path)),
+    )
 }
 
 pub(crate) fn render_cv_homepage(
@@ -36,7 +41,12 @@ pub(crate) fn render_cv_homepage(
     let mut context = base_context(state, &resources, language, request_path, SiteKind::Cv);
     context.insert("page_url", request_path);
     context.insert("robots", "index,follow");
-    render_template(state, "cv/pages/homepage.html", context)
+    render_template(
+        state,
+        "cv/pages/homepage.html",
+        context,
+        Some(cache_key(SiteKind::Cv, language, "cv/pages/homepage.html", request_path)),
+    )
 }
 
 pub(crate) fn render_cv_curriculum(
@@ -54,13 +64,20 @@ pub(crate) fn render_cv_curriculum(
     context.insert("page_url", request_path);
     context.insert("robots", "index,follow");
 
+    let has_contact_feedback = contact_form.as_ref().is_some_and(|form| form.feedback.is_some());
     let contact_form_context = contact_form.unwrap_or_default();
     context.insert("contact_form", &contact_form_context);
     context.insert("contact_form_enabled", &state.mailer.is_some());
 
     context.insert("age", &calculate_age(&resources.data.person.date_of_birth));
 
-    render_template(state, "cv/pages/curriculum.html", context)
+    let cache = if has_contact_feedback {
+        None
+    } else {
+        Some(cache_key(SiteKind::Cv, language, "cv/pages/curriculum.html", request_path))
+    };
+
+    render_template(state, "cv/pages/curriculum.html", context, cache)
 }
 
 pub(crate) fn render_cv_menu(
@@ -82,9 +99,16 @@ pub(crate) fn render_cv_menu(
     context.insert("has_education_section", &!profile.educations.is_empty());
     context.insert("has_skills_section", &!profile.skills.is_empty());
     context.insert("has_courses_section", &!profile.courses_certifications.is_empty());
+    context.insert("has_other_projects_section", &!profile.other_projects.is_empty());
+    context.insert("has_download_section", &true);
     context.insert("has_contact_section", &state.mailer.is_some());
 
-    render_template(state, "cv/pages/menu.html", context)
+    render_template(
+        state,
+        "cv/pages/menu.html",
+        context,
+        Some(cache_key(SiteKind::Cv, language, "cv/pages/menu.html", request_path)),
+    )
 }
 
 pub(crate) fn render_error(
@@ -119,7 +143,7 @@ pub(crate) fn render_error(
     context.insert("error_code_last", &error_code.chars().nth(2).unwrap_or('0').to_string());
     context.insert("error_message", &error.message);
 
-    render_template(state, "errors/error.html", context)
+    render_template(state, "errors/error.html", context, None)
 }
 
 fn load_resources(
@@ -195,7 +219,15 @@ fn base_context(
     context.insert("show_credits", &state.show_credits);
     let (_, _, language_prefix) = state.language_from_path(request_path);
     context.insert("language_prefix", &language_prefix);
-    context.insert("languages", &state.language_links(language, request_path, site));
+    let language_links = state.language_links(language, request_path, site);
+    let hreflang_default_url = language_links
+        .iter()
+        .find(|link| link.code == state.localization_snapshot().default_language.as_code())
+        .map(|link| link.url.clone())
+        .or_else(|| language_links.first().map(|link| link.url.clone()))
+        .unwrap_or_else(|| request_path.to_string());
+    context.insert("languages", &language_links);
+    context.insert("hreflang_default_url", &hreflang_default_url);
     context.insert("translations", translations);
     context.insert("language_tag", translations.language_tag().unwrap_or(language.as_code()));
     let meta_language_fallback = language.as_code().to_uppercase();
@@ -205,24 +237,54 @@ fn base_context(
     );
     context.insert("dc_language", translations.dc_language().unwrap_or(language.as_code()));
     context.insert("language_direction", translations.language_direction().unwrap_or("ltr"));
+    let full_name = format!("{} {}", person.first_name, person.last_name);
+    let social_card_alt = translations
+        .get_str(&["accessibility", "social_card_alt"])
+        .unwrap_or_else(|| format!("Social card for {full_name}"))
+        .replace("{name}", &full_name);
+    context.insert("social_card_alt", &social_card_alt);
     context
+}
+
+fn cache_key(
+    site: SiteKind,
+    language: &Language,
+    template: &'static str,
+    request_path: &str,
+) -> HtmlCacheKey {
+    HtmlCacheKey {
+        site,
+        language: language.clone(),
+        template,
+        request_path: request_path.to_string(),
+    }
 }
 
 fn render_template(
     state: &AppState,
     template: &str,
     context: Context,
+    cache: Option<HtmlCacheKey>,
 ) -> Result<String, StatusCode> {
+    if let Some(key) = cache.as_ref()
+        && let Some(cached) = state.cached_html_page(key)
+    {
+        return Ok(cached.to_string());
+    }
+
     let rendered = state.tera.render(template, &context).map_err(|error| {
         error!(error = ?error, template, "failed to render template");
         StatusCode::INTERNAL_SERVER_ERROR
     })?;
 
-    if !state.environment.should_minify_html() {
-        return Ok(rendered);
+    let rendered =
+        if state.environment.should_minify_html() { html::minify(&rendered) } else { rendered };
+
+    if let Some(key) = cache {
+        state.store_html_page(key, Arc::from(rendered.as_str()));
     }
 
-    Ok(html::minify(&rendered))
+    Ok(rendered)
 }
 
 struct ErrorDetails {
@@ -253,12 +315,11 @@ fn error_details(status: StatusCode, translations: &Translations) -> ErrorDetail
 
 fn calculate_age(date_of_birth: &NaiveDate) -> Option<i32> {
     let today = Utc::now().date_naive();
-
     let mut age = today.year() - date_of_birth.year();
 
-    let birth_day_of_year = date_of_birth.ordinal();
-    let today_day_of_year = today.ordinal();
-    if today_day_of_year < birth_day_of_year {
+    let birthday_passed =
+        (today.month(), today.day()) >= (date_of_birth.month(), date_of_birth.day());
+    if !birthday_passed {
         age -= 1;
     }
 

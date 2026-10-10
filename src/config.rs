@@ -18,9 +18,6 @@ pub const DEFAULT_CV_PORT: u16 = 36547;
 /// Default directory used for localized content and source images.
 pub const DEFAULT_DATA_DIR: &str = "data";
 
-/// Glob pattern used to discover template files.
-pub const TEMPLATES_PATTERN: &str = "templates/**/*";
-
 pub fn data_dir() -> PathBuf {
     data_dir_from_env(|| env::var_os(ENV_DATA_DIR))
 }

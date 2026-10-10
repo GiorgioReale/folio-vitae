@@ -24,7 +24,7 @@ mod implementation {
     pub(crate) struct Mailer {
         transport: AsyncSmtpTransport<Tokio1Executor>,
         from: Mailbox,
-        to: Mailbox,
+        default_to: Mailbox,
     }
 
     pub(crate) struct CvContactPayload<'a> {
@@ -77,11 +77,15 @@ mod implementation {
             .parse::<Mailbox>()
             .with_context(|| format!("parsing cv contact email {cv_email}"))?;
 
-        Ok(Some(Mailer { transport, from: from_mailbox, to: to_mailbox }))
+        Ok(Some(Mailer { transport, from: from_mailbox, default_to: to_mailbox }))
     }
 
     impl Mailer {
-        pub(crate) async fn send_cv_contact(&self, payload: CvContactPayload<'_>) -> AppResult<()> {
+        pub(crate) async fn send_cv_contact(
+            &self,
+            payload: CvContactPayload<'_>,
+            to_override: Option<&str>,
+        ) -> AppResult<()> {
             let subject_name = sanitize_header_value(payload.full_name, MAX_SUBJECT_NAME_LENGTH);
             let subject = format!("Nuovo contatto dal CV - {subject_name}");
 
@@ -90,12 +94,24 @@ mod implementation {
                 sanitize_body_value(payload.full_name, MAX_SUBJECT_NAME_LENGTH),
                 sanitize_body_value(payload.company, MAX_COMPANY_LENGTH),
                 sanitize_body_value(payload.email, MAX_EMAIL_LENGTH),
-                sanitize_body_value(payload.message, MAX_MESSAGE_LENGTH)
+                sanitize_message_body(payload.message, MAX_MESSAGE_LENGTH)
             );
+
+            let reply_to = sanitize_header_value(payload.email, MAX_EMAIL_LENGTH)
+                .parse::<Mailbox>()
+                .with_context(|| "parsing contact form reply-to address")?;
+
+            let to = match to_override {
+                Some(value) => value
+                    .parse::<Mailbox>()
+                    .with_context(|| format!("parsing cv contact email {value}"))?,
+                None => self.default_to.clone(),
+            };
 
             let email = Message::builder()
                 .from(self.from.clone())
-                .to(self.to.clone())
+                .to(to)
+                .reply_to(reply_to)
                 .subject(subject)
                 .singlepart(SinglePart::builder().header(ContentType::TEXT_PLAIN).body(body))?;
 
@@ -123,11 +139,34 @@ mod implementation {
     }
 
     fn sanitize_body_value(value: &str, max_len: usize) -> String {
+        sanitize_header_value(value, max_len)
+    }
+
+    fn sanitize_message_body(value: &str, max_len: usize) -> String {
         value
+            .replace("\r\n", "\n")
+            .replace('\r', "\n")
             .chars()
-            .filter(|character| *character != '\r' && *character != '\n')
+            .filter(|character| *character != '\0')
             .take(max_len)
             .collect()
+    }
+
+    #[cfg(test)]
+    mod tests {
+        use super::{sanitize_header_value, sanitize_message_body};
+
+        #[test]
+        fn message_body_keeps_newlines() {
+            let sanitized = sanitize_message_body("hello\r\nworld\n\nagain", 2_000);
+            assert_eq!(sanitized, "hello\nworld\n\nagain");
+        }
+
+        #[test]
+        fn header_values_strip_newlines() {
+            let sanitized = sanitize_header_value("hello\nworld", 120);
+            assert_eq!(sanitized, "helloworld");
+        }
     }
 }
 
@@ -154,6 +193,7 @@ mod implementation {
         pub(crate) async fn send_cv_contact(
             &self,
             _payload: CvContactPayload<'_>,
+            _to_override: Option<&str>,
         ) -> AppResult<()> {
             Ok(())
         }
