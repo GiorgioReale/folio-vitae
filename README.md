@@ -7,6 +7,13 @@ A small Rust CLI that runs two personal sites from YAML:
 
 Edit your content. Customize templates and styles if you want. That is it.
 
+## Live examples
+
+Sites built with folio-vitae:
+
+- [giorgioreale.xyz](https://giorgioreale.xyz/en) — main site
+- [cv.giorgioreale.xyz](https://cv.giorgioreale.xyz/en) — CV site
+
 ## Install
 
 ```bash
