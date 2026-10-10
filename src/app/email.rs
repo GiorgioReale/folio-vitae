@@ -2,6 +2,7 @@
 mod implementation {
     use std::env::{self, VarError};
 
+    use lettre::transport::smtp::AsyncSmtpTransportBuilder;
     use lettre::{
         AsyncSmtpTransport, AsyncTransport, Message, Tokio1Executor,
         message::{Mailbox, SinglePart, header::ContentType},
@@ -57,11 +58,17 @@ mod implementation {
 
         let credentials = Credentials::new(username, password);
 
-        let transport = AsyncSmtpTransport::<Tokio1Executor>::relay(&host)
-            .with_context(|| format!("building smtp transport for {host}"))?
-            .port(port)
-            .credentials(credentials)
-            .build();
+        // `relay` = implicit TLS (typically 465). `starttls_relay` = STARTTLS (typically 587).
+        // Using `relay` on 587 makes rustls speak TLS to a plaintext SMTP banner.
+        let builder: AsyncSmtpTransportBuilder = if port == 465 {
+            AsyncSmtpTransport::<Tokio1Executor>::relay(&host)
+                .with_context(|| format!("building smtp transport for {host}"))?
+        } else {
+            AsyncSmtpTransport::<Tokio1Executor>::starttls_relay(&host)
+                .with_context(|| format!("building starttls smtp transport for {host}"))?
+        };
+
+        let transport = builder.port(port).credentials(credentials).build();
 
         let from_mailbox =
             from.parse::<Mailbox>().with_context(|| format!("parsing SMTP_FROM address {from}"))?;
