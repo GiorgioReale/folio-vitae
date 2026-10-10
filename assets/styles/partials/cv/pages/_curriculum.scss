@@ -244,7 +244,7 @@ body#curriculum {
           font-size: 1rem;
           font-family: var(--font-family-sans-serif);
 
-          &:focus {
+          &:focus-visible {
             outline: 2px solid var(--color-buttons-primary);
             outline-offset: 4px;
           }

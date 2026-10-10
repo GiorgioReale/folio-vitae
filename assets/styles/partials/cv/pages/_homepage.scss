@@ -9,11 +9,17 @@ body#homepage {
   align-items: stretch;
 
   > .hero-media {
-    background-image: image-set(url('/assets/images/cv/home-background/home-background.avif') type('image/avif'), url('/assets/images/cv/home-background/home-background.jpg') type('image/jpeg'));
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: cover;
+    padding: 0;
+    overflow: hidden;
     border-inline-end: none;
+
+    > picture,
+    > picture > img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
   }
 
   > .page-shell {
@@ -32,19 +38,37 @@ body#homepage {
         margin: 0 0 0.25rem 0;
       }
 
-      > a {
+      > a.curriculum-cta {
         text-decoration: none;
+        display: inline-flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: center;
+        gap: 0.75rem;
+        min-height: 2.75rem;
+        margin-top: 0.75rem;
 
         > svg {
           fill: var(--color-buttons-primary);
           background-color: var(--background-buttons-primary);
-          width: 2rem;
-          height: 2rem;
+          width: 2.75rem;
+          height: 2.75rem;
+          flex: 0 0 auto;
+        }
 
-          &:hover {
-            fill: var(--color-buttons-primary-hover);
-            background-color: var(--background-buttons-primary-hover);
-          }
+        > span {
+          color: var(--color-links);
+          font-variation-settings: 'wght' 600;
+          font-weight: 600;
+        }
+
+        &:hover > svg {
+          fill: var(--color-buttons-primary-hover);
+          background-color: var(--background-buttons-primary-hover);
+        }
+
+        &:hover > span {
+          color: var(--color-links-hover);
         }
       }
     }
@@ -58,7 +82,6 @@ body#homepage {
       position: relative;
       height: auto;
       aspect-ratio: 2/1;
-      background-image: image-set(url('/assets/images/cv/home-background/home-background-mobile.avif'), url('/assets/images/cv/home-background/home-background-mobile.jpg'));
       border-bottom: none;
     }
 

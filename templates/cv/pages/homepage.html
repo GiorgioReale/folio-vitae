@@ -1,17 +1,24 @@
 {% extends "cv/base.html" %}
 {% block body_id %}homepage{% endblock body_id %}
 {% block aside %}
-<div class="hero-media" aria-hidden="true"></div>
+<div class="hero-media" aria-hidden="true">
+  <picture>
+    <source media="(max-width: 1024px)" type="image/avif" srcset="/assets/images/cv/home-background/home-background-mobile.avif" />
+    <source media="(max-width: 1024px)" type="image/jpeg" srcset="/assets/images/cv/home-background/home-background-mobile.jpg" />
+    <source type="image/avif" srcset="/assets/images/cv/home-background/home-background.avif" />
+    <img src="/assets/images/cv/home-background/home-background.jpg" alt="" width="1920" height="1080" fetchpriority="high" decoding="async" />
+  </picture>
+</div>
 {% endblock aside %}
 {% block content %}
 <main id="main-content" tabindex="-1">
   <h1>{{ first_name }} {{ last_name }}</h1>
   <h2>{{ role }}</h2>
-  <a href="{{ language_prefix ~ '/curriculum' }}">
+  <a class="curriculum-cta" href="{{ language_prefix ~ '/curriculum' }}">
     <svg aria-hidden="true" focusable="false">
       <use href="/assets/icons/cv/website/sprites.svg#right-arrow" xlink:href="/assets/icons/cv/website/sprites.svg#right-arrow" />
     </svg>
-    <span class="sr-only">{{ translations.cv_homepage.curriculum_action }}</span>
+    <span>{{ translations.cv_homepage.curriculum_action }}</span>
   </a>
 </main>
 {% endblock content %}

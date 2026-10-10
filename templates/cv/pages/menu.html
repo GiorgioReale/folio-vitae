@@ -20,6 +20,12 @@
       {% if has_courses_section %}
       <li><a href="{{ language_prefix ~ '/curriculum#courses-certifications' }}">{{ translations.cv_menu.courses }}</a></li>
       {% endif %}
+      {% if has_other_projects_section %}
+      <li><a href="{{ language_prefix ~ '/curriculum#other-projects' }}">{{ translations.cv_curriculum.other_projects_heading }}</a></li>
+      {% endif %}
+      {% if has_download_section %}
+      <li><a href="{{ language_prefix ~ '/curriculum#download' }}">{{ translations.cv_menu.download }}</a></li>
+      {% endif %}
       {% if has_contact_section %}
       <li><a href="{{ language_prefix ~ '/curriculum#contact' }}">{{ translations.cv_menu.contact }}</a></li>
       {% endif %}
