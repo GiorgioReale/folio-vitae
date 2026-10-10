@@ -129,7 +129,7 @@ jobs:
           tags: |
             type=raw,value=edge,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
             type=sha,prefix=sha-,format=short,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-            type=raw,value=latest,enable=${{ github.event_name == 'release' || (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && inputs.update_latest) }}
+            type=raw,value=latest,enable=${{ github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.update_latest) }}
             type=raw,value=${{ steps.cargo_version.outputs.version }},enable=${{ github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.update_version_tags) }}
             type=raw,value=${{ steps.cargo_version.outputs.major_minor }},enable=${{ github.event_name == 'release' || (github.event_name == 'workflow_dispatch' && inputs.update_version_tags) }}
 
