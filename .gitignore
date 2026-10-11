@@ -22,8 +22,15 @@ target
 
 .DS_Store
 
+# Editor / IDE local settings
 .idea/
 *.iml
+.cursor/
+.vscode/
+.zed/
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
 
 .env
 .folio-cache.json
