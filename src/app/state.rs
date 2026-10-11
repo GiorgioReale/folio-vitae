@@ -15,7 +15,7 @@ use crate::{
         environment::Environment,
         localization::{
             Language, Localizations, LocalizedResources, detect_languages_with_last_change,
-            load_language_names, load_localizations,
+            load_language_names, load_localizations, match_accept_language,
         },
         models::SiteData,
         rate_limit::ContactRateLimiter,
@@ -177,7 +177,12 @@ impl AppState {
         path_matches_page(path, page, &snapshot.supported_languages)
     }
 
-    pub(crate) fn redirect_path_for_missing_language(&self, path: &str) -> Option<String> {
+    pub(crate) fn redirect_path_for_missing_language(
+        &self,
+        path: &str,
+        accept_language: Option<&str>,
+        site: Option<SiteKind>,
+    ) -> Option<String> {
         let snapshot = self.localization_snapshot();
         let clean = path.trim_matches('/');
 
@@ -192,8 +197,10 @@ impl AppState {
             return None;
         }
 
+        let preferred = self.preferred_language(accept_language, site);
+
         if clean.is_empty() {
-            return Some(format!("/{}", snapshot.default_language.as_code()));
+            return Some(format!("/{}", preferred.as_code()));
         }
 
         let (prefix, _) = split_language_prefix(clean);
@@ -202,7 +209,38 @@ impl AppState {
         }
 
         is_known_page_suffix(clean)
-            .then(|| format!("/{}/{}", snapshot.default_language.as_code(), clean))
+            .then(|| format!("/{}/{}", preferred.as_code(), clean))
+    }
+
+    /// Prefer browser `Accept-Language`, then `DEFAULT_LANGUAGE` / configured default,
+    /// then the existing English-or-first fallback already stored as `default_language`.
+    pub(crate) fn preferred_language(
+        &self,
+        accept_language: Option<&str>,
+        site: Option<SiteKind>,
+    ) -> Language {
+        let snapshot = self.localization_snapshot();
+        let available: Vec<Language> = snapshot
+            .supported_languages
+            .iter()
+            .filter(|language| match site {
+                Some(site) => language_has_site_in_snapshot(language, site, &snapshot),
+                None => true,
+            })
+            .cloned()
+            .collect();
+
+        if let Some(header) = accept_language
+            && let Some(matched) = match_accept_language(header, &available)
+        {
+            return matched;
+        }
+
+        if available.iter().any(|language| language == &snapshot.default_language) {
+            return snapshot.default_language.clone();
+        }
+
+        available.first().cloned().unwrap_or_else(|| snapshot.default_language.clone())
     }
 
     pub(crate) fn language_links(
@@ -729,7 +767,7 @@ mod tests {
 
         assert!(!state.path_matches_page("/asdas", SitePage::Home));
         assert!(!state.path_matches_page("/asdas/", SitePage::Home));
-        assert!(state.redirect_path_for_missing_language("/asdas").is_none());
+        assert!(state.redirect_path_for_missing_language("/asdas", None, None).is_none());
     }
 
     #[test]
@@ -738,16 +776,19 @@ mod tests {
 
         assert!(!state.path_matches_page("/en/curriculum", SitePage::Curriculum));
         assert!(!state.path_matches_page("/foo/menu", SitePage::Menu));
-        assert!(state.redirect_path_for_missing_language("/it/asdas").is_none());
+        assert!(state.redirect_path_for_missing_language("/it/asdas", None, None).is_none());
     }
 
     #[test]
     fn single_language_prefix_redirects_only_known_pages() {
         let state = app_state_with_languages(&["it"]);
 
-        assert_eq!(state.redirect_path_for_missing_language("/it"), Some("/".to_string()));
         assert_eq!(
-            state.redirect_path_for_missing_language("/it/curriculum"),
+            state.redirect_path_for_missing_language("/it", None, None),
+            Some("/".to_string())
+        );
+        assert_eq!(
+            state.redirect_path_for_missing_language("/it/curriculum", None, None),
             Some("/curriculum".to_string())
         );
         assert!(state.path_matches_page("/", SitePage::Home));
@@ -761,20 +802,39 @@ mod tests {
     fn multilingual_unknown_path_is_not_rewritten_to_the_homepage() {
         let state = app_state_with_languages(&["en", "it"]);
 
-        assert!(state.redirect_path_for_missing_language("/asdas").is_none());
-        assert!(state.redirect_path_for_missing_language("/zz/curriculum").is_none());
-        assert_eq!(state.redirect_path_for_missing_language("/"), Some("/en".to_string()));
+        assert!(state.redirect_path_for_missing_language("/asdas", None, None).is_none());
+        assert!(state.redirect_path_for_missing_language("/zz/curriculum", None, None).is_none());
         assert_eq!(
-            state.redirect_path_for_missing_language("/curriculum"),
+            state.redirect_path_for_missing_language("/", None, None),
+            Some("/en".to_string())
+        );
+        assert_eq!(
+            state.redirect_path_for_missing_language("/curriculum", None, None),
             Some("/en/curriculum".to_string())
         );
-        assert!(state.redirect_path_for_missing_language("/en/curriculum").is_none());
+        assert!(
+            state
+                .redirect_path_for_missing_language("/en/curriculum", None, None)
+                .is_none()
+        );
         assert!(state.path_matches_page("/en", SitePage::Home));
         assert!(state.path_matches_page("/it/curriculum", SitePage::Curriculum));
         assert!(state.path_matches_page("/en/languages", SitePage::Languages));
         assert_eq!(
-            state.redirect_path_for_missing_language("/languages"),
+            state.redirect_path_for_missing_language("/languages", None, None),
             Some("/en/languages".to_string())
+        );
+        assert_eq!(
+            state.redirect_path_for_missing_language("/", Some("it-IT,it;q=0.9,en;q=0.8"), None),
+            Some("/it".to_string())
+        );
+        assert_eq!(
+            state.redirect_path_for_missing_language(
+                "/curriculum",
+                Some("fr-FR,fr;q=0.9"),
+                None
+            ),
+            Some("/en/curriculum".to_string())
         );
     }
 
