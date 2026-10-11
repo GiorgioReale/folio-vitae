@@ -1,7 +1,7 @@
 services:
   folio-vitae:
     image: ghcr.io/giorgioreale/folio-vitae:latest
-    # Or pin a version: ghcr.io/giorgioreale/folio-vitae:0.1.5
+    # Or pin a version: ghcr.io/giorgioreale/folio-vitae:0.1.6
     # Or build from this repo instead of pulling:
     # build: .
     container_name: folio-vitae
