@@ -154,14 +154,18 @@
   <p class="legal-notice">{{ translations.cv_curriculum.legal_notice }}</p>
   {% if contact_form_enabled %}
   {% set invalid_field = contact_form.feedback?.field or "" %}
-  <section class="contact-form" id="contact" aria-labelledby="contact-heading" tabindex="-1">
+  {% set contact_success = contact_form.feedback and contact_form.feedback.status == "success" %}
+  <section class="contact-form{% if contact_success %} contact-form--submitted{% endif %}" id="contact" aria-labelledby="contact-heading" tabindex="-1">
     <div class="contact-form__header">
       <h3 id="contact-heading">{{ translations.cv_curriculum.contact_heading }}</h3>
+      {% if not contact_success %}
       <p id="contact-description">{{ translations.cv_curriculum.contact_description }}</p>
+      {% endif %}
     </div>
     <div id="contact-feedback" class="contact-form__feedback{% if contact_form.feedback %} contact-form__feedback--{{ contact_form.feedback.status }}{% endif %}" role="status" tabindex="-1" data-contact-feedback {% if contact_form.feedback %}data-field="{{ invalid_field }}"{% endif %} {% if not contact_form.feedback %}hidden{% elif invalid_field == "" %}autofocus{% endif %}>
       <p>{% if contact_form.feedback %}{{ contact_form.feedback.message }}{% endif %}</p>
     </div>
+    {% if not contact_success %}
     <form action="{{ language_prefix ~ '/contact' }}" method="post" autocomplete="on" aria-describedby="contact-description" data-contact-form data-msg-full-name-required="{{ translations.validation.full_name_required }}" data-msg-full-name-length="{{ translations.validation.full_name_length }}" data-msg-company-required="{{ translations.validation.company_required }}" data-msg-company-length="{{ translations.validation.company_length }}" data-msg-email-required="{{ translations.validation.email_required }}" data-msg-email="{{ translations.validation.email }}" data-msg-message-required="{{ translations.validation.message_required }}" data-msg-message-length="{{ translations.validation.message_length }}">
       <label for="full-name">{{ translations.cv_curriculum.contact_labels.full_name }} <span class="field-required">({{ translations.accessibility.required }})</span></label>
       <p id="full-name-hint" class="field-hint">{{ translations.cv_curriculum.contact_hints.full_name }}</p>
@@ -186,6 +190,7 @@
         {{ translations.cv_curriculum.contact_submit }}
       </button>
     </form>
+    {% endif %}
   </section>
   {% endif %}
 </main>

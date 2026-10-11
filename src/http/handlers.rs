@@ -280,11 +280,12 @@ pub(crate) async fn contact_cv(
         },
     };
 
+    let succeeded = feedback.status == "success";
     let context = CvContactFormContext {
-        full_name: form_data.full_name.value,
-        company: form_data.company.value,
-        email: form_data.email.value,
-        message: form_data.message.value,
+        full_name: if succeeded { String::new() } else { form_data.full_name.value },
+        company: if succeeded { String::new() } else { form_data.company.value },
+        email: if succeeded { String::new() } else { form_data.email.value },
+        message: if succeeded { String::new() } else { form_data.message.value },
         feedback: Some(feedback),
     };
 
