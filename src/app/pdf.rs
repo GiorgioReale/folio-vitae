@@ -1,4 +1,8 @@
-use std::{io::Cursor, sync::OnceLock};
+use std::{
+    collections::HashMap,
+    io::Cursor,
+    sync::{Arc, Mutex, OnceLock},
+};
 
 use image::{DynamicImage, GenericImageView, Rgba, RgbaImage};
 use printpdf::{
@@ -584,12 +588,15 @@ fn place_image(ops: &mut Vec<Op>, id: XObjectId, left: f32, top: f32, size: f32,
 
 fn skill_icon_ids(document: &mut PdfDocument, sections: &[PdfSection]) -> Vec<Option<XObjectId>> {
     let mut icons = Vec::new();
+    let mut decode_warnings = Vec::new();
     for section in sections {
         for block in &section.blocks {
             if let PdfBlock::Skills(skills) = block {
                 for skill in skills {
-                    let image = rasterize_skill_icon(&skill.icon)
-                        .and_then(|png| RawImage::decode_from_bytes(&png, &mut Vec::new()).ok());
+                    decode_warnings.clear();
+                    let image = rasterize_skill_icon(&skill.icon).and_then(|png| {
+                        RawImage::decode_from_bytes(png.as_slice(), &mut decode_warnings).ok()
+                    });
                     icons.push(image.map(|image| document.add_image(&image)));
                 }
             }
@@ -598,7 +605,27 @@ fn skill_icon_ids(document: &mut PdfDocument, sections: &[PdfSection]) -> Vec<Op
     icons
 }
 
-fn rasterize_skill_icon(slug: &str) -> Option<Vec<u8>> {
+fn rasterize_skill_icon(slug: &str) -> Option<Arc<Vec<u8>>> {
+    static CACHE: OnceLock<Mutex<HashMap<String, Arc<Vec<u8>>>>> = OnceLock::new();
+    let cache = CACHE.get_or_init(|| Mutex::new(HashMap::new()));
+
+    if let Ok(guard) = cache.lock()
+        && let Some(hit) = guard.get(slug)
+    {
+        return Some(Arc::clone(hit));
+    }
+
+    let png = rasterize_skill_icon_uncached(slug)?;
+    let png = Arc::new(png);
+
+    if let Ok(mut guard) = cache.lock() {
+        return Some(Arc::clone(guard.entry(slug.to_owned()).or_insert(png)));
+    }
+
+    Some(png)
+}
+
+fn rasterize_skill_icon_uncached(slug: &str) -> Option<Vec<u8>> {
     let icon = simpleicons_rs::slug(slug)?;
     let svg = icon.svg.replacen("<svg", "<svg fill=\"#444444\"", 1);
     let tree = usvg::Tree::from_data(svg.as_bytes(), &usvg::Options::default()).ok()?;
@@ -858,20 +885,22 @@ fn cached_font(
         return Ok(bytes.as_slice());
     }
 
-    let decoded = wuff::decompress_woff2(woff2)
-        .map_err(|error| AppError::Message(format!("decoding the {name} font: {error}")))?;
+    let decoded = wuff::decompress_woff2(woff2).map_err(|error| {
+        AppError::msg(error.to_string()).with_context(format!("decoding the {name} font"))
+    })?;
     Ok(slot.get_or_init(|| decoded).as_slice())
 }
 
 fn parse_face(bytes: &'static [u8], name: &str) -> AppResult<FontRef<'static>> {
-    FontRef::new(bytes)
-        .map_err(|error| AppError::Message(format!("reading the {name} font: {error}")))
+    FontRef::new(bytes).map_err(|error| {
+        AppError::msg(error.to_string()).with_context(format!("reading the {name} font"))
+    })
 }
 
 fn add_font(document: &mut PdfDocument, bytes: &[u8], name: &str) -> AppResult<printpdf::FontId> {
     let mut font_warnings = Vec::new();
     let font = ParsedFont::from_bytes(bytes, 0, &mut font_warnings)
-        .ok_or_else(|| AppError::Message(format!("embedding the {name} font")))?;
+        .ok_or_else(|| AppError::msg(format!("embedding the {name} font")))?;
     Ok(document.add_font(&font))
 }
 

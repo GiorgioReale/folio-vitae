@@ -45,15 +45,16 @@ fn is_compressible(path: &Path) -> bool {
 fn gzip_file(path: &Path) -> AppResult<()> {
     let content = fs::read(path).with_context(|| format!("reading {path:?}"))?;
 
-    let mut encoder = GzEncoder::new(Vec::new(), Compression::best());
+    let mut encoder = GzEncoder::new(
+        Vec::with_capacity(content.len().saturating_div(2).max(64)),
+        Compression::best(),
+    );
     encoder.write_all(&content).with_context(|| format!("compressing {path:?}"))?;
     let compressed =
         encoder.finish().with_context(|| format!("finishing compression for {path:?}"))?;
 
-    let gz_path = path.with_file_name(format!(
-        "{}.gz",
-        path.file_name().and_then(|name| name.to_str()).unwrap_or_default()
-    ));
+    let file_name = path.file_name().and_then(|name| name.to_str()).unwrap_or_default();
+    let gz_path = path.with_file_name(format!("{file_name}.gz"));
 
     let needs_write = match fs::read(&gz_path) {
         Ok(existing) => existing != compressed,

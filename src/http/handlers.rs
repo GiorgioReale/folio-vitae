@@ -8,7 +8,7 @@ use axum::{
         HeaderMap, HeaderValue, StatusCode, Uri,
         header::{CACHE_CONTROL, CONTENT_DISPOSITION, CONTENT_TYPE, HOST, ORIGIN, VARY},
     },
-    response::{Html, IntoResponse, Redirect, Response},
+    response::{IntoResponse, Redirect, Response},
 };
 use serde::Deserialize;
 use tracing::error;
@@ -44,15 +44,14 @@ pub(crate) async fn homepage(
         ResolveOutcome::Respond(response) => return response,
     };
 
-    match resolved.site {
-        SiteKind::Main => render_main_homepage(&state, &resolved.language, &resolved.path)
-            .map(Html)
-            .map(IntoResponse::into_response),
-        SiteKind::Cv => render_cv_homepage(&state, &resolved.language, &resolved.path)
-            .map(Html)
-            .map(IntoResponse::into_response),
-    }
-    .unwrap_or_else(|status| status.into_response())
+    let site = resolved.site;
+    let language = resolved.language.clone();
+    let path = resolved.path.clone();
+    render_html_page(move || match site {
+        SiteKind::Main => render_main_homepage(&state, &language, &path),
+        SiteKind::Cv => render_cv_homepage(&state, &language, &path),
+    })
+    .await
 }
 
 pub(crate) async fn curriculum(
@@ -66,10 +65,9 @@ pub(crate) async fn curriculum(
             ResolveOutcome::Respond(response) => return response,
         };
 
-    render_cv_curriculum(&state, None, &resolved.language, &resolved.path)
-        .map(Html)
-        .map(IntoResponse::into_response)
-        .unwrap_or_else(|status| status.into_response())
+    let language = resolved.language.clone();
+    let path = resolved.path.clone();
+    render_html_page(move || render_cv_curriculum(&state, None, &language, &path)).await
 }
 
 pub(crate) async fn curriculum_pdf(
@@ -112,8 +110,9 @@ pub(crate) async fn curriculum_pdf(
                 return StatusCode::INTERNAL_SERVER_ERROR.into_response();
             },
         };
-    state.store_cv_pdf(resolved.language.clone(), Arc::clone(&bytes));
-    pdf_response(&state, &resolved.language, bytes)
+    let language = resolved.language;
+    state.store_cv_pdf(language.clone(), Arc::clone(&bytes));
+    pdf_response(&state, &language, bytes)
 }
 
 fn pdf_response(state: &AppState, language: &Language, bytes: Arc<Vec<u8>>) -> Response {
@@ -219,9 +218,12 @@ pub(crate) async fn contact_cv(
             feedback: Some(error_feedback),
         };
 
-        return render_cv_curriculum(&state, Some(context), &resolved.language, &resolved.path)
-            .map(|html| (StatusCode::BAD_REQUEST, Html(html)).into_response())
-            .unwrap_or_else(|status| status.into_response());
+        let language = resolved.language.clone();
+        let path = resolved.path.clone();
+        return render_html_page_with_status(StatusCode::BAD_REQUEST, move || {
+            render_cv_curriculum(&state, Some(context), &language, &path)
+        })
+        .await;
     }
 
     let payload = CvContactPayload {
@@ -234,15 +236,12 @@ pub(crate) async fn contact_cv(
     let mailer = match &state.mailer {
         Some(mailer) => mailer,
         None => {
-            return render_error(
-                &state,
-                SiteKind::Cv,
-                StatusCode::NOT_FOUND,
-                &resolved.path,
-                &resolved.language,
-            )
-            .map(|html| (StatusCode::NOT_FOUND, Html(html)).into_response())
-            .unwrap_or_else(|status| status.into_response());
+            let language = resolved.language.clone();
+            let path = resolved.path.clone();
+            return render_html_page_with_status(StatusCode::NOT_FOUND, move || {
+                render_error(&state, SiteKind::Cv, StatusCode::NOT_FOUND, &path, &language)
+            })
+            .await;
         },
     };
 
@@ -289,9 +288,12 @@ pub(crate) async fn contact_cv(
         feedback: Some(feedback),
     };
 
-    render_cv_curriculum(&state, Some(context), &resolved.language, &resolved.path)
-        .map(|html| (status, Html(html)).into_response())
-        .unwrap_or_else(|render_status| render_status.into_response())
+    let language = resolved.language.clone();
+    let path = resolved.path.clone();
+    render_html_page_with_status(status, move || {
+        render_cv_curriculum(&state, Some(context), &language, &path)
+    })
+    .await
 }
 
 pub(crate) async fn menu(State(state): State<AppState>, headers: HeaderMap, uri: Uri) -> Response {
@@ -301,10 +303,9 @@ pub(crate) async fn menu(State(state): State<AppState>, headers: HeaderMap, uri:
         ResolveOutcome::Respond(response) => return response,
     };
 
-    render_cv_menu(&state, &resolved.language, &resolved.path)
-        .map(Html)
-        .map(IntoResponse::into_response)
-        .unwrap_or_else(|status| status.into_response())
+    let language = resolved.language.clone();
+    let path = resolved.path.clone();
+    render_html_page(move || render_cv_menu(&state, &language, &path)).await
 }
 
 pub(crate) async fn languages(
@@ -317,10 +318,10 @@ pub(crate) async fn languages(
         ResolveOutcome::Respond(response) => return response,
     };
 
-    render_languages_page(&state, &resolved.language, &resolved.path, resolved.site)
-        .map(Html)
-        .map(IntoResponse::into_response)
-        .unwrap_or_else(|status| status.into_response())
+    let language = resolved.language.clone();
+    let path = resolved.path.clone();
+    let site = resolved.site;
+    render_html_page(move || render_languages_page(&state, &language, &path, site)).await
 }
 
 pub(crate) async fn robots(
@@ -447,19 +448,17 @@ fn resolve_request(
     if let Some(required_site) = required_site
         && site != required_site
     {
-        return ResolveOutcome::Respond(
-            render_error(state, SiteKind::Main, StatusCode::NOT_FOUND, uri.path(), &language)
-                .map(|html| (StatusCode::NOT_FOUND, Html(html)).into_response())
-                .unwrap_or_else(|status| status.into_response()),
-        );
+        return ResolveOutcome::Respond(html_status_response(
+            StatusCode::NOT_FOUND,
+            render_error(state, SiteKind::Main, StatusCode::NOT_FOUND, uri.path(), &language),
+        ));
     }
 
     if !state.language_has_site(&language, site) {
-        return ResolveOutcome::Respond(
-            render_error(state, site, StatusCode::NOT_FOUND, uri.path(), &language)
-                .map(|html| (StatusCode::NOT_FOUND, Html(html)).into_response())
-                .unwrap_or_else(|status| status.into_response()),
-        );
+        return ResolveOutcome::Respond(html_status_response(
+            StatusCode::NOT_FOUND,
+            render_error(state, site, StatusCode::NOT_FOUND, uri.path(), &language),
+        ));
     }
 
     ResolveOutcome::Ready(ResolvedRequest { language, site, path: uri.path().to_string() })
@@ -483,9 +482,10 @@ fn not_found_response(state: &AppState, headers: &HeaderMap, path: &str) -> Resp
     let site = site_from_host(headers, state).or_else(|| fallback_site(state));
 
     match site {
-        Some(site) => render_error(state, site, StatusCode::NOT_FOUND, path, &language)
-            .map(|html| (StatusCode::NOT_FOUND, Html(html)).into_response())
-            .unwrap_or_else(|status| status.into_response()),
+        Some(site) => html_status_response(
+            StatusCode::NOT_FOUND,
+            render_error(state, site, StatusCode::NOT_FOUND, path, &language),
+        ),
         None => StatusCode::NOT_FOUND.into_response(),
     }
 }
@@ -714,12 +714,49 @@ fn site_not_available(
     language: &crate::app::localization::Language,
 ) -> Response {
     if let Some(site) = fallback_site(state) {
-        return render_error(state, site, StatusCode::NOT_FOUND, page_url, language)
-            .map(|html| (StatusCode::NOT_FOUND, Html(html)).into_response())
-            .unwrap_or_else(|status| status.into_response());
+        return html_status_response(
+            StatusCode::NOT_FOUND,
+            render_error(state, site, StatusCode::NOT_FOUND, page_url, language),
+        );
     }
 
     StatusCode::NOT_FOUND.into_response()
+}
+
+async fn render_html_page(
+    task: impl FnOnce() -> Result<Arc<str>, StatusCode> + Send + 'static,
+) -> Response {
+    render_html_page_with_status(StatusCode::OK, task).await
+}
+
+async fn render_html_page_with_status(
+    status: StatusCode,
+    task: impl FnOnce() -> Result<Arc<str>, StatusCode> + Send + 'static,
+) -> Response {
+    match tokio::task::spawn_blocking(task).await {
+        Ok(Ok(html)) => html_response(status, html),
+        Ok(Err(render_status)) => render_status.into_response(),
+        Err(error) => {
+            error!(error = %error, "html render task failed");
+            StatusCode::INTERNAL_SERVER_ERROR.into_response()
+        },
+    }
+}
+
+fn html_status_response(status: StatusCode, rendered: Result<Arc<str>, StatusCode>) -> Response {
+    match rendered {
+        Ok(html) => html_response(status, html),
+        Err(render_status) => render_status.into_response(),
+    }
+}
+
+fn html_response(status: StatusCode, html: Arc<str>) -> Response {
+    (
+        status,
+        [(CONTENT_TYPE, HeaderValue::from_static("text/html; charset=utf-8"))],
+        Bytes::from_owner(SharedBytes(html)),
+    )
+        .into_response()
 }
 
 fn fallback_site(state: &AppState) -> Option<SiteKind> {

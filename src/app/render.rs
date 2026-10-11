@@ -1,4 +1,7 @@
-use std::{borrow::Cow, sync::Arc};
+use std::{
+    borrow::Cow,
+    sync::{Arc, OnceLock},
+};
 
 use chrono::{Datelike, NaiveDate, Utc};
 use http::StatusCode;
@@ -17,7 +20,7 @@ pub(crate) fn render_main_homepage(
     state: &AppState,
     language: &Language,
     request_path: &str,
-) -> Result<String, StatusCode> {
+) -> Result<Arc<str>, StatusCode> {
     let resources =
         load_resources(state, language, "failed to load resources for the main homepage")?;
     let mut context = base_context(state, &resources, language, request_path, SiteKind::Main);
@@ -35,7 +38,7 @@ pub(crate) fn render_cv_homepage(
     state: &AppState,
     language: &Language,
     request_path: &str,
-) -> Result<String, StatusCode> {
+) -> Result<Arc<str>, StatusCode> {
     let resources =
         load_resources(state, language, "failed to load resources for the CV homepage")?;
     let mut context = base_context(state, &resources, language, request_path, SiteKind::Cv);
@@ -54,7 +57,7 @@ pub(crate) fn render_cv_curriculum(
     contact_form: Option<CvContactFormContext>,
     language: &Language,
     request_path: &str,
-) -> Result<String, StatusCode> {
+) -> Result<Arc<str>, StatusCode> {
     let resources = load_resources(state, language, "failed to load resources for the curriculum")?;
     let mut context = base_context(state, &resources, language, request_path, SiteKind::Cv);
     let translations = resources.translations.as_ref();
@@ -84,7 +87,7 @@ pub(crate) fn render_cv_menu(
     state: &AppState,
     language: &Language,
     request_path: &str,
-) -> Result<String, StatusCode> {
+) -> Result<Arc<str>, StatusCode> {
     let resources = load_resources(state, language, "failed to load resources for menu")?;
     let mut context = base_context(state, &resources, language, request_path, SiteKind::Cv);
     let translations = resources.translations.as_ref();
@@ -116,7 +119,7 @@ pub(crate) fn render_languages_page(
     language: &Language,
     request_path: &str,
     site: SiteKind,
-) -> Result<String, StatusCode> {
+) -> Result<Arc<str>, StatusCode> {
     let resources = load_resources(state, language, "failed to load resources for languages")?;
     let mut context = base_context(state, &resources, language, request_path, site);
     let translations = resources.translations.as_ref();
@@ -127,7 +130,7 @@ pub(crate) fn render_languages_page(
             language.url_prefix(&snapshot.default_language, snapshot.supported_languages.len() > 1);
         if prefix.is_empty() { "/".to_string() } else { format!("{prefix}/") }
     };
-    let language_choices = state.language_links(language, &home_path, site);
+    let language_choices = snapshot.language_links(language, &home_path, site);
 
     context.insert("page_title", page_title.as_ref());
     context.insert("page_url", request_path);
@@ -153,7 +156,7 @@ pub(crate) fn render_error(
     status: StatusCode,
     page_url: &str,
     language: &Language,
-) -> Result<String, StatusCode> {
+) -> Result<Arc<str>, StatusCode> {
     let resources = load_resources(state, language, "failed to load resources for error page")?;
     let mut context = base_context(state, &resources, language, page_url, site);
     context.insert("page_url", page_url);
@@ -222,9 +225,10 @@ fn base_context(
     context.insert("date_of_birth", &dates.display(&person.date_of_birth));
     context.insert("position", &person.position);
 
+    let snapshot = state.localization_snapshot();
     let sites = &data.sites;
-    let has_website_main = state.language_has_site(language, SiteKind::Main);
-    let has_website_cv = state.language_has_site(language, SiteKind::Cv);
+    let has_website_main = snapshot.language_has_site(language, SiteKind::Main);
+    let has_website_cv = snapshot.language_has_site(language, SiteKind::Cv);
 
     context.insert("website_main", sites.resolved_main());
     context.insert("website_cv", sites.resolved_cv());
@@ -253,12 +257,14 @@ fn base_context(
     context.insert("asset_version", state.asset_version.as_ref());
     context.insert("generator", state.generator.as_ref());
     context.insert("show_credits", &state.show_credits);
-    let (_, _, language_prefix) = state.language_from_path(request_path);
+    let (_, path_suffix, language_prefix) =
+        crate::app::state::language_from_path_in_snapshot(request_path, &snapshot);
     context.insert("language_prefix", &language_prefix);
-    let language_links = state.language_links(language, request_path, site);
+    let language_links = snapshot.language_links(language, &path_suffix, site);
+    let default_code = snapshot.default_language.as_code();
     let hreflang_default_url = language_links
         .iter()
-        .find(|link| link.code == state.localization_snapshot().default_language.as_code())
+        .find(|link| link.code == default_code)
         .map(|link| link.url.clone())
         .or_else(|| language_links.first().map(|link| link.url.clone()))
         .unwrap_or_else(|| request_path.to_string());
@@ -301,11 +307,11 @@ fn render_template(
     template: &str,
     context: Context,
     cache: Option<HtmlCacheKey>,
-) -> Result<String, StatusCode> {
+) -> Result<Arc<str>, StatusCode> {
     if let Some(key) = cache.as_ref()
         && let Some(cached) = state.cached_html_page(key)
     {
-        return Ok(cached.to_string());
+        return Ok(cached);
     }
 
     let rendered = state.tera.render(template, &context).map_err(|error| {
@@ -313,11 +319,14 @@ fn render_template(
         StatusCode::INTERNAL_SERVER_ERROR
     })?;
 
-    let rendered =
-        if state.environment.should_minify_html() { html::minify(&rendered) } else { rendered };
+    let rendered = if state.environment.should_minify_html() {
+        Arc::<str>::from(html::minify(&rendered))
+    } else {
+        Arc::<str>::from(rendered)
+    };
 
     if let Some(key) = cache {
-        state.store_html_page(key, Arc::from(rendered.as_str()));
+        state.store_html_page(key, Arc::clone(&rendered));
     }
 
     Ok(rendered)
@@ -980,7 +989,7 @@ fn cv_pdf_content(
         });
     }
 
-    let photo_jpeg = std::fs::read("assets/images/cv/profile-pictures/profile-picture.jpg").ok();
+    let photo_jpeg = cached_profile_photo_jpeg();
 
     Ok(crate::app::pdf::CvPdfContent {
         title: format!("{} {}", person.first_name.trim(), person.last_name.trim())
@@ -1003,6 +1012,14 @@ fn dated_meta(start: &str, end: &str, duration: &str) -> String {
         meta.push_str(&format!(" ({duration})"));
     }
     meta
+}
+
+fn cached_profile_photo_jpeg() -> Option<Vec<u8>> {
+    static PROFILE_PHOTO: OnceLock<Option<Vec<u8>>> = OnceLock::new();
+
+    PROFILE_PHOTO
+        .get_or_init(|| std::fs::read("assets/images/cv/profile-pictures/profile-picture.jpg").ok())
+        .clone()
 }
 
 #[cfg(test)]
