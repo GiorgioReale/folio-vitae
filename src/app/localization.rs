@@ -79,10 +79,7 @@ impl Language {
 /// Uses the browser-reported preference list (typically reflecting browser/OS
 /// locale settings). Returns the first supported primary language subtag in
 /// quality order, or `None` when nothing matches.
-pub(crate) fn match_accept_language(
-    header: &str,
-    available: &[Language],
-) -> Option<Language> {
+pub(crate) fn match_accept_language(header: &str, available: &[Language]) -> Option<Language> {
     if available.is_empty() {
         return None;
     }
@@ -207,10 +204,7 @@ mod tests {
         let available = vec![Language::new("en"), Language::new("it")];
 
         assert!(match_accept_language("de;q=0,fr", &available).is_none());
-        assert_eq!(
-            match_accept_language("de;q=0,en;q=0.1", &available).unwrap().as_code(),
-            "en"
-        );
+        assert_eq!(match_accept_language("de;q=0,en;q=0.1", &available).unwrap().as_code(), "en");
     }
 
     #[test]

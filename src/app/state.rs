@@ -208,8 +208,7 @@ impl AppState {
             return None;
         }
 
-        is_known_page_suffix(clean)
-            .then(|| format!("/{}/{}", preferred.as_code(), clean))
+        is_known_page_suffix(clean).then(|| format!("/{}/{}", preferred.as_code(), clean))
     }
 
     /// Prefer browser `Accept-Language`, then `DEFAULT_LANGUAGE` / configured default,
@@ -812,11 +811,7 @@ mod tests {
             state.redirect_path_for_missing_language("/curriculum", None, None),
             Some("/en/curriculum".to_string())
         );
-        assert!(
-            state
-                .redirect_path_for_missing_language("/en/curriculum", None, None)
-                .is_none()
-        );
+        assert!(state.redirect_path_for_missing_language("/en/curriculum", None, None).is_none());
         assert!(state.path_matches_page("/en", SitePage::Home));
         assert!(state.path_matches_page("/it/curriculum", SitePage::Curriculum));
         assert!(state.path_matches_page("/en/languages", SitePage::Languages));
@@ -829,11 +824,7 @@ mod tests {
             Some("/it".to_string())
         );
         assert_eq!(
-            state.redirect_path_for_missing_language(
-                "/curriculum",
-                Some("fr-FR,fr;q=0.9"),
-                None
-            ),
+            state.redirect_path_for_missing_language("/curriculum", Some("fr-FR,fr;q=0.9"), None),
             Some("/en/curriculum".to_string())
         );
     }

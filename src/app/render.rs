@@ -1056,13 +1056,9 @@ mod tests {
             render_cv_menu(&prepared.cv_state, &language, "/menu").expect("menu should render");
         assert!(menu.contains("menu-title"));
 
-        let languages = render_languages_page(
-            &prepared.cv_state,
-            &language,
-            "/it/languages",
-            SiteKind::Cv,
-        )
-        .expect("languages page should render");
+        let languages =
+            render_languages_page(&prepared.cv_state, &language, "/it/languages", SiteKind::Cv)
+                .expect("languages page should render");
         assert!(languages.contains("languages-title"));
         assert!(languages.contains("data-language-option"));
         assert!(languages.contains("/en/") || languages.contains("href=\"/en"));

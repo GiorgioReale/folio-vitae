@@ -609,30 +609,24 @@ fn email_is_valid(email: &str) -> bool {
     email.contains('@') && email.contains('.')
 }
 
-fn redirect_missing_language(
-    state: &AppState,
-    headers: &HeaderMap,
-    uri: &Uri,
-) -> Option<Response> {
+fn redirect_missing_language(state: &AppState, headers: &HeaderMap, uri: &Uri) -> Option<Response> {
     let accept_language =
         headers.get(axum::http::header::ACCEPT_LANGUAGE).and_then(|value| value.to_str().ok());
     let site = site_from_host(headers, state);
 
-    state
-        .redirect_path_for_missing_language(uri.path(), accept_language, site)
-        .map(|mut target| {
-            if let Some(query) = uri.query() {
-                target.push('?');
-                target.push_str(query);
-            }
+    state.redirect_path_for_missing_language(uri.path(), accept_language, site).map(|mut target| {
+        if let Some(query) = uri.query() {
+            target.push('?');
+            target.push_str(query);
+        }
 
-            // Must not be publicly cached: the target depends on Accept-Language.
-            let mut response = Redirect::temporary(&target).into_response();
-            let headers = response.headers_mut();
-            headers.insert(CACHE_CONTROL, HeaderValue::from_static("private, no-store"));
-            headers.insert(VARY, HeaderValue::from_static("accept-language"));
-            response
-        })
+        // Must not be publicly cached: the target depends on Accept-Language.
+        let mut response = Redirect::temporary(&target).into_response();
+        let headers = response.headers_mut();
+        headers.insert(CACHE_CONTROL, HeaderValue::from_static("private, no-store"));
+        headers.insert(VARY, HeaderValue::from_static("accept-language"));
+        response
+    })
 }
 
 fn site_from_host(headers: &HeaderMap, state: &AppState) -> Option<SiteKind> {
