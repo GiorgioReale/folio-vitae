@@ -1,0 +1,19 @@
+{% extends "main/base.html" %}
+{% block body_id %}languages{% endblock body_id %}
+{% block content %}
+<main id="main-content" tabindex="-1">
+  <h1 id="languages-title">{{ translations.nav.languages }}</h1>
+  <nav aria-labelledby="languages-title">
+    <ul>
+      {% for language in languages %}
+      <li>
+        <a href="{{ language.url }}" lang="{{ language.code }}" hreflang="{{ language.code }}" data-language-option{% if language.is_current %} aria-current="true"{% endif %}>
+          <span class="language-code" aria-hidden="true">{{ language.code }}</span>
+          <span>{{ language.label }}{% if language.is_current %} <span class="sr-only">({{ translations.nav.current_language }})</span>{% endif %}</span>
+        </a>
+      </li>
+      {% endfor %}
+    </ul>
+  </nav>
+</main>
+{% endblock content %}

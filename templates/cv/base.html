@@ -147,14 +147,16 @@
   <script src="/assets/scripts/light-dark-mode.js?v={{ asset_version }}" charset="utf-8" data-sprite-prefix="/assets/icons/cv/website/sprites.svg#"></script>
   {% endif %}
   <link rel="preload" href="/assets/styles/cv.css?v={{ asset_version }}" as="style" />
-  <link rel="preload" as="image" href="/assets/images/cv/home-background/home-background.avif" type="image/avif" imagesrcset="/assets/images/cv/home-background/home-background-mobile.avif 1024w, /assets/images/cv/home-background/home-background.avif 1920w" imagesizes="(max-width: 1024px) 100vw, 40vw" />
+  <link rel="preload" as="image" href="/assets/images/cv/home-background/home-background.avif" type="image/avif" imagesrcset="/assets/images/cv/home-background/home-background-mobile.avif 992w, /assets/images/cv/home-background/home-background.avif 1920w" imagesizes="(max-width: 992px) 100vw, 40vw" />
   <link rel="stylesheet" href="/assets/styles/cv.css?v={{ asset_version }}" type="text/css" fetchpriority="high" />
   {% if minify_assets %}
   <script src="/assets/scripts/cv/open-close-menu.min.js?v={{ asset_version }}" charset="utf-8" defer></script>
   <script src="/assets/scripts/cv/contact-form.min.js?v={{ asset_version }}" charset="utf-8" defer></script>
+  <script src="/assets/scripts/language-nav.min.js?v={{ asset_version }}" charset="utf-8" defer></script>
   {% else %}
   <script src="/assets/scripts/cv/open-close-menu.js?v={{ asset_version }}" charset="utf-8" defer></script>
   <script src="/assets/scripts/cv/contact-form.js?v={{ asset_version }}" charset="utf-8" defer></script>
+  <script src="/assets/scripts/language-nav.js?v={{ asset_version }}" charset="utf-8" defer></script>
   {% endif %}
 </head>
 

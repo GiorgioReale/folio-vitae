@@ -74,6 +74,88 @@ impl Language {
     }
 }
 
+/// Match an HTTP `Accept-Language` header against available language codes.
+///
+/// Uses the browser-reported preference list (typically reflecting browser/OS
+/// locale settings). Returns the first supported primary language subtag in
+/// quality order, or `None` when nothing matches.
+pub(crate) fn match_accept_language(header: &str, available: &[Language]) -> Option<Language> {
+    if available.is_empty() {
+        return None;
+    }
+
+    let mut ranges = parse_accept_language(header);
+    ranges.sort_by(|left, right| {
+        right
+            .q
+            .partial_cmp(&left.q)
+            .unwrap_or(std::cmp::Ordering::Equal)
+            .then_with(|| left.index.cmp(&right.index))
+    });
+
+    for range in ranges {
+        if range.tag == "*" {
+            continue;
+        }
+
+        let primary = range.tag.split('-').next().unwrap_or(range.tag.as_str());
+        if let Some(language) = Language::from_code(primary, available) {
+            return Some(language);
+        }
+
+        if let Some(language) = Language::from_code(&range.tag, available) {
+            return Some(language);
+        }
+    }
+
+    None
+}
+
+#[derive(Debug, Clone)]
+struct AcceptLanguageRange {
+    tag: String,
+    q: f32,
+    index: usize,
+}
+
+fn parse_accept_language(header: &str) -> Vec<AcceptLanguageRange> {
+    header
+        .split(',')
+        .enumerate()
+        .filter_map(|(index, part)| {
+            let part = part.trim();
+            if part.is_empty() {
+                return None;
+            }
+
+            let mut pieces = part.split(';');
+            let tag = pieces.next()?.trim().to_ascii_lowercase();
+            if tag.is_empty() {
+                return None;
+            }
+
+            let mut q = 1.0_f32;
+            for parameter in pieces {
+                let parameter = parameter.trim();
+                let Some((name, value)) = parameter.split_once('=') else {
+                    continue;
+                };
+                if name.trim().eq_ignore_ascii_case("q")
+                    && let Ok(parsed) = value.trim().parse::<f32>()
+                {
+                    q = parsed.clamp(0.0, 1.0);
+                }
+            }
+
+            if q <= 0.0 {
+                return None;
+            }
+
+            Some(AcceptLanguageRange { tag, q, index })
+        })
+        .collect()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -106,6 +188,23 @@ mod tests {
 
         assert_eq!(language.as_code(), "en");
         assert!(!from_env);
+    }
+
+    #[test]
+    fn accept_language_prefers_highest_quality_supported_tag() {
+        let available = vec![Language::new("en"), Language::new("it")];
+        let matched =
+            match_accept_language("fr-FR,fr;q=0.9,it-IT;q=0.8,en;q=0.7", &available).unwrap();
+
+        assert_eq!(matched.as_code(), "it");
+    }
+
+    #[test]
+    fn accept_language_ignores_unsupported_and_zero_quality() {
+        let available = vec![Language::new("en"), Language::new("it")];
+
+        assert!(match_accept_language("de;q=0,fr", &available).is_none());
+        assert_eq!(match_accept_language("de;q=0,en;q=0.1", &available).unwrap().as_code(), "en");
     }
 
     #[test]

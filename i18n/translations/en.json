@@ -26,7 +26,10 @@
     "primary": "Site",
     "theme_light": "Light theme",
     "theme_dark": "Dark theme",
-    "theme_auto": "System theme"
+    "theme_auto": "System theme",
+    "languages": "Languages",
+    "change_language": "Change language",
+    "close_languages": "Close language selection"
   },
   "main_page": {
     "websites": "Websites",

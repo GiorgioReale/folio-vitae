@@ -17,8 +17,8 @@ use tower_http::{
 use crate::{
     app::state::AppState,
     http::handlers::{
-        contact_cv, curriculum, curriculum_pdf, homepage, manifest, menu, not_found, robots,
-        security_txt, sitemap,
+        contact_cv, curriculum, curriculum_pdf, homepage, languages, manifest, menu, not_found,
+        robots, security_txt, sitemap,
     },
 };
 
@@ -58,6 +58,10 @@ pub fn build_router(state: AppState) -> Router {
         .route("/menu/", get(menu))
         .route("/{lang}/menu", get(menu))
         .route("/{lang}/menu/", get(menu))
+        .route("/languages", get(languages))
+        .route("/languages/", get(languages))
+        .route("/{lang}/languages", get(languages))
+        .route("/{lang}/languages/", get(languages))
         .route("/contact", post(contact_cv))
         .route("/{lang}/contact", post(contact_cv))
         .route("/{lang}/contact/", post(contact_cv))

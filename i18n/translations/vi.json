@@ -26,7 +26,10 @@
     "primary": "Trang",
     "theme_light": "Giao diện sáng",
     "theme_dark": "Giao diện tối",
-    "theme_auto": "Giao diện hệ thống"
+    "theme_auto": "Giao diện hệ thống",
+    "languages": "Ngôn ngữ",
+    "change_language": "Đổi ngôn ngữ",
+    "close_languages": "Đóng chọn ngôn ngữ"
   },
   "main_page": {
     "websites": "Trang web",

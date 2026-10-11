@@ -26,7 +26,10 @@
     "primary": "Сайт",
     "theme_light": "Светлая тема",
     "theme_dark": "Тёмная тема",
-    "theme_auto": "Системная тема"
+    "theme_auto": "Системная тема",
+    "languages": "Языки",
+    "change_language": "Сменить язык",
+    "close_languages": "Закрыть выбор языка"
   },
   "main_page": {
     "websites": "Веб-сайты",

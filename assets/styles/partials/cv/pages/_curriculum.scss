@@ -104,6 +104,16 @@ body#curriculum {
 
     > main {
       > section {
+        &:target {
+          outline: 2px solid var(--color-border);
+          outline-offset: 0.5rem;
+        }
+
+        &:focus-visible {
+          outline: 2px solid var(--color-text-primary);
+          outline-offset: 0.5rem;
+        }
+
         > h3 {
           margin: 3rem 0 0.75rem 0;
         }
@@ -230,10 +240,18 @@ body#curriculum {
       padding: 0;
       margin: 3rem 0 1rem 0;
 
+      &.contact-form--submitted {
+        > .contact-form__feedback {
+          padding: 1.25rem 1.5rem;
+          font-size: 1.05rem;
+          line-height: 1.4;
+        }
+      }
+
       > form {
         display: grid;
         grid-template-columns: 1fr;
-        gap: 0.5rem;
+        gap: 0.75rem;
 
         > input,
         > textarea {
@@ -349,7 +367,7 @@ body#curriculum {
       flex: none;
       position: relative;
       height: auto;
-      padding: 0.5rem;
+      padding: 1rem;
     }
 
     > .page-shell {
@@ -364,7 +382,7 @@ body#curriculum {
           }
 
           &.pdf-download {
-            margin-inline: -0.5rem;
+            margin-inline: -1rem;
           }
         }
       }

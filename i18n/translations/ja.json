@@ -26,7 +26,10 @@
     "primary": "サイト",
     "theme_light": "ライトテーマ",
     "theme_dark": "ダークテーマ",
-    "theme_auto": "システムテーマ"
+    "theme_auto": "システムテーマ",
+    "languages": "言語",
+    "change_language": "言語を変更",
+    "close_languages": "言語選択を閉じる"
   },
   "main_page": {
     "websites": "ウェブサイト",

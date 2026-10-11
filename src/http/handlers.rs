@@ -6,7 +6,7 @@ use axum::{
     extract::{ConnectInfo, State},
     http::{
         HeaderMap, HeaderValue, StatusCode, Uri,
-        header::{CACHE_CONTROL, CONTENT_DISPOSITION, CONTENT_TYPE, HOST, ORIGIN},
+        header::{CACHE_CONTROL, CONTENT_DISPOSITION, CONTENT_TYPE, HOST, ORIGIN, VARY},
     },
     response::{Html, IntoResponse, Redirect, Response},
 };
@@ -18,7 +18,7 @@ use crate::app::{
     localization::{Language, Translations},
     render::{
         ContactFeedback, CvContactFormContext, render_cv_curriculum, render_cv_homepage,
-        render_cv_menu, render_cv_pdf, render_error, render_main_homepage,
+        render_cv_menu, render_cv_pdf, render_error, render_languages_page, render_main_homepage,
     },
     state::{AppState, SiteKind, SitePage},
 };
@@ -280,11 +280,12 @@ pub(crate) async fn contact_cv(
         },
     };
 
+    let succeeded = feedback.status == "success";
     let context = CvContactFormContext {
-        full_name: form_data.full_name.value,
-        company: form_data.company.value,
-        email: form_data.email.value,
-        message: form_data.message.value,
+        full_name: if succeeded { String::new() } else { form_data.full_name.value },
+        company: if succeeded { String::new() } else { form_data.company.value },
+        email: if succeeded { String::new() } else { form_data.email.value },
+        message: if succeeded { String::new() } else { form_data.message.value },
         feedback: Some(feedback),
     };
 
@@ -301,6 +302,22 @@ pub(crate) async fn menu(State(state): State<AppState>, headers: HeaderMap, uri:
     };
 
     render_cv_menu(&state, &resolved.language, &resolved.path)
+        .map(Html)
+        .map(IntoResponse::into_response)
+        .unwrap_or_else(|status| status.into_response())
+}
+
+pub(crate) async fn languages(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    uri: Uri,
+) -> Response {
+    let resolved = match resolve_request(&state, &headers, &uri, SitePage::Languages, None) {
+        ResolveOutcome::Ready(resolved) => resolved,
+        ResolveOutcome::Respond(response) => return response,
+    };
+
+    render_languages_page(&state, &resolved.language, &resolved.path, resolved.site)
         .map(Html)
         .map(IntoResponse::into_response)
         .unwrap_or_else(|status| status.into_response())
@@ -399,7 +416,7 @@ pub(crate) async fn not_found(
     headers: HeaderMap,
     uri: Uri,
 ) -> Response {
-    if let Some(redirect) = redirect_missing_language(&state, &uri) {
+    if let Some(redirect) = redirect_missing_language(&state, &headers, &uri) {
         return redirect;
     }
 
@@ -417,7 +434,7 @@ fn resolve_request(
         return ResolveOutcome::Respond(response);
     }
 
-    if let Some(redirect) = redirect_missing_language(state, uri) {
+    if let Some(redirect) = redirect_missing_language(state, headers, uri) {
         return ResolveOutcome::Respond(redirect);
     }
 
@@ -592,14 +609,23 @@ fn email_is_valid(email: &str) -> bool {
     email.contains('@') && email.contains('.')
 }
 
-fn redirect_missing_language(state: &AppState, uri: &Uri) -> Option<Response> {
-    state.redirect_path_for_missing_language(uri.path()).map(|mut target| {
+fn redirect_missing_language(state: &AppState, headers: &HeaderMap, uri: &Uri) -> Option<Response> {
+    let accept_language =
+        headers.get(axum::http::header::ACCEPT_LANGUAGE).and_then(|value| value.to_str().ok());
+    let site = site_from_host(headers, state);
+
+    state.redirect_path_for_missing_language(uri.path(), accept_language, site).map(|mut target| {
         if let Some(query) = uri.query() {
             target.push('?');
             target.push_str(query);
         }
 
-        Redirect::temporary(&target).into_response()
+        // Must not be publicly cached: the target depends on Accept-Language.
+        let mut response = Redirect::temporary(&target).into_response();
+        let headers = response.headers_mut();
+        headers.insert(CACHE_CONTROL, HeaderValue::from_static("private, no-store"));
+        headers.insert(VARY, HeaderValue::from_static("accept-language"));
+        response
     })
 }
 

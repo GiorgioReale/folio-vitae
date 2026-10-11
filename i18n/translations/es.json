@@ -26,7 +26,10 @@
     "primary": "Sitio",
     "theme_light": "Tema claro",
     "theme_dark": "Tema oscuro",
-    "theme_auto": "Tema del sistema"
+    "theme_auto": "Tema del sistema",
+    "languages": "Idiomas",
+    "change_language": "Cambiar idioma",
+    "close_languages": "Cerrar selección de idioma"
   },
   "main_page": {
     "websites": "Sitios web",

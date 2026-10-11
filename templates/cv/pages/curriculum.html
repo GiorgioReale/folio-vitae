@@ -58,13 +58,13 @@
 {% block content %}
 <main id="main-content" tabindex="-1">
   {% if description %}
-  <section id="info" class="info">
+  <section id="info" class="info" tabindex="-1">
     <h3>{{ translations.cv_curriculum.about_heading }}</h3>
     <p>{{ description }}</p>
   </section>
   {% endif %}
   {% if work_experiences | length > 0 %}
-  <section id="experience" class="experience">
+  <section id="experience" class="experience" tabindex="-1">
     <h3>{{ translations.cv_curriculum.experience_heading }}</h3>
     {% for work_experience in work_experiences %}
     <article>
@@ -85,7 +85,7 @@
   </section>
   {% endif %}
   {% if skills | length > 0 %}
-  <section id="skills" class="skills">
+  <section id="skills" class="skills" tabindex="-1">
     <h3>{{ translations.cv_curriculum.skills_heading }}</h3>
     <ul>
       {% for skill in skills %}
@@ -98,7 +98,7 @@
   </section>
   {% endif %}
   {% if other_projects | length > 0 %}
-  <section id="other-projects" class="other-projects">
+  <section id="other-projects" class="other-projects" tabindex="-1">
     <h3>{{ translations.cv_curriculum.other_projects_heading }}</h3>
     {% for project in other_projects %}
     <article>
@@ -111,7 +111,7 @@
   </section>
   {% endif %}
   {% if educations | length > 0 %}
-  <section id="education" class="formation">
+  <section id="education" class="formation" tabindex="-1">
     <h3>{{ translations.cv_curriculum.education_heading }}</h3>
     {% for education in educations %}
     <article>
@@ -126,7 +126,7 @@
   </section>
   {% endif %}
   {% if courses_certifications | length > 0 %}
-  <section id="courses-certifications" class="training-courses">
+  <section id="courses-certifications" class="training-courses" tabindex="-1">
     <h3>{{ translations.cv_curriculum.courses_heading }}</h3>
     {% for courses_certification in courses_certifications %}
     <article>
@@ -141,7 +141,7 @@
     {% endif %}
   </section>
   {% endif %}
-  <section class="pdf-download" id="download">
+  <section class="pdf-download" id="download" tabindex="-1">
     <h3>{{ translations.cv_curriculum.pdf_heading }}</h3>
     <p>{{ translations.cv_curriculum.pdf_description }}</p>
     <a href="{{ language_prefix ~ '/curriculum.pdf' }}">
@@ -154,14 +154,18 @@
   <p class="legal-notice">{{ translations.cv_curriculum.legal_notice }}</p>
   {% if contact_form_enabled %}
   {% set invalid_field = contact_form.feedback?.field or "" %}
-  <section class="contact-form" id="contact" aria-labelledby="contact-heading">
+  {% set contact_success = contact_form.feedback and contact_form.feedback.status == "success" %}
+  <section class="contact-form{% if contact_success %} contact-form--submitted{% endif %}" id="contact" aria-labelledby="contact-heading" tabindex="-1">
     <div class="contact-form__header">
       <h3 id="contact-heading">{{ translations.cv_curriculum.contact_heading }}</h3>
+      {% if not contact_success %}
       <p id="contact-description">{{ translations.cv_curriculum.contact_description }}</p>
+      {% endif %}
     </div>
     <div id="contact-feedback" class="contact-form__feedback{% if contact_form.feedback %} contact-form__feedback--{{ contact_form.feedback.status }}{% endif %}" role="status" tabindex="-1" data-contact-feedback {% if contact_form.feedback %}data-field="{{ invalid_field }}"{% endif %} {% if not contact_form.feedback %}hidden{% elif invalid_field == "" %}autofocus{% endif %}>
       <p>{% if contact_form.feedback %}{{ contact_form.feedback.message }}{% endif %}</p>
     </div>
+    {% if not contact_success %}
     <form action="{{ language_prefix ~ '/contact' }}" method="post" autocomplete="on" aria-describedby="contact-description" data-contact-form data-msg-full-name-required="{{ translations.validation.full_name_required }}" data-msg-full-name-length="{{ translations.validation.full_name_length }}" data-msg-company-required="{{ translations.validation.company_required }}" data-msg-company-length="{{ translations.validation.company_length }}" data-msg-email-required="{{ translations.validation.email_required }}" data-msg-email="{{ translations.validation.email }}" data-msg-message-required="{{ translations.validation.message_required }}" data-msg-message-length="{{ translations.validation.message_length }}">
       <label for="full-name">{{ translations.cv_curriculum.contact_labels.full_name }} <span class="field-required">({{ translations.accessibility.required }})</span></label>
       <p id="full-name-hint" class="field-hint">{{ translations.cv_curriculum.contact_hints.full_name }}</p>
@@ -186,6 +190,7 @@
         {{ translations.cv_curriculum.contact_submit }}
       </button>
     </form>
+    {% endif %}
   </section>
   {% endif %}
 </main>

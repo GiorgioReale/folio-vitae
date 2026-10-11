@@ -26,7 +26,10 @@
     "primary": "사이트",
     "theme_light": "라이트 테마",
     "theme_dark": "다크 테마",
-    "theme_auto": "시스템 테마"
+    "theme_auto": "시스템 테마",
+    "languages": "언어",
+    "change_language": "언어 변경",
+    "close_languages": "언어 선택 닫기"
   },
   "main_page": {
     "websites": "웹사이트",
