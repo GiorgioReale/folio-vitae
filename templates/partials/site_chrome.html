@@ -10,27 +10,26 @@
 {% endif %}
 {% set normalized_path = page_url | trim_end(pat="/") %}
 {% set on_menu = normalized_path is ending_with(pat="/menu") %}
+{% set on_languages = normalized_path is ending_with(pat="/languages") %}
 {% set on_home = normalized_path == language_prefix %}
 <header>
   <nav class="site-controls" aria-label="{{ translations.nav.primary }}">
     {% if languages | length > 1 %}
-    <ul class="language-switcher" aria-label="{{ translations.nav.language_selector_label }}">
-      {% for language in languages %}
-      <li>
-        {% if language.is_current %}
-        <span class="language-switcher__current" lang="{{ language.code }}" aria-current="true">
-          {{ language.code }}
-          <span class="sr-only">{{ language.label }}, {{ translations.nav.current_language }}</span>
-        </span>
-        {% else %}
-        <a href="{{ language.url }}" lang="{{ language.code }}" hreflang="{{ language.code }}">
-          {{ language.code }}
-          <span class="sr-only">{{ language.label }}</span>
-        </a>
-        {% endif %}
-      </li>
-      {% endfor %}
-    </ul>
+    {% for language in languages %}
+    {% if language.is_current %}
+    {% if on_languages %}
+    <a class="language-switcher" href="{{ language_prefix }}/" lang="{{ language.code }}" aria-current="page" data-language-control data-language-state="close">
+      {{ language.code }}
+      <span class="sr-only">{{ language.label }}, {{ translations.nav.close_languages }}</span>
+    </a>
+    {% else %}
+    <a class="language-switcher" href="{{ language_prefix }}/languages" lang="{{ language.code }}" data-language-control data-language-state="open">
+      {{ language.code }}
+      <span class="sr-only">{{ language.label }}, {{ translations.nav.change_language }}</span>
+    </a>
+    {% endif %}
+    {% endif %}
+    {% endfor %}
     {% endif %}
     {% if site == "cv" %}
     <a href="{{ language_prefix ~ '/' }}" {% if on_home %}aria-current="page"{% endif %}>

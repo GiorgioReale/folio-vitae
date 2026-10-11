@@ -26,7 +26,10 @@
     "primary": "Tovuti",
     "theme_light": "Mandhari meupe",
     "theme_dark": "Mandhari meusi",
-    "theme_auto": "Mandhari ya mfumo"
+    "theme_auto": "Mandhari ya mfumo",
+    "languages": "Lugha",
+    "change_language": "Badilisha lugha",
+    "close_languages": "Funga uteuzi wa lugha"
   },
   "main_page": {
     "websites": "Tovuti",

@@ -26,7 +26,10 @@
     "primary": "Website",
     "theme_light": "Helles Design",
     "theme_dark": "Dunkles Design",
-    "theme_auto": "Systemdesign"
+    "theme_auto": "Systemdesign",
+    "languages": "Sprachen",
+    "change_language": "Sprache ändern",
+    "close_languages": "Sprachauswahl schließen"
   },
   "main_page": {
     "websites": "Webseiten",

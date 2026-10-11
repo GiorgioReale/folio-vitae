@@ -26,7 +26,10 @@
     "primary": "سائٹ",
     "theme_light": "ہلکی تھیم",
     "theme_dark": "گہری تھیم",
-    "theme_auto": "سسٹم تھیم"
+    "theme_auto": "سسٹم تھیم",
+    "languages": "زبانیں",
+    "change_language": "زبان تبدیل کریں",
+    "close_languages": "زبان کا انتخاب بند کریں"
   },
   "main_page": {
     "websites": "ویب سائٹس",

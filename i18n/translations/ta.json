@@ -26,7 +26,10 @@
     "primary": "தளம்",
     "theme_light": "ஒளி தீம்",
     "theme_dark": "இருள் தீம்",
-    "theme_auto": "கணினி தீம்"
+    "theme_auto": "கணினி தீம்",
+    "languages": "மொழிகள்",
+    "change_language": "மொழியை மாற்று",
+    "close_languages": "மொழி தேர்வை மூடு"
   },
   "main_page": {
     "websites": "வலைத்தளங்கள்",

@@ -26,7 +26,10 @@
     "primary": "সাইট",
     "theme_light": "হালকা থিম",
     "theme_dark": "গাঢ় থিম",
-    "theme_auto": "সিস্টেম থিম"
+    "theme_auto": "সিস্টেম থিম",
+    "languages": "ভাষা",
+    "change_language": "ভাষা পরিবর্তন করুন",
+    "close_languages": "ভাষা নির্বাচন বন্ধ করুন"
   },
   "main_page": {
     "websites": "ওয়েবসাইট",

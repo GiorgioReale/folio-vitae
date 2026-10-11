@@ -26,7 +26,10 @@
     "primary": "సైట్",
     "theme_light": "లేత థీమ్",
     "theme_dark": "ముదురు థీమ్",
-    "theme_auto": "సిస్టమ్ థీమ్"
+    "theme_auto": "సిస్టమ్ థీమ్",
+    "languages": "Languages",
+    "change_language": "Change language",
+    "close_languages": "Close language selection"
   },
   "main_page": {
     "websites": "వెబ్‌సైట్లు",

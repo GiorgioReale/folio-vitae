@@ -26,7 +26,10 @@
     "primary": "साइट",
     "theme_light": "हल्की थीम",
     "theme_dark": "गहरी थीम",
-    "theme_auto": "सिस्टम थीम"
+    "theme_auto": "सिस्टम थीम",
+    "languages": "भाषाएँ",
+    "change_language": "भाषा बदलें",
+    "close_languages": "भाषा चयन बंद करें"
   },
   "main_page": {
     "websites": "वेबसाइट्स",

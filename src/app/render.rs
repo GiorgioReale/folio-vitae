@@ -111,6 +111,42 @@ pub(crate) fn render_cv_menu(
     )
 }
 
+pub(crate) fn render_languages_page(
+    state: &AppState,
+    language: &Language,
+    request_path: &str,
+    site: SiteKind,
+) -> Result<String, StatusCode> {
+    let resources = load_resources(state, language, "failed to load resources for languages")?;
+    let mut context = base_context(state, &resources, language, request_path, site);
+    let translations = resources.translations.as_ref();
+    let page_title = translated_or(translations, &["nav", "languages"], "Languages");
+    let snapshot = state.localization_snapshot();
+    let home_path = {
+        let prefix =
+            language.url_prefix(&snapshot.default_language, snapshot.supported_languages.len() > 1);
+        if prefix.is_empty() { "/".to_string() } else { format!("{prefix}/") }
+    };
+    let language_choices = state.language_links(language, &home_path, site);
+
+    context.insert("page_title", page_title.as_ref());
+    context.insert("page_url", request_path);
+    context.insert("robots", "noindex,nofollow");
+    context.insert("languages", &language_choices);
+
+    let template = match site {
+        SiteKind::Cv => "cv/pages/languages.html",
+        SiteKind::Main => "main/pages/languages.html",
+    };
+
+    render_template(
+        state,
+        template,
+        context,
+        Some(cache_key(site, language, template, request_path)),
+    )
+}
+
 pub(crate) fn render_error(
     state: &AppState,
     site: SiteKind,
@@ -1019,6 +1055,17 @@ mod tests {
         let menu =
             render_cv_menu(&prepared.cv_state, &language, "/menu").expect("menu should render");
         assert!(menu.contains("menu-title"));
+
+        let languages = render_languages_page(
+            &prepared.cv_state,
+            &language,
+            "/it/languages",
+            SiteKind::Cv,
+        )
+        .expect("languages page should render");
+        assert!(languages.contains("languages-title"));
+        assert!(languages.contains("data-language-option"));
+        assert!(languages.contains("/en/") || languages.contains("href=\"/en"));
 
         let error = render_error(
             &prepared.cv_state,

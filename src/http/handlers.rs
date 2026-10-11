@@ -18,7 +18,7 @@ use crate::app::{
     localization::{Language, Translations},
     render::{
         ContactFeedback, CvContactFormContext, render_cv_curriculum, render_cv_homepage,
-        render_cv_menu, render_cv_pdf, render_error, render_main_homepage,
+        render_cv_menu, render_cv_pdf, render_error, render_languages_page, render_main_homepage,
     },
     state::{AppState, SiteKind, SitePage},
 };
@@ -301,6 +301,22 @@ pub(crate) async fn menu(State(state): State<AppState>, headers: HeaderMap, uri:
     };
 
     render_cv_menu(&state, &resolved.language, &resolved.path)
+        .map(Html)
+        .map(IntoResponse::into_response)
+        .unwrap_or_else(|status| status.into_response())
+}
+
+pub(crate) async fn languages(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    uri: Uri,
+) -> Response {
+    let resolved = match resolve_request(&state, &headers, &uri, SitePage::Languages, None) {
+        ResolveOutcome::Ready(resolved) => resolved,
+        ResolveOutcome::Respond(response) => return response,
+    };
+
+    render_languages_page(&state, &resolved.language, &resolved.path, resolved.site)
         .map(Html)
         .map(IntoResponse::into_response)
         .unwrap_or_else(|status| status.into_response())

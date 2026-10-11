@@ -26,7 +26,10 @@
     "primary": "Situs",
     "theme_light": "Tema terang",
     "theme_dark": "Tema gelap",
-    "theme_auto": "Tema sistem"
+    "theme_auto": "Tema sistem",
+    "languages": "Bahasa",
+    "change_language": "Ubah bahasa",
+    "close_languages": "Tutup pilihan bahasa"
   },
   "main_page": {
     "websites": "Situs Web",

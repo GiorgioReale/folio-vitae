@@ -26,7 +26,10 @@
     "primary": "网站",
     "theme_light": "浅色主题",
     "theme_dark": "深色主题",
-    "theme_auto": "系统主题"
+    "theme_auto": "系统主题",
+    "languages": "语言",
+    "change_language": "更改语言",
+    "close_languages": "关闭语言选择"
   },
   "main_page": {
     "websites": "网站",

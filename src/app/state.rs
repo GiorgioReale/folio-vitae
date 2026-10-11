@@ -93,16 +93,18 @@ pub(crate) enum SitePage {
     Curriculum,
     CurriculumPdf,
     Menu,
+    Languages,
     Contact,
 }
 
 impl SitePage {
-    fn slug(self) -> &'static str {
+    pub(crate) fn slug(self) -> &'static str {
         match self {
             Self::Home => "",
             Self::Curriculum => "curriculum",
             Self::CurriculumPdf => "curriculum.pdf",
             Self::Menu => "menu",
+            Self::Languages => "languages",
             Self::Contact => "contact",
         }
     }
@@ -654,6 +656,7 @@ fn is_known_page_suffix(suffix: &str) -> bool {
         SitePage::Curriculum,
         SitePage::CurriculumPdf,
         SitePage::Menu,
+        SitePage::Languages,
         SitePage::Contact,
     ]
     .into_iter()
@@ -750,6 +753,8 @@ mod tests {
         assert!(state.path_matches_page("/", SitePage::Home));
         assert!(state.path_matches_page("/curriculum", SitePage::Curriculum));
         assert!(state.path_matches_page("/it/menu/", SitePage::Menu));
+        assert!(state.path_matches_page("/it/languages/", SitePage::Languages));
+        assert!(state.path_matches_page("/languages/", SitePage::Languages));
     }
 
     #[test]
@@ -766,6 +771,11 @@ mod tests {
         assert!(state.redirect_path_for_missing_language("/en/curriculum").is_none());
         assert!(state.path_matches_page("/en", SitePage::Home));
         assert!(state.path_matches_page("/it/curriculum", SitePage::Curriculum));
+        assert!(state.path_matches_page("/en/languages", SitePage::Languages));
+        assert_eq!(
+            state.redirect_path_for_missing_language("/languages"),
+            Some("/en/languages".to_string())
+        );
     }
 
     fn empty_static_assets() -> StaticAssets {

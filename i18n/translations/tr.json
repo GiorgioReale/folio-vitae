@@ -26,7 +26,10 @@
     "primary": "Site",
     "theme_light": "Açık tema",
     "theme_dark": "Koyu tema",
-    "theme_auto": "Sistem teması"
+    "theme_auto": "Sistem teması",
+    "languages": "Diller",
+    "change_language": "Dili değiştir",
+    "close_languages": "Dil seçimini kapat"
   },
   "main_page": {
     "websites": "Web Siteleri",

@@ -26,7 +26,10 @@
     "primary": "الموقع",
     "theme_light": "السمة الفاتحة",
     "theme_dark": "السمة الداكنة",
-    "theme_auto": "سمة النظام"
+    "theme_auto": "سمة النظام",
+    "languages": "اللغات",
+    "change_language": "تغيير اللغة",
+    "close_languages": "إغلاق اختيار اللغة"
   },
   "main_page": {
     "websites": "المواقع",

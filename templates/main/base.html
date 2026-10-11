@@ -147,6 +147,11 @@
   {% endif %}
   <link rel="preload" href="/assets/styles/main.css?v={{ asset_version }}" as="style" />
   <link rel="stylesheet" href="/assets/styles/main.css?v={{ asset_version }}" type="text/css" fetchpriority="high" />
+  {% if minify_assets %}
+  <script src="/assets/scripts/language-nav.min.js?v={{ asset_version }}" charset="utf-8" defer></script>
+  {% else %}
+  <script src="/assets/scripts/language-nav.js?v={{ asset_version }}" charset="utf-8" defer></script>
+  {% endif %}
 </head>
 
 <body id="{% block body_id %}{% endblock body_id %}">

@@ -215,6 +215,7 @@ html {
     .social a,
     .socials a,
     .pdf-download a,
+    .language-switcher,
     .language-switcher a,
     .site-controls > a {
       text-decoration: none;
@@ -287,49 +288,32 @@ html {
           gap: 1rem;
           max-width: 100%;
 
-          > ul.language-switcher {
-            display: flex;
+          > a.language-switcher {
+            width: 2.25rem;
+            height: 2.25rem;
+            min-width: 2.25rem;
+            min-height: 2.25rem;
+            aspect-ratio: 1;
+            border: 0.15rem solid var(--color-links);
+            font-size: 0.85rem;
+            line-height: 1;
+            font-family: var(--font-family-monospace);
+            text-transform: uppercase;
+            text-align: center;
+            font-variation-settings: 'wght' 700;
+            font-weight: 700;
+            display: inline-flex;
             flex-direction: row;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
             align-content: center;
-            justify-content: flex-end;
+            justify-content: center;
             align-items: center;
-            gap: 1rem;
-            max-width: 100%;
-            list-style: none;
 
-            > li {
-              display: flex;
-            }
-
-            > li > a,
-            > li > span.language-switcher__current {
-              width: 2.25rem;
-              height: 2.25rem;
-              min-width: 2.25rem;
-              min-height: 2.25rem;
-              aspect-ratio: 1;
-              border: 0.15rem solid var(--color-links);
-              font-size: 0.85rem;
-              font-family: var(--font-family-monospace);
-              text-transform: uppercase;
-              text-align: center;
-              font-variation-settings: 'wght' 700;
-              font-weight: 700;
-              display: flex;
-              flex-direction: row;
-              flex-wrap: nowrap;
-              align-content: center;
-              justify-content: center;
-              align-items: center;
-            }
-
-            > li > a:hover {
+            &:hover {
               border-color: var(--color-links-hover);
             }
 
-            > li > a[aria-current='page'],
-            > li > span[aria-current='true'] {
+            &[aria-current='page'] {
               background-color: var(--color-links);
               color: var(--background-main);
             }
@@ -342,7 +326,7 @@ html {
             cursor: pointer;
           }
 
-          > a,
+          > a:not(.language-switcher),
           > button {
             line-height: 0;
             min-width: 2.25rem;
@@ -484,6 +468,7 @@ main :where(section, article) {
 
   input,
   textarea,
+  .language-switcher,
   .language-switcher a,
   .language-switcher__current {
     border-color: ButtonText;
