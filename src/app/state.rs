@@ -1,5 +1,6 @@
 use std::{
     collections::HashMap,
+    fmt::Write as _,
     sync::{Arc, Mutex, RwLock},
     time::{Duration, Instant, SystemTime},
 };
@@ -124,39 +125,7 @@ impl AppState {
     }
 
     pub(crate) fn language_from_path(&self, path: &str) -> (Language, String, String) {
-        let snapshot = self.localization_snapshot();
-        let clean_path = path.trim_matches('/');
-
-        if snapshot.supported_languages.len() == 1 {
-            let language = snapshot.supported_languages.first().cloned().unwrap_or_else(|| {
-                warn!("supported languages missing; defaulting to English");
-                Language::new("en")
-            });
-
-            let mut segments = clean_path.split('/');
-
-            if let Some(first_segment) = segments.next()
-                && first_segment == language.as_code()
-            {
-                return (language, rooted_segments(segments), String::new());
-            }
-
-            return (language, rooted_path(clean_path), String::new());
-        }
-
-        if clean_path.is_empty() {
-            return (snapshot.default_language.clone(), "/".to_string(), String::new());
-        }
-
-        let mut segments = clean_path.split('/');
-        if let Some(first_segment) = segments.next()
-            && let Some(language) =
-                Language::from_code(first_segment, &snapshot.supported_languages)
-        {
-            return (language, rooted_segments(segments), format!("/{first_segment}"));
-        }
-
-        (snapshot.default_language.clone(), rooted_path(clean_path), String::new())
+        language_from_path_in_snapshot(path, &self.localization_snapshot())
     }
 
     pub(crate) fn language_has_site(&self, language: &Language, site: SiteKind) -> bool {
@@ -219,67 +188,7 @@ impl AppState {
         site: Option<SiteKind>,
     ) -> Language {
         let snapshot = self.localization_snapshot();
-        let available: Vec<Language> = snapshot
-            .supported_languages
-            .iter()
-            .filter(|language| match site {
-                Some(site) => language_has_site_in_snapshot(language, site, &snapshot),
-                None => true,
-            })
-            .cloned()
-            .collect();
-
-        if let Some(header) = accept_language
-            && let Some(matched) = match_accept_language(header, &available)
-        {
-            return matched;
-        }
-
-        if available.iter().any(|language| language == &snapshot.default_language) {
-            return snapshot.default_language.clone();
-        }
-
-        available.first().cloned().unwrap_or_else(|| snapshot.default_language.clone())
-    }
-
-    pub(crate) fn language_links(
-        &self,
-        current_language: &Language,
-        request_path: &str,
-        site: SiteKind,
-    ) -> Vec<LanguageLink> {
-        let snapshot = self.localization_snapshot();
-
-        let available_languages: Vec<_> = snapshot
-            .supported_languages
-            .iter()
-            .filter(|language| language_has_site_in_snapshot(language, site, &snapshot))
-            .collect();
-
-        if available_languages.len() <= 1 {
-            return Vec::new();
-        }
-
-        let (_, path_suffix, _) = self.language_from_path(request_path);
-
-        available_languages
-            .into_iter()
-            .map(|language| {
-                let mut url = language.url_prefix(&snapshot.default_language, true);
-                url.push_str(&path_suffix);
-
-                LanguageLink {
-                    code: language.as_code().to_string(),
-                    label: snapshot
-                        .language_names
-                        .get(language)
-                        .cloned()
-                        .unwrap_or_else(|| language.as_code().to_string()),
-                    url,
-                    is_current: language == current_language,
-                }
-            })
-            .collect()
+        preferred_language_in_snapshot(&snapshot, accept_language, site)
     }
 
     pub(crate) fn localization_snapshot(&self) -> Arc<LocalizationState> {
@@ -419,6 +328,120 @@ impl LocalizationState {
             cv_available,
         }
     }
+
+    pub(crate) fn language_has_site(&self, language: &Language, site: SiteKind) -> bool {
+        language_has_site_in_snapshot(language, site, self)
+    }
+
+    pub(crate) fn language_links(
+        &self,
+        current_language: &Language,
+        path_suffix: &str,
+        site: SiteKind,
+    ) -> Vec<LanguageLink> {
+        language_links_in_snapshot(self, current_language, path_suffix, site)
+    }
+}
+
+pub(crate) fn language_from_path_in_snapshot(
+    path: &str,
+    snapshot: &LocalizationState,
+) -> (Language, String, String) {
+    let clean_path = path.trim_matches('/');
+
+    if snapshot.supported_languages.len() == 1 {
+        let language = snapshot.supported_languages.first().cloned().unwrap_or_else(|| {
+            warn!("supported languages missing; defaulting to English");
+            Language::new("en")
+        });
+
+        let mut segments = clean_path.split('/');
+
+        if let Some(first_segment) = segments.next()
+            && first_segment == language.as_code()
+        {
+            return (language, rooted_segments(segments), String::new());
+        }
+
+        return (language, rooted_path(clean_path), String::new());
+    }
+
+    if clean_path.is_empty() {
+        return (snapshot.default_language.clone(), "/".to_string(), String::new());
+    }
+
+    let mut segments = clean_path.split('/');
+    if let Some(first_segment) = segments.next()
+        && let Some(language) = Language::from_code(first_segment, &snapshot.supported_languages)
+    {
+        return (language, rooted_segments(segments), format!("/{first_segment}"));
+    }
+
+    (snapshot.default_language.clone(), rooted_path(clean_path), String::new())
+}
+
+fn preferred_language_in_snapshot(
+    snapshot: &LocalizationState,
+    accept_language: Option<&str>,
+    site: Option<SiteKind>,
+) -> Language {
+    let available: Vec<Language> = snapshot
+        .supported_languages
+        .iter()
+        .filter(|language| match site {
+            Some(site) => language_has_site_in_snapshot(language, site, snapshot),
+            None => true,
+        })
+        .cloned()
+        .collect();
+
+    if let Some(header) = accept_language
+        && let Some(matched) = match_accept_language(header, &available)
+    {
+        return matched;
+    }
+
+    if available.iter().any(|language| language == &snapshot.default_language) {
+        return snapshot.default_language.clone();
+    }
+
+    available.first().cloned().unwrap_or_else(|| snapshot.default_language.clone())
+}
+
+fn language_links_in_snapshot(
+    snapshot: &LocalizationState,
+    current_language: &Language,
+    path_suffix: &str,
+    site: SiteKind,
+) -> Vec<LanguageLink> {
+    let available_languages: Vec<_> = snapshot
+        .supported_languages
+        .iter()
+        .filter(|language| language_has_site_in_snapshot(language, site, snapshot))
+        .collect();
+
+    if available_languages.len() <= 1 {
+        return Vec::new();
+    }
+
+    available_languages
+        .into_iter()
+        .map(|language| {
+            let mut url = language.url_prefix(&snapshot.default_language, true);
+            url.push_str(path_suffix);
+
+            LanguageLink {
+                code: language.as_code().to_string(),
+                label: snapshot
+                    .language_names
+                    .get(language)
+                    .cloned()
+                    .unwrap_or_else(|| language.as_code().to_string()),
+                url,
+                is_current: language == current_language,
+            }
+        })
+        .collect()
 }
 
 fn language_has_site_in_snapshot(
@@ -560,8 +583,8 @@ fn render_sitemap(
     localization: &LocalizationState,
 ) -> AppResult<String> {
     let domain = match site {
-        SiteKind::Main => data.sites.resolved_main().domain.clone(),
-        SiteKind::Cv => data.sites.resolved_cv().domain.clone(),
+        SiteKind::Main => data.sites.resolved_main().domain.as_str(),
+        SiteKind::Cv => data.sites.resolved_cv().domain.as_str(),
     };
     let base_url = format!("https://{domain}");
     let pages: &[(&str, &str)] = match site {
@@ -576,7 +599,10 @@ fn render_sitemap(
         .collect();
 
     let multilingual = languages.len() > 1;
-    let mut output = String::from(
+    // Header + roughly 200 bytes per URL entry (with hreflang alternates when multilingual).
+    let estimated_entries = pages.len().saturating_mul(languages.len().max(1));
+    let mut output = String::with_capacity(160 + estimated_entries.saturating_mul(220));
+    output.push_str(
         r#"<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
 "#,
@@ -590,10 +616,10 @@ fn render_sitemap(
                 &localization.default_language,
                 multilingual,
             );
-            let loc = format!("{base_url}{path}");
-            output.push_str("  <url>\n");
-            output.push_str(&format!("    <loc>{loc}</loc>\n"));
-            output.push_str(&format!("    <priority>{priority}</priority>\n"));
+            let _ = writeln!(
+                output,
+                "  <url>\n    <loc>{base_url}{path}</loc>\n    <priority>{priority}</priority>"
+            );
 
             if multilingual {
                 for alternate in &languages {
@@ -603,10 +629,11 @@ fn render_sitemap(
                         &localization.default_language,
                         true,
                     );
-                    output.push_str(&format!(
-                        "    <xhtml:link rel=\"alternate\" hreflang=\"{}\" href=\"{base_url}{alternate_path}\" />\n",
+                    let _ = writeln!(
+                        output,
+                        "    <xhtml:link rel=\"alternate\" hreflang=\"{}\" href=\"{base_url}{alternate_path}\" />",
                         alternate.as_code()
-                    ));
+                    );
                 }
                 let default_path = language_prefixed_path(
                     &localization.default_language,
@@ -614,9 +641,10 @@ fn render_sitemap(
                     &localization.default_language,
                     true,
                 );
-                output.push_str(&format!(
-                    "    <xhtml:link rel=\"alternate\" hreflang=\"x-default\" href=\"{base_url}{default_path}\" />\n"
-                ));
+                let _ = writeln!(
+                    output,
+                    "    <xhtml:link rel=\"alternate\" hreflang=\"x-default\" href=\"{base_url}{default_path}\" />"
+                );
             }
 
             output.push_str("  </url>\n");
