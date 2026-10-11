@@ -304,12 +304,13 @@ html {
 
             > li > a,
             > li > span.language-switcher__current {
-              width: 2.75rem;
-              height: 2.75rem;
-              min-width: 2.75rem;
-              min-height: 2.75rem;
+              width: 2.25rem;
+              height: 2.25rem;
+              min-width: 2.25rem;
+              min-height: 2.25rem;
               aspect-ratio: 1;
-              border: 0.2rem solid var(--color-links);
+              border: 0.15rem solid var(--color-links);
+              font-size: 0.85rem;
               font-family: var(--font-family-monospace);
               text-transform: uppercase;
               text-align: center;
@@ -344,16 +345,16 @@ html {
           > a,
           > button {
             line-height: 0;
-            min-width: 2.75rem;
-            min-height: 2.75rem;
+            min-width: 2.25rem;
+            min-height: 2.25rem;
             display: inline-flex;
             align-items: center;
             justify-content: center;
 
             > svg {
               fill: var(--color-links);
-              width: 2.75rem;
-              height: 2.75rem;
+              width: 2.25rem;
+              height: 2.25rem;
 
               &:hover {
                 fill: var(--color-links-hover);
@@ -410,13 +411,13 @@ html {
         > header,
         > main,
         > footer {
-          padding: 0.5rem 0.5rem 0.5rem 0.5rem;
+          padding: 1rem;
         }
 
         > footer {
           flex-direction: column;
           justify-content: center;
-          gap: 0.25rem;
+          gap: 0.5rem;
         }
       }
     }
@@ -475,7 +476,9 @@ main :where(section, article) {
   button:focus-visible,
   input:focus-visible,
   textarea:focus-visible,
-  .skip-link:focus-visible {
+  .skip-link:focus-visible,
+  main section:focus-visible,
+  main section:target {
     outline: 2px solid CanvasText;
   }
 
