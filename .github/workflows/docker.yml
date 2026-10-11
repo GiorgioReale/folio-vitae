@@ -123,9 +123,10 @@ jobs:
         with:
           images: ${{ env.IMAGE_NAME }}
           tags: |
-            type=raw,value=latest,enable=${{ (github.event_name == 'workflow_call' || github.event_name == 'workflow_dispatch') && inputs.update_latest }}
-            type=raw,value=${{ steps.cargo_version.outputs.version }},enable=${{ (github.event_name == 'workflow_call' || github.event_name == 'workflow_dispatch') && inputs.update_version_tags }}
-            type=raw,value=${{ steps.cargo_version.outputs.major_minor }},enable=${{ (github.event_name == 'workflow_call' || github.event_name == 'workflow_dispatch') && inputs.update_version_tags }}
+            # Reusable workflows keep the caller's event name (e.g. `release`), never `workflow_call`.
+            type=raw,value=latest,enable=${{ github.event_name != 'pull_request' && inputs.update_latest }}
+            type=raw,value=${{ steps.cargo_version.outputs.version }},enable=${{ github.event_name != 'pull_request' && inputs.update_version_tags }}
+            type=raw,value=${{ steps.cargo_version.outputs.major_minor }},enable=${{ github.event_name != 'pull_request' && inputs.update_version_tags }}
 
       - name: Build and push
         uses: docker/build-push-action@v7
