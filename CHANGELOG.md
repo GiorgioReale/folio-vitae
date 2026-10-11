@@ -6,6 +6,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.6] - 2026-10-11
+
+### Added
+- Dedicated `/languages` page with return-to-path navigation for language switching
+
+### Fixed
+- Bare paths without a language prefix now honor `Accept-Language` (with `Vary` / no-store redirects)
+- Successful contact submissions clear the form and show a confirmation state
+- Docker image version tags are published correctly when the build is triggered from a GitHub Release
+
+### Changed
+- CV menu and curriculum section focus targets for smoother in-page navigation
+
+### Performance
+- Cheaper production HTML serving via shared `Arc` page cache entries
+- Cached PDF skill-icon rasterization and profile photo bytes
+- Release profile uses fat LTO and `panic = "abort"`
+
 ## [0.1.5] - 2026-10-11
 
 ### Fixed
