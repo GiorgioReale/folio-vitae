@@ -6,8 +6,9 @@ use std::{
 
 use image::{DynamicImage, GenericImageView, Rgba, RgbaImage};
 use printpdf::{
-    Color, Line, LinePoint, Mm, Op, ParsedFont, PdfDocument, PdfFontHandle, PdfPage,
-    PdfSaveOptions, Point, Pt, RawImage, Rgb, TextItem, XObjectId, XObjectTransform,
+    Actions, BorderArray, Color, ColorArray, Line, LinePoint, LinkAnnotation, Mm, Op, ParsedFont,
+    PdfDocument, PdfFontHandle, PdfPage, PdfSaveOptions, Point, Pt, RawImage, Rect, Rgb, TextItem,
+    XObjectId, XObjectTransform,
 };
 use resvg::{
     tiny_skia::{Pixmap, Transform},
@@ -72,6 +73,7 @@ pub(crate) struct CvPdfContent {
 pub(crate) struct PdfFact {
     pub label: String,
     pub value: String,
+    pub href: Option<String>,
 }
 
 pub(crate) struct PdfSection {
@@ -200,12 +202,18 @@ pub(crate) fn render(content: &CvPdfContent) -> AppResult<Vec<u8>> {
     Ok(document.with_pages(pdf_pages).save(&PdfSaveOptions::default(), &mut warnings))
 }
 
-pub(crate) fn content_disposition(first_name: &str, last_name: &str) -> String {
-    let utf8_name =
+pub(crate) fn content_disposition(first_name: &str, last_name: &str, language: &str) -> String {
+    let person =
         format!("{first_name} {last_name}").split_whitespace().collect::<Vec<_>>().join(" ");
-    let utf8_name =
-        if utf8_name.is_empty() { "CV.pdf".to_string() } else { format!("{utf8_name} - CV.pdf") };
-    let ascii = ascii_filename(first_name, last_name);
+    let language = language.trim();
+    let utf8_name = if person.is_empty() {
+        if language.is_empty() { "CV.pdf".to_string() } else { format!("CV - {language}.pdf") }
+    } else if language.is_empty() {
+        format!("{person} - CV.pdf")
+    } else {
+        format!("{person} - CV - {language}.pdf")
+    };
+    let ascii = ascii_filename(&utf8_name);
     format!("attachment; filename=\"{ascii}\"; filename*=UTF-8''{}", percent_encode(&utf8_name))
 }
 
@@ -261,8 +269,15 @@ fn draw_header(
         }
         right_y =
             draw_centered_block(ops, &fact.label, label_style, right_x, column_width, right_y);
-        right_y =
-            draw_centered_block(ops, &fact.value, value_style, right_x, column_width, right_y);
+        right_y = draw_centered_block_with_link(
+            ops,
+            &fact.value,
+            value_style,
+            right_x,
+            column_width,
+            right_y,
+            fact.href.as_deref(),
+        );
     }
 
     let mut bottom = left_y.max(right_y);
@@ -669,7 +684,19 @@ fn draw_centered_block(
     style: TextStyle<'_>,
     x: f32,
     width: f32,
+    y: f32,
+) -> f32 {
+    draw_centered_block_with_link(ops, text, style, x, width, y, None)
+}
+
+fn draw_centered_block_with_link(
+    ops: &mut Vec<Op>,
+    text: &str,
+    style: TextStyle<'_>,
+    x: f32,
+    width: f32,
     mut y: f32,
+    href: Option<&str>,
 ) -> f32 {
     let face = face(style.faces, style.role);
     for line in wrap_text(face, text, style.size, width) {
@@ -678,8 +705,25 @@ fn draw_centered_block(
             continue;
         }
         let line_width = text_width(face, &line, style.size);
+        let text_x = x + ((width - line_width) / 2.0);
         let baseline = PAGE_H - (y + style.size);
-        paint_text(ops, &line, style, x + ((width - line_width) / 2.0), baseline);
+        paint_text(ops, &line, style, text_x, baseline);
+        if let Some(href) = href.filter(|value| !value.trim().is_empty()) {
+            ops.push(Op::LinkAnnotation {
+                link: LinkAnnotation::new(
+                    Rect::from_xywh(
+                        Pt(text_x),
+                        Pt(baseline - (style.size * 0.2)),
+                        Pt(line_width),
+                        Pt(style.size * 1.2),
+                    ),
+                    Actions::uri(href.to_string()),
+                    Some(BorderArray::Solid([0.0, 0.0, 0.0])),
+                    Some(ColorArray::Transparent),
+                    None,
+                ),
+            });
+        }
         y += style.size * 1.25;
     }
     y
@@ -916,9 +960,10 @@ fn add_font(document: &mut PdfDocument, bytes: &[u8], name: &str) -> AppResult<p
     Ok(document.add_font(&font))
 }
 
-fn ascii_filename(first_name: &str, last_name: &str) -> String {
+fn ascii_filename(utf8_name: &str) -> String {
+    let stem = utf8_name.strip_suffix(".pdf").unwrap_or(utf8_name);
     let mut name = String::new();
-    for ch in format!("{first_name}-{last_name}").chars() {
+    for ch in stem.chars() {
         if let Some(folded) = fold_ascii(ch) {
             name.push(folded);
         } else if (ch.is_ascii_whitespace() || ch == '-') && !name.ends_with('-') {
@@ -926,7 +971,7 @@ fn ascii_filename(first_name: &str, last_name: &str) -> String {
         }
     }
     let name = name.trim_matches('-');
-    if name.is_empty() { "cv.pdf".to_string() } else { format!("{name}-cv.pdf") }
+    if name.is_empty() { "cv.pdf".to_string() } else { format!("{name}.pdf") }
 }
 
 fn fold_ascii(ch: char) -> Option<char> {
@@ -979,7 +1024,11 @@ mod tests {
             last_name: "Carter".to_string(),
             role: "Full Stack Developer".to_string(),
             photo: None,
-            facts: vec![PdfFact { label: "City:".to_string(), value: "Austin".to_string() }],
+            facts: vec![PdfFact {
+                label: "City:".to_string(),
+                value: "Austin".to_string(),
+                href: None,
+            }],
             sections: vec![
                 PdfSection {
                     heading: "Experience".to_string(),
@@ -1096,9 +1145,12 @@ mod tests {
 
     #[test]
     fn content_disposition_keeps_unicode_out_of_the_ascii_filename() {
-        let header = content_disposition("Giòrgio", "Reale");
-        assert!(header.contains("filename=\"Giorgio-Reale-cv.pdf\""), "header was {header}");
+        let header = content_disposition("Giòrgio", "Reale", "it");
+        assert!(header.contains("filename=\"Giorgio-Reale-CV-it.pdf\""), "header was {header}");
         assert!(header.contains("filename*=UTF-8''"));
-        assert!(header.contains("%C3%B2"));
+        assert!(
+            header.contains("Gi%C3%B2rgio%20Reale%20-%20CV%20-%20it.pdf"),
+            "header was {header}"
+        );
     }
 }
