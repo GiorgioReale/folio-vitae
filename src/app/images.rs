@@ -124,8 +124,9 @@ fn generate_cv_assets(root: &Path) -> AppResult<()> {
     export_resized(&favicon_path, &[(&chrome_192, 192, 192), (&chrome_512, 512, 512)])?;
 
     let profile_avif = outputs.image(&["profile-pictures"], "profile-picture.avif");
-    let profile_jpg = outputs.image(&["profile-pictures"], "profile-picture.jpg");
-    export_resized(&cv_profile_picture, &[(&profile_avif, 512, 512), (&profile_jpg, 512, 512)])?;
+    let profile_png = outputs.image(&["profile-pictures"], "profile-picture.png");
+    export_resized(&cv_profile_picture, &[(&profile_avif, 512, 512), (&profile_png, 512, 512)])?;
+    remove_stale_file(&outputs.image(&["profile-pictures"], "profile-picture.jpg"))?;
 
     copy_image(&cv_social_card, &outputs.image(&["social-card"], "social-card.png"))?;
 
@@ -150,8 +151,9 @@ fn generate_main_assets(root: &Path) -> AppResult<()> {
     export_resized(&main_icon, &[(&chrome_192, 192, 192), (&chrome_512, 512, 512)])?;
 
     let profile_avif = outputs.image(&["profile-pictures"], "profile-picture.avif");
-    let profile_jpg = outputs.image(&["profile-pictures"], "profile-picture.jpg");
-    export_resized(&main_profile_picture, &[(&profile_avif, 512, 512), (&profile_jpg, 512, 512)])?;
+    let profile_png = outputs.image(&["profile-pictures"], "profile-picture.png");
+    export_resized(&main_profile_picture, &[(&profile_avif, 512, 512), (&profile_png, 512, 512)])?;
+    remove_stale_file(&outputs.image(&["profile-pictures"], "profile-picture.jpg"))?;
 
     copy_image(&main_social_card, &outputs.image(&["social-card"], "social-card.png"))?;
 
@@ -179,7 +181,7 @@ fn expected_cv_outputs(root: &Path) -> AppResult<Vec<PathBuf>> {
         outputs.icon(&["logos"], "android-chrome-192x192.png"),
         outputs.icon(&["logos"], "android-chrome-512x512.png"),
         outputs.image(&["profile-pictures"], "profile-picture.avif"),
-        outputs.image(&["profile-pictures"], "profile-picture.jpg"),
+        outputs.image(&["profile-pictures"], "profile-picture.png"),
         outputs.image(&["social-card"], "social-card.png"),
         outputs.logos_dir().join("apple-touch-icon.png"),
         outputs.logos_dir().join("favicon-16x16.png"),
@@ -209,7 +211,7 @@ fn expected_main_outputs(root: &Path) -> AppResult<Vec<PathBuf>> {
         outputs.icon(&["logos"], "android-chrome-192x192.png"),
         outputs.icon(&["logos"], "android-chrome-512x512.png"),
         outputs.image(&["profile-pictures"], "profile-picture.avif"),
-        outputs.image(&["profile-pictures"], "profile-picture.jpg"),
+        outputs.image(&["profile-pictures"], "profile-picture.png"),
         outputs.image(&["social-card"], "social-card.png"),
         outputs.logos_dir().join("apple-touch-icon.png"),
         outputs.logos_dir().join("favicon-16x16.png"),
@@ -405,6 +407,14 @@ fn rasterize_svg(svg_source: &Path) -> AppResult<DynamicImage> {
         .ok_or_else(|| AppError::msg(format!("creating RGBA image for {svg_source:?}")))?;
 
     Ok(DynamicImage::ImageRgba8(rgba))
+}
+
+fn remove_stale_file(path: &Path) -> AppResult<()> {
+    match fs::remove_file(path) {
+        Ok(()) => Ok(()),
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => Ok(()),
+        Err(error) => Err(error).with_context(|| format!("removing {path:?}")),
+    }
 }
 
 fn copy_svg(input: &Path, output: &Path) -> AppResult<()> {

@@ -139,7 +139,7 @@ expression: main_homepage
 <aside>
   <picture>
     <source srcset="/assets/images/main/profile-pictures/profile-picture.avif" type="image/avif"/>
-    <img src="/assets/images/main/profile-pictures/profile-picture.jpg" alt="Alex Carter" width="512" height="512" fetchpriority="high" decoding="async" importance="high"/>
+    <img src="/assets/images/main/profile-pictures/profile-picture.png" alt="Alex Carter" width="512" height="512" fetchpriority="high" decoding="async" importance="high"/>
   </picture>
   <h1>Alex Carter</h1>
 </aside>
