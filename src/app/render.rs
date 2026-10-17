@@ -836,26 +836,34 @@ fn cv_pdf_content(
         facts.push(crate::app::pdf::PdfFact {
             label: label("city_label", "City:"),
             value: person.position.locality.clone(),
+            href: None,
         });
     }
     facts.push(crate::app::pdf::PdfFact {
         label: label("birth_date_label", "Birth date:"),
         value: dates.display(&person.date_of_birth),
+        href: None,
     });
-    if state.language_has_site(language, SiteKind::Main) {
-        let domain = &data.sites.resolved_main().domain;
-        if !domain.trim().is_empty() {
-            facts.push(crate::app::pdf::PdfFact {
-                label: label("website_label", "Website:"),
-                value: domain.clone(),
-            });
-        }
+    let website_domain = if state.language_has_site(language, SiteKind::Main) {
+        Some(data.sites.resolved_main().domain.as_str())
+    } else if state.language_has_site(language, SiteKind::Cv) {
+        Some(data.sites.resolved_cv().domain.as_str())
+    } else {
+        None
+    };
+    if let Some(domain) = website_domain.filter(|domain| !domain.trim().is_empty()) {
+        facts.push(crate::app::pdf::PdfFact {
+            label: label("website_label", "Website:"),
+            value: domain.to_string(),
+            href: Some(format!("https://{domain}/")),
+        });
     }
     let email = data.contact.emails.resolved_cv();
     if !email.trim().is_empty() {
         facts.push(crate::app::pdf::PdfFact {
             label: label("email_label", "E-Mail:"),
             value: email.to_string(),
+            href: Some(format!("mailto:{email}")),
         });
     }
 

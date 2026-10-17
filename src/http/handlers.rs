@@ -120,6 +120,7 @@ fn pdf_response(state: &AppState, language: &Language, bytes: Arc<Vec<u8>>) -> R
         Ok(resources) => crate::app::pdf::content_disposition(
             &resources.data.person.first_name,
             &resources.data.person.last_name,
+            language.as_code(),
         ),
         Err(error) => {
             error!(error = ?error, "Failed to load the CV name for the PDF filename");

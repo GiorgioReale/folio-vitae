@@ -24,6 +24,11 @@
       <dt>{{ translations.cv_curriculum.website_label }}</dt>
       <dd><a href="https://{{ website_main.domain }}/">{{ website_main.domain }}</a></dd>
     </div>
+    {% elif has_website_cv %}
+    <div>
+      <dt>{{ translations.cv_curriculum.website_label }}</dt>
+      <dd><a href="https://{{ website_cv.domain }}/">{{ website_cv.domain }}</a></dd>
+    </div>
     {% endif %}
     <div>
       <dt>{{ translations.cv_curriculum.email_label }}</dt>
