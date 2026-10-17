@@ -989,7 +989,7 @@ fn cv_pdf_content(
         });
     }
 
-    let photo_jpeg = cached_profile_photo_jpeg();
+    let photo = cached_profile_photo();
 
     Ok(crate::app::pdf::CvPdfContent {
         title: format!("{} {}", person.first_name.trim(), person.last_name.trim())
@@ -999,7 +999,7 @@ fn cv_pdf_content(
         first_name: person.first_name.clone(),
         last_name: person.last_name.clone(),
         role: person.role.clone(),
-        photo_jpeg,
+        photo,
         facts,
         sections,
         legal_notice: label("legal_notice", ""),
@@ -1014,11 +1014,11 @@ fn dated_meta(start: &str, end: &str, duration: &str) -> String {
     meta
 }
 
-fn cached_profile_photo_jpeg() -> Option<Vec<u8>> {
+fn cached_profile_photo() -> Option<Vec<u8>> {
     static PROFILE_PHOTO: OnceLock<Option<Vec<u8>>> = OnceLock::new();
 
     PROFILE_PHOTO
-        .get_or_init(|| std::fs::read("assets/images/cv/profile-pictures/profile-picture.jpg").ok())
+        .get_or_init(|| std::fs::read("assets/images/cv/profile-pictures/profile-picture.png").ok())
         .clone()
 }
 

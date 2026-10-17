@@ -63,7 +63,7 @@ pub(crate) struct CvPdfContent {
     pub first_name: String,
     pub last_name: String,
     pub role: String,
-    pub photo_jpeg: Option<Vec<u8>>,
+    pub photo: Option<Vec<u8>>,
     pub facts: Vec<PdfFact>,
     pub sections: Vec<PdfSection>,
     pub legal_notice: String,
@@ -169,7 +169,7 @@ pub(crate) fn render(content: &CvPdfContent) -> AppResult<Vec<u8>> {
         text_light: add_font(&mut document, bytes.text_light, "Red Hat Text Light")?,
     };
 
-    let photo = content.photo_jpeg.as_deref().and_then(circular_portrait);
+    let photo = content.photo.as_deref().and_then(circular_portrait);
     let photo_id = photo.as_ref().map(|image| document.add_image(image));
     let skill_icons = skill_icon_ids(&mut document, &content.sections);
 
@@ -709,9 +709,10 @@ fn stroke_line(ops: &mut Vec<Op>, x1: f32, y1: f32, x2: f32, y2: f32, thickness:
     ]);
 }
 
-fn circular_portrait(jpeg: &[u8]) -> Option<RawImage> {
-    let image = image::load_from_memory(jpeg).ok()?;
+fn circular_portrait(bytes: &[u8]) -> Option<RawImage> {
+    let image = image::load_from_memory(bytes).ok()?;
     let mut square = cover_square(image, PHOTO_PX);
+    composite_onto_text_color(&mut square);
     mask_circle(&mut square);
 
     let mut png = Cursor::new(Vec::new());
@@ -728,6 +729,17 @@ fn cover_square(image: DynamicImage, size: u32) -> RgbaImage {
         .crop_imm(x, y, side, side)
         .resize_exact(size, size, image::imageops::FilterType::Lanczos3)
         .to_rgba8()
+}
+
+fn composite_onto_text_color(image: &mut RgbaImage) {
+    for pixel in image.pixels_mut() {
+        let alpha = u32::from(pixel[3]);
+        let blend = |source: u8| -> u8 {
+            let blended = u32::from(source) * alpha + u32::from(TEXT) * (255 - alpha);
+            ((blended + 127) / 255) as u8
+        };
+        *pixel = Rgba([blend(pixel[0]), blend(pixel[1]), blend(pixel[2]), 255]);
+    }
 }
 
 fn mask_circle(image: &mut RgbaImage) {
@@ -966,7 +978,7 @@ mod tests {
             first_name: "Alex".to_string(),
             last_name: "Carter".to_string(),
             role: "Full Stack Developer".to_string(),
-            photo_jpeg: None,
+            photo: None,
             facts: vec![PdfFact { label: "City:".to_string(), value: "Austin".to_string() }],
             sections: vec![
                 PdfSection {
@@ -1021,7 +1033,7 @@ mod tests {
             first_name: "Alex".to_string(),
             last_name: "Carter".to_string(),
             role: "Developer".to_string(),
-            photo_jpeg: None,
+            photo: None,
             facts: Vec::new(),
             sections: vec![
                 PdfSection {
@@ -1067,6 +1079,19 @@ mod tests {
             })
             .count();
         assert_eq!(project_pages, 1, "a project was split across pages: {pages:?}");
+    }
+
+    #[test]
+    fn transparent_portrait_background_uses_the_text_color() {
+        let mut image = RgbaImage::from_pixel(4, 4, Rgba([0, 0, 0, 0]));
+        image.put_pixel(1, 1, Rgba([10, 20, 30, 255]));
+        image.put_pixel(1, 2, Rgba([255, 0, 0, 128]));
+
+        composite_onto_text_color(&mut image);
+
+        assert_eq!(image.get_pixel(0, 0).0, [TEXT, TEXT, TEXT, 255]);
+        assert_eq!(image.get_pixel(1, 1).0, [10, 20, 30, 255]);
+        assert_eq!(image.get_pixel(1, 2).0, [162, 34, 34, 255]);
     }
 
     #[test]
