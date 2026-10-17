@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.7] - 2026-10-17
+
+### Fixed
+- Transparent profile photos are kept as PNG (instead of JPEG) and PDF portraits blend onto the text-color background
+- CV PDF download filenames include the language (e.g. `Name - CV - en.pdf`)
+- Website and email values in the CV PDF are clickable links
+- Curriculum website falls back to the CV site domain when no main site is configured
+
 ## [0.1.6] - 2026-10-11
 
 ### Added

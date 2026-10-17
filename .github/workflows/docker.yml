@@ -28,7 +28,7 @@ on:
         type: boolean
         default: true
       update_version_tags:
-        description: Also tag with the Cargo.toml app version (e.g. 0.1.6 and 0.1)
+        description: Also tag with the Cargo.toml app version (e.g. 0.1.7 and 0.1)
         required: false
         type: boolean
         default: true
@@ -45,7 +45,7 @@ on:
         type: boolean
         default: true
       update_version_tags:
-        description: Also tag with the Cargo.toml app version (e.g. 0.1.6 and 0.1), without a new GitHub Release
+        description: Also tag with the Cargo.toml app version (e.g. 0.1.7 and 0.1), without a new GitHub Release
         required: false
         type: boolean
         default: true
