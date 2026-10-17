@@ -207,11 +207,7 @@ pub(crate) fn content_disposition(first_name: &str, last_name: &str, language: &
         format!("{first_name} {last_name}").split_whitespace().collect::<Vec<_>>().join(" ");
     let language = language.trim();
     let utf8_name = if person.is_empty() {
-        if language.is_empty() {
-            "CV.pdf".to_string()
-        } else {
-            format!("CV - {language}.pdf")
-        }
+        if language.is_empty() { "CV.pdf".to_string() } else { format!("CV - {language}.pdf") }
     } else if language.is_empty() {
         format!("{person} - CV.pdf")
     } else {
@@ -1150,10 +1146,7 @@ mod tests {
     #[test]
     fn content_disposition_keeps_unicode_out_of_the_ascii_filename() {
         let header = content_disposition("Giòrgio", "Reale", "it");
-        assert!(
-            header.contains("filename=\"Giorgio-Reale-CV-it.pdf\""),
-            "header was {header}"
-        );
+        assert!(header.contains("filename=\"Giorgio-Reale-CV-it.pdf\""), "header was {header}");
         assert!(header.contains("filename*=UTF-8''"));
         assert!(
             header.contains("Gi%C3%B2rgio%20Reale%20-%20CV%20-%20it.pdf"),
