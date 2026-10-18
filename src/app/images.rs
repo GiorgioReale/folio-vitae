@@ -309,9 +309,11 @@ fn resize_cover(image: &DynamicImage, width: u32, height: u32) -> DynamicImage {
     let left = (src_width - crop_width) / 2;
     let top = (src_height - crop_height) / 2;
 
-    image
-        .crop_imm(left, top, crop_width, crop_height)
-        .resize_exact(width, height, FilterType::Triangle)
+    image.crop_imm(left, top, crop_width, crop_height).resize_exact(
+        width,
+        height,
+        FilterType::Triangle,
+    )
 }
 
 fn generate_favicon_set(source: &Path, output_dir: &Path) -> AppResult<()> {
