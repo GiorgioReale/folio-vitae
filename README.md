@@ -151,14 +151,14 @@ Notes:
 
 - The image runs `folio-vitae prod --host 0.0.0.0` and reads content from `/app/data`.
 - Put source images under `data/images/` when your YAML references them.
-- Pin a version in Compose (`image: ...:0.1.7`) if you do not want `latest` to move.
+- Pin a version in Compose (`image: ...:0.1.8`) if you do not want `latest` to move.
 - For a public deploy, put a reverse proxy (Caddy, Traefik, nginx) in front and point your domains at the two ports.
 - SMTP variables in `.env` enable the CV contact form (built into the default binary).
 - Upgrading the crate fills in missing `assets/`, `templates/`, `static/`, and `i18n/` files but does not overwrite local edits.
 
 ### Image tags
 
-- version tags (`0.1.7`, `0.1`) and `latest` after a successful crates.io publish on each GitHub Release
+- version tags (`0.1.8`, `0.1`) and `latest` after a successful crates.io publish on each GitHub Release
 - manual rebuild via Actions → Docker → Run workflow (refresh `latest` / version tags without a new app release)
 
 ### Build locally
