@@ -76,24 +76,6 @@ pub(crate) fn generate_all_images() -> AppResult<()> {
     Ok(())
 }
 
-pub(crate) fn generated_outputs_missing() -> AppResult<bool> {
-    let root = project_root()?;
-
-    for path in expected_cv_outputs(&root)? {
-        if !path.exists() {
-            return Ok(true);
-        }
-    }
-
-    for path in expected_main_outputs(&root)? {
-        if !path.exists() {
-            return Ok(true);
-        }
-    }
-
-    Ok(false)
-}
-
 fn generate_cv_assets(root: &Path) -> AppResult<()> {
     let outputs = OutputPaths::new(root, "cv");
     let images_root = data_dir().join("images");
@@ -160,70 +142,6 @@ fn generate_main_assets(root: &Path) -> AppResult<()> {
     Ok(())
 }
 
-fn expected_cv_outputs(root: &Path) -> AppResult<Vec<PathBuf>> {
-    let outputs = OutputPaths::new(root, "cv");
-    let images_root = data_dir().join("images");
-
-    let favicon_path = find_supported_image(&images_root, &["cv"], "favicon")?;
-    let favicon_is_svg = favicon_path
-        .extension()
-        .and_then(|ext| ext.to_str())
-        .map(|ext| ext.eq_ignore_ascii_case("svg"))
-        .unwrap_or(false);
-
-    let mut paths = vec![
-        outputs.image(&["home-background"], "home-background.avif"),
-        outputs.image(&["home-background"], "home-background.jpg"),
-        outputs.image(&["home-background"], "home-background-mobile.avif"),
-        outputs.image(&["home-background"], "home-background-mobile.jpg"),
-        outputs.icon(&["logos"], "android-chrome-192x192.png"),
-        outputs.icon(&["logos"], "android-chrome-512x512.png"),
-        outputs.image(&["profile-pictures"], "profile-picture.avif"),
-        outputs.image(&["profile-pictures"], "profile-picture.png"),
-        outputs.image(&["social-card"], "social-card.png"),
-        outputs.logos_dir().join("apple-touch-icon.png"),
-        outputs.logos_dir().join("favicon-16x16.png"),
-        outputs.logos_dir().join("favicon-32x32.png"),
-        outputs.logos_dir().join("favicon.ico"),
-    ];
-
-    if favicon_is_svg {
-        paths.push(outputs.logos_dir().join("favicon.svg"));
-    }
-
-    Ok(paths)
-}
-
-fn expected_main_outputs(root: &Path) -> AppResult<Vec<PathBuf>> {
-    let outputs = OutputPaths::new(root, "main");
-    let images_root = data_dir().join("images");
-
-    let favicon_path = find_supported_image(&images_root, &["main"], "favicon")?;
-    let favicon_is_svg = favicon_path
-        .extension()
-        .and_then(|ext| ext.to_str())
-        .map(|ext| ext.eq_ignore_ascii_case("svg"))
-        .unwrap_or(false);
-
-    let mut paths = vec![
-        outputs.icon(&["logos"], "android-chrome-192x192.png"),
-        outputs.icon(&["logos"], "android-chrome-512x512.png"),
-        outputs.image(&["profile-pictures"], "profile-picture.avif"),
-        outputs.image(&["profile-pictures"], "profile-picture.png"),
-        outputs.image(&["social-card"], "social-card.png"),
-        outputs.logos_dir().join("apple-touch-icon.png"),
-        outputs.logos_dir().join("favicon-16x16.png"),
-        outputs.logos_dir().join("favicon-32x32.png"),
-        outputs.logos_dir().join("favicon.ico"),
-    ];
-
-    if favicon_is_svg {
-        paths.push(outputs.logos_dir().join("favicon.svg"));
-    }
-
-    Ok(paths)
-}
-
 fn path_with_filename(base: &Path, segments: &[&str], filename: &str) -> PathBuf {
     let mut path = path_with_segments(base, segments);
     path.push(filename);
@@ -238,10 +156,6 @@ fn path_with_segments(base: &Path, segments: &[&str]) -> PathBuf {
 }
 
 fn copy_image(input: &Path, output: &Path) -> AppResult<()> {
-    if is_up_to_date(input, output)? {
-        return Ok(());
-    }
-
     let image = load_dynamic_image(input)?;
     ensure_parent_directory(output)?;
     image.save(output).with_context(|| format!("writing {output:?}"))?;
@@ -249,21 +163,9 @@ fn copy_image(input: &Path, output: &Path) -> AppResult<()> {
 }
 
 fn export_resized(input: &Path, outputs: &[(&Path, u32, u32)]) -> AppResult<()> {
-    let mut pending = Vec::new();
-
-    for &(output, width, height) in outputs {
-        if !is_up_to_date(input, output)? {
-            pending.push((output, width, height));
-        }
-    }
-
-    if pending.is_empty() {
-        return Ok(());
-    }
-
     let image = load_rgba_image(input)?;
 
-    for (output, width, height) in pending {
+    for &(output, width, height) in outputs {
         let resized = resize_cover(&image, width, height);
         ensure_parent_directory(output)?;
         resized.save(output).with_context(|| format!("writing {output:?}"))?;
@@ -322,8 +224,6 @@ fn generate_favicon_set(source: &Path, output_dir: &Path) -> AppResult<()> {
     let favicon_32 = output_dir.join("favicon-32x32.png");
     let ico_output = output_dir.join("favicon.ico");
 
-    let mut source_image: Option<DynamicImage> = None;
-
     if source
         .extension()
         .and_then(|ext| ext.to_str())
@@ -333,28 +233,17 @@ fn generate_favicon_set(source: &Path, output_dir: &Path) -> AppResult<()> {
         copy_svg(source, &svg_output)?;
     }
 
+    let source_image = load_rgba_image(source)?;
+
     for (output, width, height) in
         [(&apple_touch, 180, 180), (&favicon_16, 16, 16), (&favicon_32, 32, 32)]
     {
-        if is_up_to_date(source, output)? {
-            continue;
-        }
-
-        if source_image.is_none() {
-            source_image = Some(load_rgba_image(source)?);
-        }
-
-        let Some(image) = source_image.as_ref() else {
-            continue;
-        };
-        let resized = resize_cover(image, width, height);
+        let resized = resize_cover(&source_image, width, height);
         ensure_parent_directory(output)?;
         resized.save(output).with_context(|| format!("writing {output:?}"))?;
     }
 
-    if !is_up_to_date(&favicon_16, &ico_output)? || !is_up_to_date(&favicon_32, &ico_output)? {
-        save_ico(&[(&favicon_16, 16, 16), (&favicon_32, 32, 32)], &ico_output)?;
-    }
+    save_ico(&[(&favicon_16, 16, 16), (&favicon_32, 32, 32)], &ico_output)?;
 
     Ok(())
 }
@@ -410,28 +299,12 @@ fn remove_stale_file(path: &Path) -> AppResult<()> {
 }
 
 fn copy_svg(input: &Path, output: &Path) -> AppResult<()> {
-    if is_up_to_date(input, output)? {
-        return Ok(());
-    }
-
     ensure_parent_directory(output)?;
     fs::copy(input, output).with_context(|| format!("copying {input:?} to {output:?}"))?;
     Ok(())
 }
 
 fn save_ico(images: &[(&Path, u32, u32)], output: &Path) -> AppResult<()> {
-    let mut should_write = false;
-    for (path, _, _) in images {
-        if !is_up_to_date(path, output)? {
-            should_write = true;
-            break;
-        }
-    }
-
-    if !should_write {
-        return Ok(());
-    }
-
     let mut icon_dir = IconDir::new(ResourceType::Icon);
 
     for (path, width, height) in images {
@@ -448,25 +321,6 @@ fn save_ico(images: &[(&Path, u32, u32)], output: &Path) -> AppResult<()> {
     icon_dir.write(&mut file).with_context(|| format!("writing {output:?}"))?;
 
     Ok(())
-}
-
-fn is_up_to_date(input: &Path, output: &Path) -> AppResult<bool> {
-    let output_metadata = match fs::metadata(output) {
-        Ok(metadata) => metadata,
-        Err(_) => return Ok(false),
-    };
-
-    let input_metadata =
-        fs::metadata(input).with_context(|| format!("reading metadata for {input:?}"))?;
-
-    let input_modified = input_metadata
-        .modified()
-        .with_context(|| format!("getting modification time for {input:?}"))?;
-    let output_modified = output_metadata
-        .modified()
-        .with_context(|| format!("getting modification time for {output:?}"))?;
-
-    Ok(output_modified >= input_modified)
 }
 
 fn ensure_parent_directory(path: &Path) -> AppResult<()> {
