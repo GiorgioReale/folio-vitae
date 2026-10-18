@@ -3,10 +3,8 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use fast_image_resize as fir;
-use fir::{FilterType, PixelType, ResizeAlg, ResizeOptions, Resizer, images::Image};
 use ico::{IconDir, IconDirEntry, IconImage, ResourceType};
-use image::{DynamicImage, RgbaImage};
+use image::{DynamicImage, GenericImageView, RgbaImage, imageops::FilterType};
 use resvg::{
     tiny_skia::{Pixmap, Transform},
     usvg,
@@ -250,12 +248,6 @@ fn copy_image(input: &Path, output: &Path) -> AppResult<()> {
     Ok(())
 }
 
-struct DecodedImage {
-    pixels: Vec<u8>,
-    width: u32,
-    height: u32,
-}
-
 fn export_resized(input: &Path, outputs: &[(&Path, u32, u32)]) -> AppResult<()> {
     let mut pending = Vec::new();
 
@@ -269,11 +261,10 @@ fn export_resized(input: &Path, outputs: &[(&Path, u32, u32)]) -> AppResult<()> 
         return Ok(());
     }
 
-    let mut decoded = decode_image(input)?;
+    let image = load_rgba_image(input)?;
 
     for (output, width, height) in pending {
-        let resized =
-            resize_pixels(&mut decoded.pixels, decoded.width, decoded.height, width, height)?;
+        let resized = resize_cover(&image, width, height);
         ensure_parent_directory(output)?;
         resized.save(output).with_context(|| format!("writing {output:?}"))?;
     }
@@ -293,35 +284,34 @@ fn load_dynamic_image(input: &Path) -> AppResult<DynamicImage> {
     }
 }
 
-fn decode_image(input: &Path) -> AppResult<DecodedImage> {
-    let rgba = load_dynamic_image(input)?.into_rgba8();
-    let (width, height) = rgba.dimensions();
-
-    Ok(DecodedImage { pixels: rgba.into_raw(), width, height })
+fn load_rgba_image(input: &Path) -> AppResult<DynamicImage> {
+    Ok(DynamicImage::ImageRgba8(load_dynamic_image(input)?.into_rgba8()))
 }
 
-fn resize_pixels(
-    pixels: &mut [u8],
-    src_width: u32,
-    src_height: u32,
-    width: u32,
-    height: u32,
-) -> AppResult<DynamicImage> {
-    let src_image = Image::from_slice_u8(src_width, src_height, pixels, PixelType::U8x4)
-        .map_err(|err| AppError::msg(format!("creating source image for resize: {err}")))?;
+/// Center-crop the source to the destination aspect ratio, then scale uniformly.
+fn resize_cover(image: &DynamicImage, width: u32, height: u32) -> DynamicImage {
+    let (src_width, src_height) = image.dimensions();
+    if src_width == 0 || src_height == 0 || width == 0 || height == 0 {
+        return image.resize_exact(width.max(1), height.max(1), FilterType::Triangle);
+    }
 
-    let mut dst_image = Image::new(width, height, PixelType::U8x4);
-    let mut resizer = Resizer::new();
-    let options = ResizeOptions::new().resize_alg(ResizeAlg::Convolution(FilterType::Bilinear));
+    let src_ratio = f64::from(src_width) / f64::from(src_height);
+    let dst_ratio = f64::from(width) / f64::from(height);
 
-    resizer
-        .resize(&src_image, &mut dst_image, &options)
-        .map_err(|err| AppError::msg(format!("resizing image to {width}x{height}: {err}")))?;
+    let (crop_width, crop_height) = if src_ratio > dst_ratio {
+        let crop_width = ((f64::from(src_height) * dst_ratio).round() as u32).clamp(1, src_width);
+        (crop_width, src_height)
+    } else {
+        let crop_height = ((f64::from(src_width) / dst_ratio).round() as u32).clamp(1, src_height);
+        (src_width, crop_height)
+    };
 
-    let resized_image = RgbaImage::from_raw(width, height, dst_image.into_vec())
-        .ok_or_else(|| AppError::msg("creating resized RGBA image"))?;
+    let left = (src_width - crop_width) / 2;
+    let top = (src_height - crop_height) / 2;
 
-    Ok(DynamicImage::ImageRgba8(resized_image))
+    image
+        .crop_imm(left, top, crop_width, crop_height)
+        .resize_exact(width, height, FilterType::Triangle)
 }
 
 fn generate_favicon_set(source: &Path, output_dir: &Path) -> AppResult<()> {
@@ -330,7 +320,7 @@ fn generate_favicon_set(source: &Path, output_dir: &Path) -> AppResult<()> {
     let favicon_32 = output_dir.join("favicon-32x32.png");
     let ico_output = output_dir.join("favicon.ico");
 
-    let mut decoded: Option<DecodedImage> = None;
+    let mut source_image: Option<DynamicImage> = None;
 
     if source
         .extension()
@@ -348,14 +338,14 @@ fn generate_favicon_set(source: &Path, output_dir: &Path) -> AppResult<()> {
             continue;
         }
 
-        if decoded.is_none() {
-            decoded = Some(decode_image(source)?);
+        if source_image.is_none() {
+            source_image = Some(load_rgba_image(source)?);
         }
 
-        let Some(image) = decoded.as_mut() else {
+        let Some(image) = source_image.as_ref() else {
             continue;
         };
-        let resized = resize_pixels(&mut image.pixels, image.width, image.height, width, height)?;
+        let resized = resize_cover(image, width, height);
         ensure_parent_directory(output)?;
         resized.save(output).with_context(|| format!("writing {output:?}"))?;
     }
