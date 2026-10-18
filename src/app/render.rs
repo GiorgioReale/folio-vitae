@@ -72,8 +72,6 @@ pub(crate) fn render_cv_curriculum(
     context.insert("contact_form", &contact_form_context);
     context.insert("contact_form_enabled", &state.mailer.is_some());
 
-    context.insert("age", &calculate_age(&resources.data.person.date_of_birth));
-
     let cache = if has_contact_feedback {
         None
     } else {
@@ -356,19 +354,6 @@ fn error_details(status: StatusCode, translations: &Translations) -> ErrorDetail
         });
 
     ErrorDetails { code: status.as_u16(), message }
-}
-
-fn calculate_age(date_of_birth: &NaiveDate) -> Option<i32> {
-    let today = Utc::now().date_naive();
-    let mut age = today.year() - date_of_birth.year();
-
-    let birthday_passed =
-        (today.month(), today.day()) >= (date_of_birth.month(), date_of_birth.day());
-    if !birthday_passed {
-        age -= 1;
-    }
-
-    Some(age)
 }
 
 #[derive(Serialize)]
