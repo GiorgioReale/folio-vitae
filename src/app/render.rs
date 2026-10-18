@@ -398,6 +398,7 @@ struct FormattedProject {
     duration: String,
     description: String,
     link: String,
+    link_title: String,
 }
 
 #[derive(Serialize)]
@@ -639,6 +640,7 @@ fn format_projects(
                 .unwrap_or_default(),
             description: project.description.clone(),
             link: project.link.clone(),
+            link_title: project.link_title.clone(),
         })
         .collect()
 }
@@ -925,7 +927,12 @@ fn cv_pdf_content(
                 .map(|project| {
                     let mut notes = Vec::new();
                     if !project.link.trim().is_empty() {
-                        notes.push(format!("{project_link}: {}", project.link));
+                        let link_label = if project.link_title.trim().is_empty() {
+                            project_link.as_str()
+                        } else {
+                            project.link_title.as_str()
+                        };
+                        notes.push(format!("{link_label}: {}", project.link));
                     }
                     crate::app::pdf::PdfBlock::Entry(crate::app::pdf::PdfEntry {
                         title: project.title,
