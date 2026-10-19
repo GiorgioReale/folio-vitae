@@ -15,7 +15,7 @@
 # - At least one of sites.main.domain and sites.cv.domain is required.
 #   contact.emails.main is required too.
 
-# Identity shared by every page: name, role, age, and place.
+# Identity shared by every page: name, role, and place.
 person:
   first_name: Alex
   last_name: Carter
