@@ -360,7 +360,7 @@ pub(crate) fn expected_fields_for_container(
         Some("roles") => Some(&["title", "start_date", "end_date", "description"]),
         Some("other_projects") => {
             Some(&["title", "start_date", "end_date", "description", "link", "link_title"])
-        }
+        },
         Some("educations") => Some(&[
             "institute",
             "educational_qualification",
