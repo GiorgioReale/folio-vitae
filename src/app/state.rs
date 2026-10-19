@@ -531,8 +531,9 @@ pub(crate) fn compile_static_assets(
     site: SiteKind,
     data: &SiteData,
     localization: &LocalizationState,
+    asset_version: &str,
 ) -> AppResult<StaticAssets> {
-    let context = build_static_context(site, data, localization)?;
+    let context = build_static_context(site, data, localization, asset_version)?;
     let mut tera = Tera::default();
     tera.autoescape_on(Vec::<&str>::new());
 
@@ -553,6 +554,7 @@ fn build_static_context(
     site: SiteKind,
     data: &SiteData,
     localization: &LocalizationState,
+    asset_version: &str,
 ) -> AppResult<Context> {
     let main_site = data.sites.resolved_main();
     let cv_site = data.sites.resolved_cv();
@@ -567,6 +569,7 @@ fn build_static_context(
     context.insert("description", site_data.2);
     context.insert("lang", localization.default_language.as_code());
     context.insert("base_url", &format!("https://{}", site_data.0));
+    context.insert("asset_version", asset_version);
     let security_txt_expires = Utc
         .with_ymd_and_hms(Utc::now().year().saturating_add(2), 1, 1, 0, 0, 0)
         .single()

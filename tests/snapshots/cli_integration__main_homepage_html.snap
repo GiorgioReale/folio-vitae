@@ -54,9 +54,9 @@ expression: main_homepage
   <meta property="og:type" content="website" />
   
   <meta property="og:url" content="https://alexcarter.dev&#x2F;en&#x2F;" />
-  <meta property="og:image" content="https://alexcarter.dev/assets/images/main/social-card/social-card.png" />
-  <meta property="og:image:url" content="https://alexcarter.dev/assets/images/main/social-card/social-card.png" />
-  <meta property="og:image:secure_url" content="https://alexcarter.dev/assets/images/main/social-card/social-card.png" />
+  <meta property="og:image" content="https://alexcarter.dev/assets/images/main/social-card/social-card.png?v=ASSET_VERSION" />
+  <meta property="og:image:url" content="https://alexcarter.dev/assets/images/main/social-card/social-card.png?v=ASSET_VERSION" />
+  <meta property="og:image:secure_url" content="https://alexcarter.dev/assets/images/main/social-card/social-card.png?v=ASSET_VERSION" />
   <meta property="og:image:type" content="image/png" />
   <meta property="og:image:width" content="1920" />
   <meta property="og:image:height" content="1080" />
@@ -91,7 +91,7 @@ expression: main_homepage
   <meta name="twitter:card" content="summary" />
   
   <meta name="twitter:url" content="https://alexcarter.dev&#x2F;en&#x2F;" />
-  <meta name="twitter:image" content="https://alexcarter.dev/assets/images/main/social-card/social-card.png" />
+  <meta name="twitter:image" content="https://alexcarter.dev/assets/images/main/social-card/social-card.png?v=ASSET_VERSION" />
   <meta name="twitter:image:alt" content="Social card del sito di Alex Carter" />
   
   
@@ -115,10 +115,10 @@ expression: main_homepage
   
   <link rel="canonical" href="https://alexcarter.dev&#x2F;en&#x2F;" />
   
-  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/main/logos/apple-touch-icon.png" />
-  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/main/logos/favicon-32x32.png" />
-  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/main/logos/favicon-16x16.png" />
-  <link rel="icon" type="image/svg+xml" href="/assets/icons/main/logos/favicon.svg" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/main/logos/apple-touch-icon.png?v=ASSET_VERSION" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/main/logos/favicon-32x32.png?v=ASSET_VERSION" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/main/logos/favicon-16x16.png?v=ASSET_VERSION" />
+  <link rel="icon" type="image/svg+xml" href="/assets/icons/main/logos/favicon.svg?v=ASSET_VERSION" />
   <link rel="manifest" href="/site.webmanifest" />
   
   <meta name="apple-mobile-web-app-title" content="Alex Carter | Full Stack Developer" />
@@ -129,7 +129,7 @@ expression: main_homepage
   <link rel="preload" href="/assets/styles/main.css?v=ASSET_VERSION" as="style" />
   <link rel="stylesheet" href="/assets/styles/main.css?v=ASSET_VERSION" type="text/css" fetchpriority="high" />
   
-  <script src="/assets/scripts/light-dark-mode.js?v=ASSET_VERSION" charset="utf-8" defer data-sprite-prefix="/assets/icons/main/website/sprites.svg#"></script>
+  <script src="/assets/scripts/light-dark-mode.js?v=ASSET_VERSION" charset="utf-8" defer data-sprite-prefix="/assets/icons/main/website/sprites.svg?v=ASSET_VERSION#" data-theme-audio="/assets/audios/light-switch.mp3?v=ASSET_VERSION"></script>
   
 </head>
 
@@ -138,8 +138,8 @@ expression: main_homepage
   
 <aside>
   <picture>
-    <source srcset="/assets/images/main/profile-pictures/profile-picture.avif" type="image/avif"/>
-    <img src="/assets/images/main/profile-pictures/profile-picture.png" alt="Alex Carter" width="512" height="512" fetchpriority="high" decoding="async" importance="high"/>
+    <source srcset="/assets/images/main/profile-pictures/profile-picture.avif?v=ASSET_VERSION" type="image/avif"/>
+    <img src="/assets/images/main/profile-pictures/profile-picture.png?v=ASSET_VERSION" alt="Alex Carter" width="512" height="512" fetchpriority="high" decoding="async" importance="high"/>
   </picture>
   <h1>Alex Carter</h1>
 </aside>
@@ -171,7 +171,7 @@ expression: main_homepage
         <button type="button" id="theme-switch" aria-label="Light&#x2F;Dark Mode"
           title="Light&#x2F;Dark Mode">
           <svg aria-hidden="true" focusable="false">
-            <use xlink:href="/assets/icons/main/website/sprites.svg#moon-auto" />
+            <use xlink:href="/assets/icons/main/website/sprites.svg?v=ASSET_VERSION#moon-auto" />
           </svg>
         </button>
       </nav>
@@ -206,7 +206,7 @@ expression: main_homepage
     <a href="https:&#x2F;&#x2F;www.linkedin.com&#x2F;in&#x2F;alexcarter" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" title="LinkedIn" class="linkedin">
       
       <svg aria-hidden="true" focusable="false">
-        <use href="/assets/icons/main/website/sprites.svg#linkedin"></use>
+        <use href="/assets/icons/main/website/sprites.svg?v=ASSET_VERSION#linkedin"></use>
       </svg>
       
       alexcarter
@@ -218,7 +218,7 @@ expression: main_homepage
     <footer>
       <p>
         <svg aria-hidden="true" focusable="false">
-          <use xlink:href="/assets/icons/cv/website/sprites.svg#copyright" />
+          <use xlink:href="/assets/icons/main/website/sprites.svg?v=ASSET_VERSION#copyright" />
         </svg>
         
         CURRENT_YEAR - <a href="https://alexcarter.dev" target="_blank" rel="noopener noreferrer">Alex Carter</a>
@@ -228,7 +228,7 @@ expression: main_homepage
       <p>
         &#60;&#47;&#62; with
         <svg aria-hidden="true" focusable="false">
-          <use xlink:href="/assets/icons/cv/website/sprites.svg#love" />
+          <use xlink:href="/assets/icons/main/website/sprites.svg?v=ASSET_VERSION#love" />
         </svg>
         by <a href="https://github.com/GiorgioReale/folio-vitae" target="_blank" rel="noopener noreferrer">folio-vitae</a>
       </p>

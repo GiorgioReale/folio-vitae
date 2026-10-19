@@ -6,14 +6,14 @@
 {% set website = website_main %}
 {% set base_domain = website_main.domain %}
 {% set stylesheet = "/assets/styles/main.css?v=" ~ asset_version %}
-{% set sprite_prefix = "/assets/icons/main/website/sprites.svg#" %}
-{% set social_card_path = "/assets/images/main/social-card/social-card.png" %}
+{% set sprite_prefix = "/assets/icons/main/website/sprites.svg?v=" ~ asset_version ~ "#" %}
+{% set social_card_path = "/assets/images/main/social-card/social-card.png?v=" ~ asset_version %}
 {% if site == "cv" %}
 {% set website = website_cv %}
 {% set base_domain = website_cv.domain %}
 {% set stylesheet = "/assets/styles/cv.css?v=" ~ asset_version %}
-{% set sprite_prefix = "/assets/icons/cv/website/sprites.svg#" %}
-{% set social_card_path = "/assets/images/cv/social-card/social-card.png" %}
+{% set sprite_prefix = "/assets/icons/cv/website/sprites.svg?v=" ~ asset_version ~ "#" %}
+{% set social_card_path = "/assets/images/cv/social-card/social-card.png?v=" ~ asset_version %}
 {% endif %}
 {% set twitter_handle = "" %}
 {% for social in socials %}
@@ -59,19 +59,19 @@
   {% endif %}
   <title>{{ resolved_page_title }} · {{ website.title }}</title>
   <link rel="canonical" href="https://{{ base_domain }}{{ resolved_page_url }}" />
-  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/{{ site }}/logos/apple-touch-icon.png" />
-  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/{{ site }}/logos/favicon-32x32.png" />
-  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/{{ site }}/logos/favicon-16x16.png" />
-  <link rel="icon" type="image/svg+xml" href="/assets/icons/{{ site }}/logos/favicon.svg" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/assets/icons/{{ site }}/logos/apple-touch-icon.png?v={{ asset_version }}" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/{{ site }}/logos/favicon-32x32.png?v={{ asset_version }}" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/{{ site }}/logos/favicon-16x16.png?v={{ asset_version }}" />
+  <link rel="icon" type="image/svg+xml" href="/assets/icons/{{ site }}/logos/favicon.svg?v={{ asset_version }}" />
   <link rel="manifest" href="/site.webmanifest" />
   <meta name="apple-mobile-web-app-title" content="{{ website.title }}" />
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="#000000" />
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000" />
   <meta name="view-transition" content="same-origin" />
   {% if minify_assets %}
-  <script src="/assets/scripts/light-dark-mode.min.js?v={{ asset_version }}" charset="utf-8" data-sprite-prefix="{{ sprite_prefix }}"></script>
+  <script src="/assets/scripts/light-dark-mode.min.js?v={{ asset_version }}" charset="utf-8" data-sprite-prefix="{{ sprite_prefix }}" data-theme-audio="/assets/audios/light-switch.mp3?v={{ asset_version }}"></script>
   {% else %}
-  <script src="/assets/scripts/light-dark-mode.js?v={{ asset_version }}" charset="utf-8" data-sprite-prefix="{{ sprite_prefix }}"></script>
+  <script src="/assets/scripts/light-dark-mode.js?v={{ asset_version }}" charset="utf-8" data-sprite-prefix="{{ sprite_prefix }}" data-theme-audio="/assets/audios/light-switch.mp3?v={{ asset_version }}"></script>
   {% endif %}
   <link rel="preload" href="{{ stylesheet }}" as="style" />
   <link rel="stylesheet" href="{{ stylesheet }}" type="text/css" fetchpriority="high" />

@@ -2,11 +2,11 @@
 <a class="skip-link" href="#main-content">{{ translations.accessibility.skip_to_content }}</a>
 {% endcomponent chrome.skip_link %}
 
-{% component chrome.site_header(site: string, @translations, @page_url, @language_prefix, @languages) %}
+{% component chrome.site_header(site: string, @translations, @page_url, @language_prefix, @languages, @asset_version) %}
 {% if site == "cv" %}
-{% set sprite = "/assets/icons/cv/website/sprites.svg#" %}
+{% set sprite = "/assets/icons/cv/website/sprites.svg?v=" ~ asset_version ~ "#" %}
 {% else %}
-{% set sprite = "/assets/icons/main/website/sprites.svg#" %}
+{% set sprite = "/assets/icons/main/website/sprites.svg?v=" ~ asset_version ~ "#" %}
 {% endif %}
 {% set normalized_path = page_url | trim_end(pat="/") %}
 {% set on_menu = normalized_path is ending_with(pat="/menu") %}
@@ -69,11 +69,11 @@
 </header>
 {% endcomponent chrome.site_header %}
 
-{% component chrome.site_footer(site: string, @translations, @has_website_main, @website_main, @current_year, @first_name, @last_name, @show_credits) %}
+{% component chrome.site_footer(site: string, @translations, @has_website_main, @website_main, @current_year, @first_name, @last_name, @show_credits, @asset_version) %}
 {% if site == "cv" %}
-{% set sprite = "/assets/icons/cv/website/sprites.svg#" %}
+{% set sprite = "/assets/icons/cv/website/sprites.svg?v=" ~ asset_version ~ "#" %}
 {% else %}
-{% set sprite = "/assets/icons/main/website/sprites.svg#" %}
+{% set sprite = "/assets/icons/main/website/sprites.svg?v=" ~ asset_version ~ "#" %}
 {% endif %}
 <footer>
   <p>

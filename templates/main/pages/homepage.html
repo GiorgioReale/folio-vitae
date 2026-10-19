@@ -3,8 +3,8 @@
 {% block aside %}
 <aside class="profile" aria-label="{{ translations.accessibility.profile }}">
   <picture>
-    <source srcset="/assets/images/main/profile-pictures/profile-picture.avif" type="image/avif"/>
-    <img src="/assets/images/main/profile-pictures/profile-picture.png" alt="{{ translations.accessibility.portrait | replace(from='{name}', to=first_name ~ ' ' ~ last_name) }}" width="512" height="512" fetchpriority="high" decoding="async"/>
+    <source srcset="/assets/images/main/profile-pictures/profile-picture.avif?v={{ asset_version }}" type="image/avif"/>
+    <img src="/assets/images/main/profile-pictures/profile-picture.png?v={{ asset_version }}" alt="{{ translations.accessibility.portrait | replace(from='{name}', to=first_name ~ ' ' ~ last_name) }}" width="512" height="512" fetchpriority="high" decoding="async"/>
   </picture>
   <h1>{{ first_name }} {{ last_name }}</h1>
 </aside>
@@ -44,7 +44,7 @@
         <a href="{{ social.link }}" target="_blank" rel="noopener noreferrer" class="{{ social.social_name }}">
           {% if social.social_name == 'linkedin' %}
           <svg aria-hidden="true" focusable="false">
-            <use href="/assets/icons/main/website/sprites.svg#linkedin"></use>
+            <use href="/assets/icons/main/website/sprites.svg?v={{ asset_version }}#linkedin"></use>
           </svg>
           {% else %}
           <span aria-hidden="true">{{ social.icon_svg | default(value="") | safe }}</span>
