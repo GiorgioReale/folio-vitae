@@ -48,6 +48,21 @@
     "email_label": "ఇమెయిల్:",
     "about_heading": "నా గురించి",
     "experience_heading": "అనుభవం",
+    "employment_types": {
+      "full_time": "పూర్తికాలం",
+      "part_time": "పార్ట్ టైమ్",
+      "self_employed": "స్వయం ఉపాధి",
+      "freelance": "ఫ్రీలాన్స్",
+      "contract": "కాంట్రాక్ట్",
+      "internship": "ఇంటర్న్‌షిప్",
+      "apprenticeship": "అప్రెంటిస్‌షిప్",
+      "seasonal": "కాలానుగుణ"
+    },
+    "location_types": {
+      "on_site": "ఆఫీసులో",
+      "hybrid": "హైబ్రిడ్",
+      "remote": "రిమోట్"
+    },
     "more_experiences": "పూర్తి పని అనుభవాల జాబితా {domain} లో అందుబాటులో ఉంది.",
     "other_projects_heading": "ఇతర ప్రాజెక్టులు",
     "education_heading": "విద్య",

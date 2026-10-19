@@ -48,6 +48,21 @@
     "email_label": "E-mail:",
     "about_heading": "Giới thiệu",
     "experience_heading": "Kinh nghiệm",
+    "employment_types": {
+      "full_time": "Toàn thời gian",
+      "part_time": "Bán thời gian",
+      "self_employed": "Tự kinh doanh",
+      "freelance": "Freelance",
+      "contract": "Hợp đồng",
+      "internship": "Thực tập",
+      "apprenticeship": "Học việc",
+      "seasonal": "Thời vụ"
+    },
+    "location_types": {
+      "on_site": "Tại văn phòng",
+      "hybrid": "Lai",
+      "remote": "Từ xa"
+    },
     "more_experiences": "Danh sách đầy đủ kinh nghiệm làm việc có tại {domain}.",
     "other_projects_heading": "Dự án khác",
     "education_heading": "Học vấn",

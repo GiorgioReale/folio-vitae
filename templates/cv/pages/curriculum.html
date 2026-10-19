@@ -78,6 +78,9 @@
       {% for role in work_experience.roles %}
       <div>
         <h5>{{ role.title }}</h5>
+        {% if role.meta %}
+        <p class="meta">{{ role.meta }}</p>
+        {% endif %}
         <p class="dates">{{ role.start_date }} - {{ role.end_date }}{% if role.duration %} ({{ role.duration }}){% endif %}</p>
         <p>{{ role.description }}</p>
       </div>

@@ -87,9 +87,14 @@ sites:
       work_experiences:
         - company:
             name: BrightForge
-            location: Remote
+            location: Austin, Texas
           roles:
             - title: Senior Full Stack Developer
+              # Optional. One of: full_time, part_time, self_employed,
+              # freelance, contract, internship, apprenticeship, seasonal.
+              employment_type: full_time
+              # Optional. One of: on_site, hybrid, remote.
+              location_type: remote
               start_date: '2023-03-01'
               # null: this role is current.
               end_date: null

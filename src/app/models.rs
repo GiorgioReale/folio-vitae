@@ -122,9 +122,80 @@ pub(crate) struct WorkCompany {
     pub location: String,
 }
 
+#[derive(Debug, Deserialize, Serialize, Clone, Copy, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub(crate) enum EmploymentType {
+    FullTime,
+    PartTime,
+    SelfEmployed,
+    Freelance,
+    Contract,
+    Internship,
+    Apprenticeship,
+    Seasonal,
+}
+
+impl EmploymentType {
+    pub(crate) const fn as_str(self) -> &'static str {
+        match self {
+            Self::FullTime => "full_time",
+            Self::PartTime => "part_time",
+            Self::SelfEmployed => "self_employed",
+            Self::Freelance => "freelance",
+            Self::Contract => "contract",
+            Self::Internship => "internship",
+            Self::Apprenticeship => "apprenticeship",
+            Self::Seasonal => "seasonal",
+        }
+    }
+
+    pub(crate) const fn fallback_label(self) -> &'static str {
+        match self {
+            Self::FullTime => "Full-time",
+            Self::PartTime => "Part-time",
+            Self::SelfEmployed => "Self-employed",
+            Self::Freelance => "Freelance",
+            Self::Contract => "Contract",
+            Self::Internship => "Internship",
+            Self::Apprenticeship => "Apprenticeship",
+            Self::Seasonal => "Seasonal",
+        }
+    }
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone, Copy, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
+pub(crate) enum LocationType {
+    OnSite,
+    Hybrid,
+    Remote,
+}
+
+impl LocationType {
+    pub(crate) const fn as_str(self) -> &'static str {
+        match self {
+            Self::OnSite => "on_site",
+            Self::Hybrid => "hybrid",
+            Self::Remote => "remote",
+        }
+    }
+
+    pub(crate) const fn fallback_label(self) -> &'static str {
+        match self {
+            Self::OnSite => "On-site",
+            Self::Hybrid => "Hybrid",
+            Self::Remote => "Remote",
+        }
+    }
+}
+
 #[derive(Deserialize, Serialize, Clone)]
 pub(crate) struct WorkRole {
     pub title: String,
+    #[serde(default)]
+    pub employment_type: Option<EmploymentType>,
+    #[serde(default)]
+    pub location_type: Option<LocationType>,
     #[serde(with = "date_format")]
     pub start_date: NaiveDate,
     #[serde(default, with = "optional_date_format")]
@@ -388,7 +459,14 @@ pub(crate) fn expected_fields_for_container(
         ]),
         Some("work_experiences") => Some(&["company", "roles"]),
         Some("company") => Some(&["name", "location"]),
-        Some("roles") => Some(&["title", "start_date", "end_date", "description"]),
+        Some("roles") => Some(&[
+            "title",
+            "employment_type",
+            "location_type",
+            "start_date",
+            "end_date",
+            "description",
+        ]),
         Some("other_projects") => Some(&["title", "start_date", "end_date", "description", "link"]),
         Some("educations") => Some(&[
             "institute",
@@ -458,5 +536,31 @@ mod tests {
         let errors = data.validate();
 
         assert!(errors.iter().any(|error| error.contains("at least one site must be configured")));
+    }
+
+    #[test]
+    fn work_role_parses_optional_employment_and_location_types() {
+        let yaml = r#"
+title: Developer
+employment_type: full_time
+location_type: remote
+start_date: "2023-03-01"
+end_date: null
+description: Building things.
+"#;
+        let role: WorkRole = serde_norway::from_str(yaml).expect("role should parse");
+        assert_eq!(role.employment_type, Some(EmploymentType::FullTime));
+        assert_eq!(role.location_type, Some(LocationType::Remote));
+    }
+
+    #[test]
+    fn work_role_allows_missing_employment_and_location_types() {
+        let yaml = r#"
+title: Developer
+start_date: "2023-03-01"
+"#;
+        let role: WorkRole = serde_norway::from_str(yaml).expect("role should parse");
+        assert_eq!(role.employment_type, None);
+        assert_eq!(role.location_type, None);
     }
 }
