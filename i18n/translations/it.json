@@ -48,6 +48,21 @@
     "email_label": "E-Mail:",
     "about_heading": "Informazioni su di me",
     "experience_heading": "Esperienze",
+    "employment_types": {
+      "full_time": "A tempo pieno",
+      "part_time": "Part-time",
+      "self_employed": "Lavoratore autonomo",
+      "freelance": "Freelance",
+      "contract": "Contratto",
+      "internship": "Tirocinio",
+      "apprenticeship": "Apprendistato",
+      "seasonal": "Stagionale"
+    },
+    "location_types": {
+      "on_site": "In sede",
+      "hybrid": "Ibrida",
+      "remote": "Da remoto"
+    },
     "more_experiences": "L'elenco completo delle esperienze lavorative è disponibile su {domain}.",
     "other_projects_heading": "Altri Progetti",
     "education_heading": "Formazione",

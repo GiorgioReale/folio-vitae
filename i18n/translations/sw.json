@@ -48,6 +48,21 @@
     "email_label": "Barua pepe:",
     "about_heading": "Kuhusu Mimi",
     "experience_heading": "Uzoefu",
+    "employment_types": {
+      "full_time": "Muda wote",
+      "part_time": "Muda wa sehemu",
+      "self_employed": "Kujiajiri",
+      "freelance": "Freelance",
+      "contract": "Mkataba",
+      "internship": "Mafunzo",
+      "apprenticeship": "Uanafunzi",
+      "seasonal": "Kulingana na msimu"
+    },
+    "location_types": {
+      "on_site": "Ofisini",
+      "hybrid": "Mchanganyiko",
+      "remote": "Kwa mbali"
+    },
     "more_experiences": "Orodha kamili ya uzoefu wa kazi inapatikana kwenye {domain}.",
     "other_projects_heading": "Miradi Mengine",
     "education_heading": "Elimu",

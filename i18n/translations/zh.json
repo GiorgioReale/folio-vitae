@@ -48,6 +48,21 @@
     "email_label": "电子邮件：",
     "about_heading": "关于我",
     "experience_heading": "工作经验",
+    "employment_types": {
+      "full_time": "全职",
+      "part_time": "兼职",
+      "self_employed": "自雇",
+      "freelance": "自由职业",
+      "contract": "合同工",
+      "internship": "实习",
+      "apprenticeship": "学徒",
+      "seasonal": "季节性"
+    },
+    "location_types": {
+      "on_site": "现场",
+      "hybrid": "混合",
+      "remote": "远程"
+    },
     "more_experiences": "完整的工作经验列表可在 {domain} 查看。",
     "other_projects_heading": "其他项目",
     "education_heading": "教育背景",

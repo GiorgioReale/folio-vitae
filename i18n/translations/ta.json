@@ -48,6 +48,21 @@
     "email_label": "மின்னஞ்சல்:",
     "about_heading": "என்னைப் பற்றி",
     "experience_heading": "அனுபவம்",
+    "employment_types": {
+      "full_time": "முழுநேரம்",
+      "part_time": "பகுதி நேரம்",
+      "self_employed": "சுயதொழில்",
+      "freelance": "ஃப்ரீலான்ஸ்",
+      "contract": "ஒப்பந்தம்",
+      "internship": "இன்டர்ன்ஷிப்",
+      "apprenticeship": "பயிற்சி",
+      "seasonal": "பருவகால"
+    },
+    "location_types": {
+      "on_site": "அலுவலகத்தில்",
+      "hybrid": "கலப்பு",
+      "remote": "தொலைநிலை"
+    },
     "more_experiences": "{domain} இல் முழு பணிச்சரிதை பட்டியல் கிடைக்கிறது.",
     "other_projects_heading": "மற்ற திட்டங்கள்",
     "education_heading": "கல்வி",

@@ -48,6 +48,21 @@
     "email_label": "E-mail:",
     "about_heading": "Tentang Saya",
     "experience_heading": "Pengalaman",
+    "employment_types": {
+      "full_time": "Penuh waktu",
+      "part_time": "Paruh waktu",
+      "self_employed": "Wiraswasta",
+      "freelance": "Freelance",
+      "contract": "Kontrak",
+      "internship": "Magang",
+      "apprenticeship": "Pemagangan",
+      "seasonal": "Musiman"
+    },
+    "location_types": {
+      "on_site": "Di kantor",
+      "hybrid": "Hibrida",
+      "remote": "Jarak jauh"
+    },
     "more_experiences": "Daftar lengkap pengalaman kerja tersedia di {domain}.",
     "other_projects_heading": "Proyek Lain",
     "education_heading": "Pendidikan",

@@ -48,6 +48,21 @@
     "email_label": "E-mail:",
     "about_heading": "Обо мне",
     "experience_heading": "Опыт работы",
+    "employment_types": {
+      "full_time": "Полная занятость",
+      "part_time": "Частичная занятость",
+      "self_employed": "Самозанятость",
+      "freelance": "Фриланс",
+      "contract": "Контракт",
+      "internship": "Стажировка",
+      "apprenticeship": "Ученичество",
+      "seasonal": "Сезонная работа"
+    },
+    "location_types": {
+      "on_site": "В офисе",
+      "hybrid": "Гибридный",
+      "remote": "Удалённо"
+    },
     "more_experiences": "Полный список опыта работы доступен на {domain}.",
     "other_projects_heading": "Другие проекты",
     "education_heading": "Образование",
