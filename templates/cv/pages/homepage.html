@@ -3,10 +3,10 @@
 {% block aside %}
 <div class="hero-media" aria-hidden="true">
   <picture>
-    <source media="(max-width: 992px)" type="image/avif" srcset="/assets/images/cv/home-background/home-background-mobile.avif" />
-    <source media="(max-width: 992px)" type="image/jpeg" srcset="/assets/images/cv/home-background/home-background-mobile.jpg" />
-    <source type="image/avif" srcset="/assets/images/cv/home-background/home-background.avif" />
-    <img src="/assets/images/cv/home-background/home-background.jpg" alt="" width="1440" height="1920" fetchpriority="high" decoding="async" />
+    <source media="(max-width: 992px)" type="image/avif" srcset="/assets/images/cv/home-background/home-background-mobile.avif?v={{ asset_version }}" />
+    <source media="(max-width: 992px)" type="image/jpeg" srcset="/assets/images/cv/home-background/home-background-mobile.jpg?v={{ asset_version }}" />
+    <source type="image/avif" srcset="/assets/images/cv/home-background/home-background.avif?v={{ asset_version }}" />
+    <img src="/assets/images/cv/home-background/home-background.jpg?v={{ asset_version }}" alt="" width="1440" height="1920" fetchpriority="high" decoding="async" />
   </picture>
 </div>
 {% endblock aside %}
@@ -16,7 +16,7 @@
   <h2>{{ role }}</h2>
   <a class="curriculum-cta" href="{{ language_prefix ~ '/curriculum' }}">
     <svg aria-hidden="true" focusable="false">
-      <use href="/assets/icons/cv/website/sprites.svg#right-arrow" xlink:href="/assets/icons/cv/website/sprites.svg#right-arrow" />
+      <use href="/assets/icons/cv/website/sprites.svg?v={{ asset_version }}#right-arrow" xlink:href="/assets/icons/cv/website/sprites.svg?v={{ asset_version }}#right-arrow" />
     </svg>
     <span>{{ translations.cv_homepage.curriculum_action }}</span>
   </a>

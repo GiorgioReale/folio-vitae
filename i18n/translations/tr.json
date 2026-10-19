@@ -48,6 +48,21 @@
     "email_label": "E-posta:",
     "about_heading": "Hakkımda",
     "experience_heading": "Deneyim",
+    "employment_types": {
+      "full_time": "Tam zamanlı",
+      "part_time": "Yarı zamanlı",
+      "self_employed": "Serbest meslek",
+      "freelance": "Freelance",
+      "contract": "Sözleşmeli",
+      "internship": "Staj",
+      "apprenticeship": "Çıraklık",
+      "seasonal": "Mevsimlik"
+    },
+    "location_types": {
+      "on_site": "Ofiste",
+      "hybrid": "Hibrit",
+      "remote": "Uzaktan"
+    },
     "more_experiences": "Tüm iş deneyimleri listesi {domain} adresinde mevcuttur.",
     "other_projects_heading": "Diğer Projeler",
     "education_heading": "Eğitim",

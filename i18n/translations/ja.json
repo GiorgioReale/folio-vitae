@@ -48,6 +48,21 @@
     "email_label": "Eメール:",
     "about_heading": "自己紹介",
     "experience_heading": "職務経験",
+    "employment_types": {
+      "full_time": "正社員",
+      "part_time": "パートタイム",
+      "self_employed": "自営業",
+      "freelance": "フリーランス",
+      "contract": "契約社員",
+      "internship": "インターンシップ",
+      "apprenticeship": "見習い",
+      "seasonal": "季節労働"
+    },
+    "location_types": {
+      "on_site": "出社",
+      "hybrid": "ハイブリッド",
+      "remote": "リモート"
+    },
     "more_experiences": "完全な職務経歴一覧は {domain} でご覧いただけます。",
     "other_projects_heading": "その他のプロジェクト",
     "education_heading": "学歴",

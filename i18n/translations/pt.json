@@ -48,6 +48,21 @@
     "email_label": "E-mail:",
     "about_heading": "Sobre mim",
     "experience_heading": "Experiência",
+    "employment_types": {
+      "full_time": "Tempo integral",
+      "part_time": "Meio período",
+      "self_employed": "Autônomo",
+      "freelance": "Freelance",
+      "contract": "Contrato",
+      "internship": "Estágio",
+      "apprenticeship": "Aprendizagem",
+      "seasonal": "Sazonal"
+    },
+    "location_types": {
+      "on_site": "Presencial",
+      "hybrid": "Híbrida",
+      "remote": "Remoto"
+    },
     "more_experiences": "A lista completa de experiências profissionais está disponível em {domain}.",
     "other_projects_heading": "Outros Projetos",
     "education_heading": "Formação",

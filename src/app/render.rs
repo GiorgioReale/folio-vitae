@@ -243,7 +243,10 @@ fn base_context(
     context.insert("socials", &format_socials(&contact.socials));
 
     let profile = &data.sites.cv.profile;
-    context.insert("work_experiences", &format_work_experiences(&profile.work_experiences, &dates));
+    context.insert(
+        "work_experiences",
+        &format_work_experiences(&profile.work_experiences, &dates, translations),
+    );
     context.insert("other_projects", &format_projects(&profile.other_projects, &dates));
     context.insert("educations", &format_educations(&profile.educations, &dates));
     context.insert("skills", &format_skills(&profile.skills));
@@ -384,6 +387,9 @@ struct FormattedWorkExperience {
 #[derive(Serialize)]
 struct FormattedWorkRole {
     title: String,
+    employment_type: String,
+    location_type: String,
+    meta: String,
     start_date: String,
     end_date: String,
     duration: String,
@@ -557,6 +563,7 @@ impl<'a> RenderDates<'a> {
 fn format_work_experiences(
     work_experiences: &[crate::app::models::WorkExperience],
     dates: &RenderDates<'_>,
+    translations: &Translations,
 ) -> Vec<FormattedWorkExperience> {
     work_experiences
         .iter()
@@ -564,14 +571,42 @@ fn format_work_experiences(
             let roles = experience
                 .roles
                 .iter()
-                .map(|role| FormattedWorkRole {
-                    title: role.title.clone(),
-                    start_date: dates.month_year(&role.start_date),
-                    end_date: dates.end(role.end_date.as_ref()),
-                    duration: dates
-                        .duration(&role.start_date, role.end_date.as_ref())
-                        .unwrap_or_default(),
-                    description: role.description.clone(),
+                .map(|role| {
+                    let employment_type = role
+                        .employment_type
+                        .map(|value| {
+                            translations
+                                .get_str(&["cv_curriculum", "employment_types", value.as_str()])
+                                .unwrap_or_else(|| value.fallback_label().to_string())
+                        })
+                        .unwrap_or_default();
+                    let location_type = role
+                        .location_type
+                        .map(|value| {
+                            translations
+                                .get_str(&["cv_curriculum", "location_types", value.as_str()])
+                                .unwrap_or_else(|| value.fallback_label().to_string())
+                        })
+                        .unwrap_or_default();
+                    let meta = match (employment_type.is_empty(), location_type.is_empty()) {
+                        (true, true) => String::new(),
+                        (false, true) => employment_type.clone(),
+                        (true, false) => location_type.clone(),
+                        (false, false) => format!("{employment_type} · {location_type}"),
+                    };
+
+                    FormattedWorkRole {
+                        title: role.title.clone(),
+                        employment_type,
+                        location_type,
+                        meta,
+                        start_date: dates.month_year(&role.start_date),
+                        end_date: dates.end(role.end_date.as_ref()),
+                        duration: dates
+                            .duration(&role.start_date, role.end_date.as_ref())
+                            .unwrap_or_default(),
+                        description: role.description.clone(),
+                    }
                 })
                 .collect();
 
@@ -877,7 +912,7 @@ fn cv_pdf_content(
         });
     }
 
-    let experiences = format_work_experiences(&profile.work_experiences, &dates);
+    let experiences = format_work_experiences(&profile.work_experiences, &dates, translations);
     if !experiences.is_empty() {
         sections.push(crate::app::pdf::PdfSection {
             heading: label("experience_heading", "Experience"),
@@ -892,7 +927,7 @@ fn cv_pdf_content(
                             .into_iter()
                             .map(|role| crate::app::pdf::PdfEntry {
                                 title: role.title,
-                                subtitle: String::new(),
+                                subtitle: role.meta,
                                 meta: dated_meta(&role.start_date, &role.end_date, &role.duration),
                                 body: role.description,
                                 notes: Vec::new(),

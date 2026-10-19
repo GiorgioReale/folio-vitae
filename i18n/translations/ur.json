@@ -48,6 +48,21 @@
     "email_label": "ای میل:",
     "about_heading": "میرے بارے میں",
     "experience_heading": "تجربہ",
+    "employment_types": {
+      "full_time": "فل ٹائم",
+      "part_time": "پارٹ ٹائم",
+      "self_employed": "خود ملازمت",
+      "freelance": "فری لانس",
+      "contract": "کنٹریکٹ",
+      "internship": "انٹرن شپ",
+      "apprenticeship": "شاگردی",
+      "seasonal": "موسمی"
+    },
+    "location_types": {
+      "on_site": "دفتر میں",
+      "hybrid": "ہائبرڈ",
+      "remote": "ریموٹ"
+    },
     "more_experiences": "کام کے مکمل تجربات کی فہرست {domain} پر دستیاب ہے۔",
     "other_projects_heading": "دیگر پروجیکٹس",
     "education_heading": "تعلیم",

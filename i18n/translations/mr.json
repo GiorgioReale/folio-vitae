@@ -48,6 +48,21 @@
     "email_label": "ई-मेल:",
     "about_heading": "माझ्याबद्दल",
     "experience_heading": "कामाचा अनुभव",
+    "employment_types": {
+      "full_time": "पूर्णवेळ",
+      "part_time": "अर्धवेळ",
+      "self_employed": "स्वरोजगार",
+      "freelance": "फ्रीलान्स",
+      "contract": "करार",
+      "internship": "इंटर्नशिप",
+      "apprenticeship": "शिकाऊ",
+      "seasonal": "हंगामी"
+    },
+    "location_types": {
+      "on_site": "ऑफिसमध्ये",
+      "hybrid": "हायब्रिड",
+      "remote": "रिमोट"
+    },
     "more_experiences": "कामाचा संपूर्ण अनुभव {domain} येथे उपलब्ध आहे.",
     "other_projects_heading": "इतर प्रोजेक्ट्स",
     "education_heading": "शिक्षण",

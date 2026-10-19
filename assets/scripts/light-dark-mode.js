@@ -3,6 +3,8 @@
   const spritePrefix =
     currentScript?.dataset.spritePrefix ??
     "/assets/icons/main/website/sprites.svg#";
+  const themeAudioSrc =
+    currentScript?.dataset.themeAudio ?? "/assets/audios/light-switch.mp3";
   const THEME_COOKIE_NAME = "theme";
   const ONE_YEAR_IN_SECONDS = 60 * 60 * 24 * 365;
   const getCookieDomain = () => {
@@ -126,7 +128,7 @@
     if (!buttonThemeSwitch || !iconButtonThemeSwitch) {
       return;
     }
-    const audioThemeSwitch = new Audio("/assets/audios/light-switch.mp3");
+    const audioThemeSwitch = new Audio(themeAudioSrc);
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     currentTheme = getInitialTheme();
     if (!getThemeCookie()) {

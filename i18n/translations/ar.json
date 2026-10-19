@@ -48,6 +48,21 @@
     "email_label": "البريد الإلكتروني:",
     "about_heading": "نبذة عني",
     "experience_heading": "الخبرات",
+    "employment_types": {
+      "full_time": "دوام كامل",
+      "part_time": "دوام جزئي",
+      "self_employed": "عمل حر",
+      "freelance": "مستقل",
+      "contract": "عقد",
+      "internship": "تدريب",
+      "apprenticeship": "تلمذة",
+      "seasonal": "موسمي"
+    },
+    "location_types": {
+      "on_site": "حضوري",
+      "hybrid": "هجين",
+      "remote": "عن بُعد"
+    },
     "more_experiences": "القائمة الكاملة للخبرات المهنية متوفرة على {domain}.",
     "other_projects_heading": "مشاريع أخرى",
     "education_heading": "التعليم",

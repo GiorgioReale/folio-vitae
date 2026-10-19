@@ -48,6 +48,21 @@
     "email_label": "이메일:",
     "about_heading": "소개",
     "experience_heading": "경력",
+    "employment_types": {
+      "full_time": "정규직",
+      "part_time": "파트타임",
+      "self_employed": "자영업",
+      "freelance": "프리랜서",
+      "contract": "계약직",
+      "internship": "인턴십",
+      "apprenticeship": "견습",
+      "seasonal": "계절직"
+    },
+    "location_types": {
+      "on_site": "출근",
+      "hybrid": "하이브리드",
+      "remote": "원격"
+    },
     "more_experiences": "전체 경력 목록은 {domain}에서 확인할 수 있습니다.",
     "other_projects_heading": "기타 프로젝트",
     "education_heading": "학력",
