@@ -6,6 +6,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.9] - 2026-10-19
+
+### Added
+- Optional employment and location types on work roles (with i18n labels)
+- Cache-busting query params on asset URLs via `asset_version`
+
+### Fixed
+- Other-projects links use `link_title` for their labels
+
+### Changed
+- Generated assets rebuild on every start/restart
+- CV birth date shows the date only (no calculated age)
+
 ## [0.1.8] - 2026-10-18
 
 ### Fixed
