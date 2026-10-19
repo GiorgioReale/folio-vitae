@@ -22,6 +22,8 @@ pub mod http;
 pub mod logging;
 pub mod resources;
 
+#[cfg(all(test, not(feature = "serve")))]
+use std::time::SystemTime;
 use std::{env, io::ErrorKind};
 #[cfg(feature = "serve")]
 use std::{
@@ -29,17 +31,15 @@ use std::{
     path::Path,
     time::{Duration, SystemTime},
 };
-#[cfg(all(test, not(feature = "serve")))]
-use std::time::SystemTime;
 
+#[cfg(feature = "serve")]
+use app::{cache::latest_modification, compression, images, scripts, styles};
 use app::{
     environment::Environment,
     localization::{detect_languages_with_last_change, load_language_names, load_localizations},
     setup::{build_app_states, load_templates},
     state::AppState,
 };
-#[cfg(feature = "serve")]
-use app::{cache::latest_modification, compression, images, scripts, styles};
 #[cfg(feature = "serve")]
 use config::data_dir;
 use dotenvy::from_path_override;
