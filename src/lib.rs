@@ -22,22 +22,25 @@ pub mod http;
 pub mod logging;
 pub mod resources;
 
+#[cfg(all(test, not(feature = "serve")))]
+use std::time::SystemTime;
+use std::{env, io::ErrorKind};
+#[cfg(feature = "serve")]
 use std::{
-    env,
-    io::ErrorKind,
     net::{IpAddr, SocketAddr},
     path::Path,
     time::{Duration, SystemTime},
 };
 
+#[cfg(feature = "serve")]
+use app::{cache::latest_modification, compression, images, scripts, styles};
 use app::{
-    cache::{BuildCache, latest_modification},
     environment::Environment,
     localization::{detect_languages_with_last_change, load_language_names, load_localizations},
     setup::{build_app_states, load_templates},
     state::AppState,
 };
-use app::{compression, images, scripts, styles};
+#[cfg(feature = "serve")]
 use config::data_dir;
 use dotenvy::from_path_override;
 #[cfg(feature = "serve")]
@@ -52,7 +55,6 @@ pub use error::{AppError, AppResult, ResultExt};
 pub struct PreparedApplication {
     pub main_state: AppState,
     pub cv_state: AppState,
-    pub build_cache: BuildCache,
 }
 
 pub fn initialize_project(force: bool) -> AppResult<()> {
@@ -71,25 +73,15 @@ pub fn load_env_file(path: &str) -> AppResult<()> {
 }
 
 pub fn prepare_application_state(environment: Environment) -> AppResult<PreparedApplication> {
-    let mut build_cache = BuildCache::load()?;
-    let data_directory = data_dir();
-
     let (available_languages, data_last_modified) = detect_languages_with_last_change()?;
-    let assets_last_modified = latest_modification(&["assets/styles", "assets/scripts"])?;
-    let images_last_modified = latest_modification(&[data_directory.join("images")])?;
-    let images_outputs_missing = images::generated_outputs_missing()?;
-    let minify_assets = environment.should_minify_assets();
 
-    if images_outputs_missing || build_cache.should_refresh_images(images_last_modified) {
+    #[cfg(feature = "serve")]
+    {
+        // Always rebuild generated outputs on every start/restart. Do not refresh them live.
         images::generate_all_images().with_context(|| "generating images")?;
-        build_cache.record_images(images_last_modified);
-    }
-
-    if build_cache.should_refresh_assets(assets_last_modified, minify_assets) {
         styles::compile_styles(environment).with_context(|| "compiling SCSS")?;
         scripts::process_scripts(environment).with_context(|| "processing scripts")?;
         compression::gzip_assets().with_context(|| "gzipping assets")?;
-        build_cache.record_assets(assets_last_modified, minify_assets);
     }
 
     let data = load_localizations(&available_languages)?;
@@ -104,11 +96,7 @@ pub fn prepare_application_state(environment: Environment) -> AppResult<Prepared
         environment,
         language_names,
     )
-    .map(|states| PreparedApplication {
-        main_state: states.0,
-        cv_state: states.1,
-        build_cache,
-    })
+    .map(|states| PreparedApplication { main_state: states.0, cv_state: states.1 })
 }
 
 #[cfg(feature = "serve")]
@@ -119,11 +107,21 @@ pub async fn run_servers<T>(
     cv_port: u16,
     shutdown_signal: impl std::future::Future<Output = AppResult<T>>,
 ) -> AppResult<T> {
-    let PreparedApplication { main_state, cv_state, build_cache, .. } =
+    let PreparedApplication { main_state, cv_state } =
         run_blocking(move || prepare_application_state(environment)).await?;
 
-    build_cache.save()?;
+    serve_prepared(main_state, cv_state, host, main_port, cv_port, shutdown_signal).await
+}
 
+#[cfg(feature = "serve")]
+async fn serve_prepared<T>(
+    main_state: AppState,
+    cv_state: AppState,
+    host: IpAddr,
+    main_port: u16,
+    cv_port: u16,
+    shutdown_signal: impl std::future::Future<Output = AppResult<T>>,
+) -> AppResult<T> {
     let main_app = build_router(main_state);
     let cv_app = build_router(cv_state);
 
@@ -228,9 +226,14 @@ pub async fn run_servers_with_watch(
     let env_file = env_file.as_ref().to_path_buf();
 
     loop {
+        // Prepare first, then snapshot: generated asset writes must not look like a live change.
+        let PreparedApplication { main_state, cv_state } =
+            run_blocking(move || prepare_application_state(environment)).await?;
+
         let watched_env = env_file.clone();
         let watch_snapshot = run_blocking(move || read_watch_snapshot(&watched_env)).await?;
-        let lifecycle = run_servers(environment, host, main_port, cv_port, async {
+
+        let lifecycle = serve_prepared(main_state, cv_state, host, main_port, cv_port, async {
             tokio::select! {
                 result = tokio::signal::ctrl_c() => {
                     result.with_context(|| "listening for shutdown signal")?;
