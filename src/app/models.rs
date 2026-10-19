@@ -204,7 +204,7 @@ pub(crate) struct WorkRole {
     pub description: String,
 }
 
-#[derive(Serialize, Clone)]
+#[derive(Deserialize, Serialize, Clone)]
 pub(crate) struct Project {
     pub title: String,
     #[serde(with = "date_format")]
@@ -215,6 +215,8 @@ pub(crate) struct Project {
     pub description: String,
     #[serde(default)]
     pub link: String,
+    #[serde(default)]
+    pub link_title: String,
 }
 
 #[derive(Deserialize, Serialize, Clone)]
@@ -269,39 +271,6 @@ mod date_format {
     {
         let value = String::deserialize(deserializer)?;
         NaiveDate::parse_from_str(&value, FORMAT).map_err(serde::de::Error::custom)
-    }
-}
-
-#[derive(Deserialize)]
-struct ProjectFields {
-    title: String,
-    #[serde(with = "date_format")]
-    start_date: NaiveDate,
-    #[serde(default, with = "optional_date_format")]
-    end_date: Option<NaiveDate>,
-    #[serde(default)]
-    description: String,
-    #[serde(default)]
-    link: Option<String>,
-    #[serde(default)]
-    link_title: Option<String>,
-}
-
-impl<'de> Deserialize<'de> for Project {
-    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-    where
-        D: serde::Deserializer<'de>,
-    {
-        let fields = ProjectFields::deserialize(deserializer)?;
-        let link = fields.link.or(fields.link_title).unwrap_or_default();
-
-        Ok(Project {
-            title: fields.title,
-            start_date: fields.start_date,
-            end_date: fields.end_date,
-            description: fields.description,
-            link,
-        })
     }
 }
 
@@ -467,7 +436,9 @@ pub(crate) fn expected_fields_for_container(
             "end_date",
             "description",
         ]),
-        Some("other_projects") => Some(&["title", "start_date", "end_date", "description", "link"]),
+        Some("other_projects") => {
+            Some(&["title", "start_date", "end_date", "description", "link", "link_title"])
+        },
         Some("educations") => Some(&[
             "institute",
             "educational_qualification",

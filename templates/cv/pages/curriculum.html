@@ -113,7 +113,7 @@
       <h4>{{ project.title }}</h4>
       <p class="dates">{{ project.start_date }} - {{ project.end_date }}{% if project.duration %} ({{ project.duration }}){% endif %}</p>
       <p>{{ project.description }}</p>
-      <a href="{{ project.link }}" target="_blank" rel="noopener noreferrer">{{ translations.cv_curriculum.project_link }}<span class="sr-only"> ({{ translations.accessibility.new_window }})</span></a>
+      <a href="{{ project.link }}" target="_blank" rel="noopener noreferrer">{% if project.link_title %}{{ project.link_title }}{% else %}{{ translations.cv_curriculum.project_link }}{% endif %}<span class="sr-only"> ({{ translations.accessibility.new_window }})</span></a>
     </article>
     {% endfor %}
   </section>
