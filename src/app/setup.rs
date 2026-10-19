@@ -43,21 +43,22 @@ pub(crate) fn build_app_states(
         supported_languages.clone(),
         language_names,
     );
+    let asset_version = Arc::<str>::from(compute_asset_version()?);
     let main_static = Arc::new(compile_static_assets(
         "static/main",
         SiteKind::Main,
         &default_resources.data,
         &localization_state,
+        &asset_version,
     )?);
     let cv_static = Arc::new(compile_static_assets(
         "static/cv",
         SiteKind::Cv,
         &default_resources.data,
         &localization_state,
+        &asset_version,
     )?);
     let mailer = build_mailer(&default_resources.data)?.map(Arc::new);
-
-    let asset_version = Arc::<str>::from(compute_asset_version()?);
     let show_credits = credits_enabled_from_env();
     let generator = Arc::<str>::from(format!("folio-vitae v{}", env!("CARGO_PKG_VERSION")));
 
@@ -128,7 +129,29 @@ fn compute_asset_version() -> AppResult<String> {
         .filter_map(Result::ok)
         .filter(|entry| entry.file_type().is_file())
         .filter(|entry| {
-            matches!(entry.path().extension().and_then(|ext| ext.to_str()), Some("css" | "js"))
+            let path = entry.path();
+            if path.extension().and_then(|ext| ext.to_str()) == Some("gz") {
+                return false;
+            }
+            matches!(
+                path.extension().and_then(|ext| ext.to_str()),
+                Some(
+                    "css"
+                        | "js"
+                        | "scss"
+                        | "svg"
+                        | "png"
+                        | "jpg"
+                        | "jpeg"
+                        | "avif"
+                        | "webp"
+                        | "gif"
+                        | "ico"
+                        | "woff"
+                        | "woff2"
+                        | "mp3"
+                )
+            )
         })
         .map(|entry| entry.into_path())
         .collect();

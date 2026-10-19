@@ -10,12 +10,12 @@
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/assets/icons/main/logos/android-chrome-192x192.png",
+      "src": "/assets/icons/main/logos/android-chrome-192x192.png?v={{ asset_version }}",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/assets/icons/main/logos/android-chrome-512x512.png",
+      "src": "/assets/icons/main/logos/android-chrome-512x512.png?v={{ asset_version }}",
       "sizes": "512x512",
       "type": "image/png"
     }
