@@ -7,7 +7,7 @@ on:
 
 jobs:
   # Create git tag + GitHub Release when a release-plz PR is merged.
-  # crates.io + GHCR stay in release.yml (triggered by the published Release).
+  # crates.io + GHCR stay in release.yml (started via workflow_dispatch below).
   release-plz-release:
     name: Release-plz release
     if: ${{ github.repository_owner == 'GiorgioReale' }}
@@ -15,6 +15,8 @@ jobs:
     permissions:
       contents: write
       pull-requests: read
+      # Needed for `gh workflow run` with GITHUB_TOKEN
+      actions: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
@@ -26,12 +28,29 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Run release-plz
+        id: release-plz
         uses: release-plz/action@v0.5
         with:
           command: release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+
+      # Releases created with GITHUB_TOKEN do not fire `release: published`.
+      # workflow_dispatch does run when invoked with GITHUB_TOKEN.
+      - name: Trigger Release workflow
+        if: ${{ steps.release-plz.outputs.releases_created == 'true' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASES: ${{ steps.release-plz.outputs.releases }}
+        run: |
+          echo "$RELEASES" | jq -r '.[].tag' | while read -r tag; do
+            if [ -z "$tag" ] || [ "$tag" = "null" ]; then
+              continue
+            fi
+            echo "Dispatching Release workflow for $tag"
+            gh workflow run release.yml -f "tag=$tag"
+          done
 
   # Open/update the release PR with version bump + CHANGELOG.
   release-plz-pr:

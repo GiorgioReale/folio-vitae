@@ -4,17 +4,26 @@ on:
   release:
     types:
       - published
+  # Explicit dispatch so release-plz (GITHUB_TOKEN) can start publish without a PAT.
+  # workflow_dispatch is one of the events that still run when triggered with GITHUB_TOKEN.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Git tag to publish (e.g. v0.1.10)
+        required: true
+        type: string
 
 permissions:
   contents: read
   packages: write
 
 concurrency:
-  group: release-${{ github.event.release.tag_name }}
+  group: release-${{ github.event.release.tag_name || inputs.tag }}
   cancel-in-progress: false
 
 env:
   CARGO_TERM_COLOR: always
+  RELEASE_TAG: ${{ github.event.release.tag_name || inputs.tag }}
 
 jobs:
   publish:
@@ -26,7 +35,7 @@ jobs:
         uses: actions/checkout@v7
         with:
           fetch-depth: 0
-          ref: ${{ github.event.release.tag_name }}
+          ref: ${{ env.RELEASE_TAG }}
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -35,8 +44,6 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Validate release tag matches Cargo.toml version
-        env:
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: |
           TAG_VERSION="${RELEASE_TAG#v}"
           CARGO_VERSION="$(awk '
@@ -71,7 +78,7 @@ jobs:
     needs: publish
     uses: ./.github/workflows/docker.yml
     with:
-      git_ref: ${{ github.event.release.tag_name }}
+      git_ref: ${{ github.event.release.tag_name || inputs.tag }}
       update_latest: true
       update_version_tags: true
     permissions:
