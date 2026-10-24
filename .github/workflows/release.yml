@@ -37,8 +37,22 @@ jobs:
           fetch-depth: 0
           ref: ${{ env.RELEASE_TAG }}
 
-      - name: Validate release tag matches Cargo.toml version
+      - name: Validate release tag, Cargo.toml version, and main ancestry
+        env:
+          RELEASE_TAG: ${{ env.RELEASE_TAG }}
         run: |
+          set -euo pipefail
+
+          if ! printf '%s' "${RELEASE_TAG}" | grep -Eq '^v?[0-9]+\.[0-9]+\.[0-9]+([.-][A-Za-z0-9._-]+)?$'; then
+            echo "Release tag '${RELEASE_TAG}' must look like a version (e.g. v0.1.10)"
+            exit 1
+          fi
+
+          if ! git rev-parse -q --verify "refs/tags/${RELEASE_TAG}" >/dev/null; then
+            echo "Release tag '${RELEASE_TAG}' is not a git tag in this repository"
+            exit 1
+          fi
+
           TAG_VERSION="${RELEASE_TAG#v}"
           CARGO_VERSION="$(awk '
             /^\[package\]$/ { in_package=1; next }
@@ -57,6 +71,12 @@ jobs:
 
           if [ "$TAG_VERSION" != "$CARGO_VERSION" ]; then
             echo "Release tag '$RELEASE_TAG' does not match Cargo.toml version '$CARGO_VERSION'"
+            exit 1
+          fi
+
+          git fetch --no-tags origin main
+          if ! git merge-base --is-ancestor HEAD origin/main; then
+            echo "Checked-out release commit is not reachable from origin/main"
             exit 1
           fi
 

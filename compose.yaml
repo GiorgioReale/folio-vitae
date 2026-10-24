@@ -6,9 +6,11 @@ services:
     # build: .
     container_name: folio-vitae
     restart: unless-stopped
+    # Bind to loopback so the reverse proxy (or local browser) is the only peer.
+    # Publish on 0.0.0.0 only when you intentionally expose the app without a proxy.
     ports:
-      - "36546:36546" # main site
-      - "36547:36547" # CV site
+      - "127.0.0.1:36546:36546" # main site
+      - "127.0.0.1:36547:36547" # CV site
     volumes:
       # Your YAML content and images (read-only is fine)
       - ./data:/app/data:ro
@@ -18,6 +20,10 @@ services:
     environment:
       APP_ENV: production
       DATA_DIR: /app/data
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
     healthcheck:
       # Both listeners share one process; probe each HTTP stack via a cheap static route.
       # BusyBox wget ships with Alpine (no extra packages). Ports follow MAIN_PORT / CV_PORT.

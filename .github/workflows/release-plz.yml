@@ -29,12 +29,12 @@ jobs:
 
       - name: Run release-plz
         id: release-plz
-        uses: release-plz/action@v0.5
+        # Pin to the commit currently resolved by release-plz/action@v0.5 (v0.5.146).
+        uses: release-plz/action@b2baf303c463c223526d52a8a91b0777f052cf3f
         with:
           command: release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
 
       # Releases created with GITHUB_TOKEN do not fire `release: published`.
       # workflow_dispatch does run when invoked with GITHUB_TOKEN.
@@ -74,9 +74,9 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Run release-plz
-        uses: release-plz/action@v0.5
+        # Pin to the commit currently resolved by release-plz/action@v0.5 (v0.5.146).
+        uses: release-plz/action@b2baf303c463c223526d52a8a91b0777f052cf3f
         with:
           command: release-pr
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}

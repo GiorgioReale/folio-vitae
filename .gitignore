@@ -32,7 +32,13 @@ target
 *.sublime-workspace
 *.code-workspace
 
+# Agent skills / tooling (local)
+.agents/
+skills-lock.json
+
 .env
+.env.*
+!.env.example
 .folio-cache.json
 .folio-assets-version
 dist/

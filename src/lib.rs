@@ -68,7 +68,15 @@ pub fn load_env_file(path: &str) -> AppResult<()> {
             debug!("No {path} file found; skipping environment loading from disk.");
             Ok(())
         },
-        Err(error) => Err(AppError::from(error).with_context(format!("loading {path} file"))),
+        // Never propagate dotenv parse Display/Debug: LineParse retains the raw line,
+        // which may contain secret values such as SMTP_PASSWORD.
+        Err(dotenvy::Error::LineParse(_, line_index)) => Err(AppError::msg(format!(
+            "invalid syntax in environment file `{path}` (near index {line_index})"
+        ))),
+        Err(dotenvy::Error::Io(error)) => {
+            Err(AppError::from(error).with_context(format!("loading `{path}` environment file")))
+        },
+        Err(_) => Err(AppError::msg(format!("failed to load environment file `{path}`"))),
     }
 }
 

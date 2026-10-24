@@ -83,11 +83,20 @@ jobs:
 
       - name: Resolve checkout ref
         id: checkout_ref
+        env:
+          INPUT_GIT_REF: ${{ inputs.git_ref }}
+          FALLBACK_SHA: ${{ github.sha }}
         run: |
-          if [ -n "${{ inputs.git_ref }}" ]; then
-            echo "ref=${{ inputs.git_ref }}" >> "$GITHUB_OUTPUT"
+          set -euo pipefail
+          if [ -n "${INPUT_GIT_REF}" ]; then
+            # Reject shell metacharacters; allow commit SHAs, tags, and branch names.
+            if ! printf '%s' "${INPUT_GIT_REF}" | grep -Eq '^[A-Za-z0-9][A-Za-z0-9._/-]*$'; then
+              echo "Invalid git_ref: only letters, digits, . _ / - are allowed"
+              exit 1
+            fi
+            echo "ref=${INPUT_GIT_REF}" >> "$GITHUB_OUTPUT"
           else
-            echo "ref=${{ github.sha }}" >> "$GITHUB_OUTPUT"
+            echo "ref=${FALLBACK_SHA}" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Checkout repository
@@ -163,11 +172,19 @@ jobs:
     steps:
       - name: Resolve checkout ref
         id: checkout_ref
+        env:
+          INPUT_GIT_REF: ${{ inputs.git_ref }}
+          FALLBACK_SHA: ${{ github.sha }}
         run: |
-          if [ -n "${{ inputs.git_ref }}" ]; then
-            echo "ref=${{ inputs.git_ref }}" >> "$GITHUB_OUTPUT"
+          set -euo pipefail
+          if [ -n "${INPUT_GIT_REF}" ]; then
+            if ! printf '%s' "${INPUT_GIT_REF}" | grep -Eq '^[A-Za-z0-9][A-Za-z0-9._/-]*$'; then
+              echo "Invalid git_ref: only letters, digits, . _ / - are allowed"
+              exit 1
+            fi
+            echo "ref=${INPUT_GIT_REF}" >> "$GITHUB_OUTPUT"
           else
-            echo "ref=${{ github.sha }}" >> "$GITHUB_OUTPUT"
+            echo "ref=${FALLBACK_SHA}" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Checkout repository
