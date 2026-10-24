@@ -1006,7 +1006,7 @@ dependencies = [
 
 [[package]]
 name = "folio-vitae"
-version = "0.1.10"
+version = "0.1.11"
 dependencies = [
  "assert_cmd",
  "assert_fs",
