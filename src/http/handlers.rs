@@ -90,8 +90,10 @@ pub(crate) async fn curriculum_pdf(
         return pdf_response(&state, &resolved.language, bytes);
     }
 
+    // Own the single-flight guard inside spawn_blocking so request timeouts cannot
+    // drop it while PDF work continues (which would allow overlapping renders).
     let render_lock = state.pdf_render_lock(&resolved.language);
-    let _guard = render_lock.lock().await;
+    let guard = render_lock.lock_owned().await;
 
     if let Some(bytes) = state.cached_cv_pdf(&resolved.language) {
         return pdf_response(&state, &resolved.language, bytes);
@@ -99,20 +101,23 @@ pub(crate) async fn curriculum_pdf(
 
     let render_state = state.clone();
     let render_language = resolved.language.clone();
-    let bytes =
-        match tokio::task::spawn_blocking(move || render_cv_pdf(&render_state, &render_language))
-            .await
-        {
-            Ok(Ok(bytes)) => Arc::new(bytes),
-            Ok(Err(status)) => return status.into_response(),
-            Err(error) => {
-                error!(error = %error, "pdf render task failed");
-                return StatusCode::INTERNAL_SERVER_ERROR.into_response();
-            },
-        };
-    let language = resolved.language;
-    state.store_cv_pdf(language.clone(), Arc::clone(&bytes));
-    pdf_response(&state, &language, bytes)
+    let bytes = match tokio::task::spawn_blocking(move || {
+        let _guard = guard;
+        let bytes = render_cv_pdf(&render_state, &render_language)?;
+        let bytes = Arc::new(bytes);
+        render_state.store_cv_pdf(render_language.clone(), Arc::clone(&bytes));
+        Ok::<Arc<Vec<u8>>, StatusCode>(bytes)
+    })
+    .await
+    {
+        Ok(Ok(bytes)) => bytes,
+        Ok(Err(status)) => return status.into_response(),
+        Err(error) => {
+            error!(error = %error, "pdf render task failed");
+            return StatusCode::INTERNAL_SERVER_ERROR.into_response();
+        },
+    };
+    pdf_response(&state, &resolved.language, bytes)
 }
 
 fn pdf_response(state: &AppState, language: &Language, bytes: Arc<Vec<u8>>) -> Response {
@@ -221,7 +226,7 @@ pub(crate) async fn contact_cv(
 
         let language = resolved.language.clone();
         let path = resolved.path.clone();
-        return render_html_page_with_status(StatusCode::BAD_REQUEST, move || {
+        return contact_html_response(StatusCode::BAD_REQUEST, move || {
             render_cv_curriculum(&state, Some(context), &language, &path)
         })
         .await;
@@ -239,7 +244,7 @@ pub(crate) async fn contact_cv(
         None => {
             let language = resolved.language.clone();
             let path = resolved.path.clone();
-            return render_html_page_with_status(StatusCode::NOT_FOUND, move || {
+            return contact_html_response(StatusCode::NOT_FOUND, move || {
                 render_error(&state, SiteKind::Cv, StatusCode::NOT_FOUND, &path, &language)
             })
             .await;
@@ -291,10 +296,19 @@ pub(crate) async fn contact_cv(
 
     let language = resolved.language.clone();
     let path = resolved.path.clone();
-    render_html_page_with_status(status, move || {
+    contact_html_response(status, move || {
         render_cv_curriculum(&state, Some(context), &language, &path)
     })
     .await
+}
+
+async fn contact_html_response<F>(status: StatusCode, render: F) -> Response
+where
+    F: FnOnce() -> Result<Arc<str>, StatusCode> + Send + 'static,
+{
+    let mut response = render_html_page_with_status(status, render).await;
+    response.headers_mut().insert(CACHE_CONTROL, HeaderValue::from_static("private, no-store"));
+    response
 }
 
 pub(crate) async fn menu(State(state): State<AppState>, headers: HeaderMap, uri: Uri) -> Response {
@@ -672,15 +686,11 @@ fn request_origin_is_allowed(headers: &HeaderMap, state: &AppState) -> bool {
         return false;
     };
 
-    let request_host =
-        headers.get(HOST).and_then(|value| value.to_str().ok()).and_then(normalize_host_header);
-
-    if request_host.as_deref() == Some(origin_host.as_str()) {
-        return true;
-    }
-
+    // Require an operator-configured site domain. Do not authorize solely because
+    // Host equals Origin (both are request-controlled and enable DNS-rebinding).
     let snapshot = state.localization_snapshot();
-    snapshot.main_domains.contains(&origin_host) || snapshot.cv_domains.contains(&origin_host)
+    domain_list_contains(&snapshot.main_domains, &origin_host)
+        || domain_list_contains(&snapshot.cv_domains, &origin_host)
 }
 
 fn host_from_origin(origin: &str) -> Option<String> {
@@ -836,6 +846,13 @@ mod tests {
     #[test]
     fn cross_site_origin_is_rejected() {
         let headers = headers_with("cv.example.com", "https://attacker.example");
+
+        assert!(!request_origin_is_allowed(&headers, &app_state()));
+    }
+
+    #[test]
+    fn matching_unconfigured_host_and_origin_are_rejected() {
+        let headers = headers_with("attacker.example", "https://attacker.example");
 
         assert!(!request_origin_is_allowed(&headers, &app_state()));
     }
