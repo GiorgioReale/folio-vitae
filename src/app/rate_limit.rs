@@ -63,7 +63,11 @@ impl ContactRateLimiter {
         }
     }
 
-    fn sweep_expired(hits: &mut HashMap<IpAddr, VecDeque<Instant>>, now: Instant, window: Duration) {
+    fn sweep_expired(
+        hits: &mut HashMap<IpAddr, VecDeque<Instant>>,
+        now: Instant,
+        window: Duration,
+    ) {
         hits.retain(|_, entries| {
             Self::prune_window(entries, now, window);
             !entries.is_empty()
