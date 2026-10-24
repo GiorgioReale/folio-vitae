@@ -104,8 +104,8 @@ You only need Docker. No local Rust or `folio-vitae` install. Templates, assets,
 ```bash
 mkdir folio-vitae && cd folio-vitae
 
-curl -fsSL -o docker-compose.yml \
-  https://raw.githubusercontent.com/GiorgioReale/folio-vitae/main/docker-compose.yml
+curl -fsSL -o compose.yaml \
+  https://raw.githubusercontent.com/GiorgioReale/folio-vitae/main/compose.yaml
 
 # Create starter data/ + .env.example using the image itself
 docker run --rm \
@@ -165,7 +165,7 @@ Notes:
 
 ```bash
 docker build -t folio-vitae .
-# or: docker compose up -d --build  (after enabling `build: .` in docker-compose.yml)
+# or: docker compose up -d --build  (after enabling `build: .` in compose.yaml)
 ```
 
 ## Contributing
