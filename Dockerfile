@@ -15,9 +15,11 @@ COPY i18n ./i18n
 COPY data_example ./data_example
 COPY README.md LICENSE ./
 
-RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=locked \
-    --mount=type=cache,target=/usr/local/cargo/git,sharing=locked \
-    --mount=type=cache,target=/src/target,sharing=locked \
+# Scope the cargo target cache per platform so amd64/arm64 builds do not clash.
+ARG TARGETPLATFORM
+RUN --mount=type=cache,id=cargo-registry,target=/usr/local/cargo/registry,sharing=locked \
+    --mount=type=cache,id=cargo-git,target=/usr/local/cargo/git,sharing=locked \
+    --mount=type=cache,id=cargo-target-${TARGETPLATFORM},target=/src/target,sharing=locked \
     cargo build --release --locked --all-features \
     && cp /src/target/release/folio-vitae /folio-vitae
 
