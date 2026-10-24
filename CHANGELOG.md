@@ -6,11 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.1.10](https://github.com/GiorgioReale/folio-vitae/compare/v0.1.9...v0.1.10) - 2026-10-24
+## [0.1.10] - 2026-10-24
 
-### Other
+### Added
+- Docker images published for `linux/amd64` and `linux/arm64`
+- Compose HTTP healthcheck that probes both site ports
 
-- Rename Compose file and add healthcheck ([#52](https://github.com/GiorgioReale/folio-vitae/pull/52))
+### Changed
+- Compose file renamed to `compose.yaml` (Compose V2)
 
 ## [0.1.9] - 2026-10-19
 
