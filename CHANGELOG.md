@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.11](https://github.com/GiorgioReale/folio-vitae/compare/v0.1.10...v0.1.11) - 2026-10-24
+
+### Other
+
+- Harden security controls from the Folio Vitae audit ([#58](https://github.com/GiorgioReale/folio-vitae/pull/58))
+- avoid hard-coded version numbers in README ([#56](https://github.com/GiorgioReale/folio-vitae/pull/56))
+
 ## [0.1.10] - 2026-10-24
 
 ### Added
