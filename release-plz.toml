@@ -1,8 +1,18 @@
 [workspace]
 publish_timeout = "10m"
-release_commits = "^(feat|fix|perf|docs|refactor)(\\(.+\\))?!?:"
-pr_name = "chore: release"
+# cargo publish + Docker remain in .github/workflows/release.yml
+publish = false
+# Only tag/publish when the release-plz PR is merged (branch prefix release-plz-)
+release_always = false
+# Conventional commits, or sentence-case titles (excludes chore/ci/deps noise)
+release_commits = "^(feat|fix|perf|docs|refactor)(\\(.+\\))?!?:|^[A-Z].+"
+pr_name = "chore: release v{{ version }}"
 pr_labels = ["release"]
+git_release_body = """
+{{ changelog }}
+
+**Full changelog:** https://github.com/GiorgioReale/folio-vitae/blob/main/CHANGELOG.md
+"""
 
 [changelog]
 header = """
