@@ -602,6 +602,7 @@ fn render_sitemap(
         .collect();
 
     let multilingual = languages.len() > 1;
+    let escaped_base_url = xml_escape(&base_url);
     // Header + roughly 200 bytes per URL entry (with hreflang alternates when multilingual).
     let estimated_entries = pages.len().saturating_mul(languages.len().max(1));
     let mut output = String::with_capacity(160 + estimated_entries.saturating_mul(220));
@@ -613,40 +614,40 @@ fn render_sitemap(
 
     for (page, priority) in pages {
         for language in &languages {
-            let path = language_prefixed_path(
+            let path = xml_escape(&language_prefixed_path(
                 language,
                 page,
                 &localization.default_language,
                 multilingual,
-            );
+            ));
             let _ = writeln!(
                 output,
-                "  <url>\n    <loc>{base_url}{path}</loc>\n    <priority>{priority}</priority>"
+                "  <url>\n    <loc>{escaped_base_url}{path}</loc>\n    <priority>{priority}</priority>"
             );
 
             if multilingual {
                 for alternate in &languages {
-                    let alternate_path = language_prefixed_path(
+                    let alternate_path = xml_escape(&language_prefixed_path(
                         alternate,
                         page,
                         &localization.default_language,
                         true,
-                    );
+                    ));
                     let _ = writeln!(
                         output,
-                        "    <xhtml:link rel=\"alternate\" hreflang=\"{}\" href=\"{base_url}{alternate_path}\" />",
-                        alternate.as_code()
+                        "    <xhtml:link rel=\"alternate\" hreflang=\"{}\" href=\"{escaped_base_url}{alternate_path}\" />",
+                        xml_escape(alternate.as_code())
                     );
                 }
-                let default_path = language_prefixed_path(
+                let default_path = xml_escape(&language_prefixed_path(
                     &localization.default_language,
                     page,
                     &localization.default_language,
                     true,
-                );
+                ));
                 let _ = writeln!(
                     output,
-                    "    <xhtml:link rel=\"alternate\" hreflang=\"x-default\" href=\"{base_url}{default_path}\" />"
+                    "    <xhtml:link rel=\"alternate\" hreflang=\"x-default\" href=\"{escaped_base_url}{default_path}\" />"
                 );
             }
 
@@ -656,6 +657,21 @@ fn render_sitemap(
 
     output.push_str("</urlset>\n");
     Ok(output)
+}
+
+fn xml_escape(value: &str) -> String {
+    let mut escaped = String::with_capacity(value.len());
+    for ch in value.chars() {
+        match ch {
+            '&' => escaped.push_str("&amp;"),
+            '<' => escaped.push_str("&lt;"),
+            '>' => escaped.push_str("&gt;"),
+            '"' => escaped.push_str("&quot;"),
+            '\'' => escaped.push_str("&apos;"),
+            _ => escaped.push(ch),
+        }
+    }
+    escaped
 }
 
 fn language_prefixed_path(
@@ -776,6 +792,15 @@ fn rooted_segments<'a>(segments: impl Iterator<Item = &'a str>) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn xml_escape_encodes_special_characters() {
+        assert_eq!(
+            xml_escape(r#"https://ex.com/a&b<"c">'d"#),
+            "https://ex.com/a&amp;b&lt;&quot;c&quot;&gt;&apos;d"
+        );
+        assert_eq!(xml_escape("https://example.com/"), "https://example.com/");
+    }
 
     #[test]
     fn development_keeps_runtime_localization_refresh_enabled() {
