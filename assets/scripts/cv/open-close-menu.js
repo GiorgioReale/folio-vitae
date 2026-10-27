@@ -25,15 +25,29 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     };
 
+    const isSafePath = (path) => {
+      if (typeof path !== "string" || !path.startsWith("/") || path.startsWith("//")) {
+        return false;
+      }
+      if (path.includes("\\") || path.includes("\0")) {
+        return false;
+      }
+
+      try {
+        const url = new URL(path, window.location.origin);
+        return (
+          url.origin === window.location.origin &&
+          url.pathname.startsWith("/") &&
+          !url.pathname.startsWith("//")
+        );
+      } catch {
+        return false;
+      }
+    };
+
     if (menuLink.dataset.menuState === "close") {
       const stored = readReturnPath();
-      if (
-        stored &&
-        stored.startsWith("/") &&
-        !stored.startsWith("//") &&
-        !stored.includes("://") &&
-        !stored.includes("\\")
-      ) {
+      if (isSafePath(stored)) {
         menuLink.setAttribute("href", stored);
       }
     } else {
