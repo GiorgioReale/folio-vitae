@@ -29,8 +29,7 @@ jobs:
 
       - name: Run release-plz
         id: release-plz
-        # Pin to the commit currently resolved by release-plz/action@v0.5 (v0.5.146).
-        uses: release-plz/action@b2baf303c463c223526d52a8a91b0777f052cf3f
+        uses: release-plz/action@v0.5
         with:
           command: release
         env:
@@ -74,8 +73,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Run release-plz
-        # Pin to the commit currently resolved by release-plz/action@v0.5 (v0.5.146).
-        uses: release-plz/action@b2baf303c463c223526d52a8a91b0777f052cf3f
+        uses: release-plz/action@v0.5
         with:
           command: release-pr
         env:
