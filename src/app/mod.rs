@@ -10,6 +10,7 @@
 pub mod cache;
 pub mod email;
 pub mod environment;
+pub mod limits;
 pub mod localization;
 pub mod models;
 pub mod rate_limit;
