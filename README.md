@@ -63,6 +63,19 @@ folio-vitae dev --host 0.0.0.0
 folio-vitae dev --env-file .env
 ```
 
+While hacking on this repository’s Rust code, you can rebuild automatically with
+[`cargo-watch`](https://crates.io/crates/cargo-watch):
+
+```bash
+cargo install cargo-watch
+cargo watch -x 'run -- dev'
+```
+
+Use `folio-vitae dev` (or `cargo run -- dev`) for content/template reloads. Prefer
+`cargo watch` when you change the Rust sources themselves — bare `cargo watch -x run`
+is not enough, because the binary requires an explicit `dev` / `prod` / `init`
+subcommand.
+
 ## Project layout
 
 ```text
