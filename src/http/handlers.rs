@@ -902,6 +902,7 @@ mod tests {
             cv_pdf_locks: Arc::new(Mutex::new(std::collections::HashMap::new())),
             html_page_cache: Arc::new(RwLock::new(std::collections::HashMap::new())),
             contact_rate_limiter: Arc::new(ContactRateLimiter::default()),
+            trusted_proxies: Arc::from([]),
         }
     }
 }
