@@ -7,18 +7,8 @@
     currentScript?.dataset.themeAudio ?? "/assets/audios/light-switch.mp3";
   const THEME_COOKIE_NAME = "theme";
   const ONE_YEAR_IN_SECONDS = 60 * 60 * 24 * 365;
-  const getCookieDomain = () => {
-    const host = window.location.hostname;
-    if (!host.includes(".")) {
-      return null;
-    }
-    const parts = host.split(".");
-    if (parts.length < 2) {
-      return null;
-    }
-    return `.${parts.slice(-2).join(".")}`;
-  };
   const setThemeCookie = (value) => {
+    // Host-only cookie: omit Domain so sibling subdomains cannot overwrite theme.
     const cookieSegments = [
       `${THEME_COOKIE_NAME}=${value}`,
       "Path=/",
@@ -27,10 +17,6 @@
     ];
     if (window.location.protocol === "https:") {
       cookieSegments.push("Secure");
-    }
-    const cookieDomain = getCookieDomain();
-    if (cookieDomain) {
-      cookieSegments.push(`Domain=${cookieDomain}`);
     }
     document.cookie = cookieSegments.join(";");
   };
