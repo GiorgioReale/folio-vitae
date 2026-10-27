@@ -153,6 +153,7 @@ Notes:
 - Put source images under `data/images/` when your YAML references them.
 - Pin a version in Compose (`image: ...:<version>`) if you do not want `latest` to move.
 - Compose publishes both ports on `127.0.0.1` only so a reverse proxy (Caddy, Traefik, nginx) on the same host can reach them without exposing the app directly. For a public deploy, put that proxy in front and point your domains at it.
+- Compose runs the container with a read-only root filesystem; a tmpfs mount on `/app` holds runtime asset materialization while `./data` stays read-only.
 - SMTP variables in `.env` enable the CV contact form (built into the default binary).
 - Upgrading the crate fills in missing `assets/`, `templates/`, `static/`, and `i18n/` files but does not overwrite local edits.
 
