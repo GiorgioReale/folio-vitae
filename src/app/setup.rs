@@ -61,6 +61,7 @@ pub(crate) fn build_app_states(
     let mailer = build_mailer(&default_resources.data)?.map(Arc::new);
     let show_credits = credits_enabled_from_env();
     let generator = Arc::<str>::from(format!("folio-vitae v{}", env!("CARGO_PKG_VERSION")));
+    let trusted_proxies = crate::config::trusted_proxies()?;
 
     let shared_localization_state = Arc::new(RwLock::new(Arc::new(localization_state)));
     let data_last_modified = Arc::new(RwLock::new(data_last_modified));
@@ -82,6 +83,7 @@ pub(crate) fn build_app_states(
         cv_pdf_locks: Arc::new(std::sync::Mutex::new(HashMap::new())),
         html_page_cache: Arc::new(RwLock::new(HashMap::new())),
         contact_rate_limiter: Arc::new(crate::app::rate_limit::ContactRateLimiter::default()),
+        trusted_proxies,
     };
 
     Ok((

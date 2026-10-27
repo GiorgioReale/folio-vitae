@@ -1,6 +1,7 @@
 use std::{
     collections::HashMap,
     fmt::Write as _,
+    net::IpAddr,
     sync::{Arc, Mutex, RwLock},
     time::{Duration, Instant, SystemTime},
 };
@@ -44,6 +45,8 @@ pub struct AppState {
     pub(crate) cv_pdf_locks: Arc<Mutex<HashMap<Language, Arc<tokio::sync::Mutex<()>>>>>,
     pub(crate) html_page_cache: Arc<RwLock<HashMap<HtmlCacheKey, Arc<str>>>>,
     pub(crate) contact_rate_limiter: Arc<ContactRateLimiter>,
+    /// Extra peer IPs allowed to set `X-Forwarded-Proto` (loopback is always trusted).
+    pub(crate) trusted_proxies: Arc<[IpAddr]>,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
@@ -922,6 +925,7 @@ mod tests {
             cv_pdf_locks: Arc::new(Mutex::new(HashMap::new())),
             html_page_cache: Arc::new(RwLock::new(HashMap::new())),
             contact_rate_limiter: Arc::new(ContactRateLimiter::default()),
+            trusted_proxies: Arc::from([]),
         }
     }
 
