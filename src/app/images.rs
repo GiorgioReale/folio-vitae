@@ -280,10 +280,16 @@ fn rasterize_svg(svg_source: &Path) -> AppResult<DynamicImage> {
     ensure_file_within_limit(svg_source, MAX_SVG_FILE_BYTES)?;
     let data = fs::read(svg_source).with_context(|| format!("reading {svg_source:?}"))?;
 
+    // usvg/simplecss cannot apply @media and logs noisy warnings; PNG/ICO also cannot
+    // honor prefers-color-scheme, so drop those rules only for rasterization. The
+    // browser-facing favicon.svg copy keeps the original media queries.
+    let svg = String::from_utf8_lossy(&data);
+    let svg_for_raster = strip_css_at_media_rules(&svg);
+
     let resources_dir = svg_source.parent().map(|parent| parent.to_path_buf());
     let options = confined_svg_options(resources_dir);
 
-    let tree = usvg::Tree::from_data(&data, &options)
+    let tree = usvg::Tree::from_data(svg_for_raster.as_bytes(), &options)
         .with_context(|| format!("parsing {svg_source:?} as SVG"))?;
 
     let size = tree.size().to_int_size();
@@ -315,6 +321,41 @@ fn rasterize_svg(svg_source: &Path) -> AppResult<DynamicImage> {
         .ok_or_else(|| AppError::msg(format!("creating RGBA image for {svg_source:?}")))?;
 
     Ok(DynamicImage::ImageRgba8(rgba))
+}
+
+fn strip_css_at_media_rules(svg: &str) -> String {
+    let mut output = String::with_capacity(svg.len());
+    let mut rest = svg;
+
+    while let Some(media_at) = rest.find("@media") {
+        output.push_str(&rest[..media_at]);
+        let after_media = &rest[media_at..];
+        let Some(brace_rel) = after_media.find('{') else {
+            output.push_str(after_media);
+            return output;
+        };
+
+        let mut depth = 0usize;
+        let mut end = brace_rel;
+        for (offset, ch) in after_media[brace_rel..].char_indices() {
+            match ch {
+                '{' => depth += 1,
+                '}' => {
+                    depth = depth.saturating_sub(1);
+                    if depth == 0 {
+                        end = brace_rel + offset + ch.len_utf8();
+                        break;
+                    }
+                },
+                _ => {},
+            }
+        }
+
+        rest = &after_media[end..];
+    }
+
+    output.push_str(rest);
+    output
 }
 
 fn confined_svg_options(resources_dir: Option<PathBuf>) -> usvg::Options<'static> {
@@ -413,4 +454,32 @@ fn ensure_parent_directory(path: &Path) -> AppResult<()> {
 
 fn project_root() -> AppResult<PathBuf> {
     std::env::current_dir().with_context(|| "reading current project directory")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::strip_css_at_media_rules;
+
+    #[test]
+    fn strip_css_at_media_rules_removes_prefers_color_scheme_blocks() {
+        let svg = r#"<svg><style>
+    svg { color: #444; }
+    @media (prefers-color-scheme: dark) {
+      svg { color: #bbb; }
+    }
+    path { fill: currentColor; }
+  </style></svg>"#;
+
+        let stripped = strip_css_at_media_rules(svg);
+        assert!(stripped.contains("color: #444"));
+        assert!(stripped.contains("fill: currentColor"));
+        assert!(!stripped.contains("@media"));
+        assert!(!stripped.contains("color: #bbb"));
+    }
+
+    #[test]
+    fn strip_css_at_media_rules_leaves_plain_svg_unchanged() {
+        let svg = r#"<svg><path d="M0 0h1v1z"/></svg>"#;
+        assert_eq!(strip_css_at_media_rules(svg), svg);
+    }
 }
