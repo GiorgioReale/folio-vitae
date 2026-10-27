@@ -1,6 +1,6 @@
 use std::{
     fs,
-    path::{Path, PathBuf},
+    path::{Component, Path, PathBuf},
 };
 
 use ico::{IconDir, IconDirEntry, IconImage, ResourceType};
@@ -11,6 +11,7 @@ use resvg::{
 };
 
 use crate::{
+    app::limits::{MAX_DECODED_PIXELS, MAX_IMAGE_FILE_BYTES, MAX_SVG_FILE_BYTES},
     config::data_dir,
     error::{AppError, AppResult, ResultExt},
 };
@@ -175,19 +176,46 @@ fn export_resized(input: &Path, outputs: &[(&Path, u32, u32)]) -> AppResult<()> 
 }
 
 fn load_dynamic_image(input: &Path) -> AppResult<DynamicImage> {
-    if input
+    ensure_file_within_limit(input, MAX_IMAGE_FILE_BYTES)?;
+
+    let image = if input
         .extension()
         .and_then(|ext| ext.to_str())
         .is_some_and(|ext| ext.eq_ignore_ascii_case("svg"))
     {
-        rasterize_svg(input)
+        rasterize_svg(input)?
     } else {
-        image::open(input).with_context(|| format!("opening {input:?}"))
-    }
+        image::open(input).with_context(|| format!("opening {input:?}"))?
+    };
+
+    ensure_decoded_pixel_limit(&image, input)?;
+    Ok(image)
 }
 
 fn load_rgba_image(input: &Path) -> AppResult<DynamicImage> {
     Ok(DynamicImage::ImageRgba8(load_dynamic_image(input)?.into_rgba8()))
+}
+
+fn ensure_file_within_limit(path: &Path, max_bytes: u64) -> AppResult<()> {
+    let metadata = fs::metadata(path).with_context(|| format!("reading metadata for {path:?}"))?;
+    if metadata.len() > max_bytes {
+        return Err(AppError::msg(format!(
+            "file {path:?} is {} bytes; maximum allowed is {max_bytes} bytes",
+            metadata.len()
+        )));
+    }
+    Ok(())
+}
+
+fn ensure_decoded_pixel_limit(image: &DynamicImage, path: &Path) -> AppResult<()> {
+    let (width, height) = image.dimensions();
+    let pixels = u64::from(width).saturating_mul(u64::from(height));
+    if pixels > MAX_DECODED_PIXELS {
+        return Err(AppError::msg(format!(
+            "decoded image {path:?} is {width}x{height} ({pixels} pixels); maximum allowed is {MAX_DECODED_PIXELS} pixels"
+        )));
+    }
+    Ok(())
 }
 
 /// Center-crop the source to the destination aspect ratio, then scale uniformly.
@@ -249,12 +277,11 @@ fn generate_favicon_set(source: &Path, output_dir: &Path) -> AppResult<()> {
 }
 
 fn rasterize_svg(svg_source: &Path) -> AppResult<DynamicImage> {
+    ensure_file_within_limit(svg_source, MAX_SVG_FILE_BYTES)?;
     let data = fs::read(svg_source).with_context(|| format!("reading {svg_source:?}"))?;
 
-    let options = usvg::Options {
-        resources_dir: svg_source.parent().map(|parent| parent.to_path_buf()),
-        ..usvg::Options::default()
-    };
+    let resources_dir = svg_source.parent().map(|parent| parent.to_path_buf());
+    let options = confined_svg_options(resources_dir);
 
     let tree = usvg::Tree::from_data(&data, &options)
         .with_context(|| format!("parsing {svg_source:?} as SVG"))?;
@@ -288,6 +315,60 @@ fn rasterize_svg(svg_source: &Path) -> AppResult<DynamicImage> {
         .ok_or_else(|| AppError::msg(format!("creating RGBA image for {svg_source:?}")))?;
 
     Ok(DynamicImage::ImageRgba8(rgba))
+}
+
+fn confined_svg_options(resources_dir: Option<PathBuf>) -> usvg::Options<'static> {
+    let base_dir = resources_dir.clone();
+    let mut options = usvg::Options { resources_dir, ..usvg::Options::default() };
+
+    options.image_href_resolver = usvg::ImageHrefResolver {
+        resolve_data: usvg::ImageHrefResolver::default_data_resolver(),
+        resolve_string: Box::new(move |href: &str, opts: &usvg::Options<'_>| {
+            if !is_confined_svg_href(href) {
+                return None;
+            }
+
+            let path = opts.get_abs_path(Path::new(href));
+            if let Some(base) = base_dir.as_ref()
+                && !path_is_within_base(&path, base)
+            {
+                return None;
+            }
+
+            if fs::metadata(&path).ok().is_none_or(|meta| meta.len() > MAX_IMAGE_FILE_BYTES) {
+                return None;
+            }
+
+            usvg::ImageHrefResolver::default_string_resolver()(href, opts)
+        }),
+    };
+
+    options
+}
+
+fn is_confined_svg_href(href: &str) -> bool {
+    if href.is_empty() || href.contains("://") || href.starts_with('/') {
+        return false;
+    }
+
+    let path = Path::new(href);
+    if path.is_absolute() {
+        return false;
+    }
+
+    !path.components().any(|component| {
+        matches!(component, Component::RootDir | Component::ParentDir | Component::Prefix(_))
+    })
+}
+
+fn path_is_within_base(path: &Path, base: &Path) -> bool {
+    let Ok(base) = fs::canonicalize(base) else {
+        return false;
+    };
+    let Ok(path) = fs::canonicalize(path) else {
+        return false;
+    };
+    path.starts_with(&base)
 }
 
 fn remove_stale_file(path: &Path) -> AppResult<()> {

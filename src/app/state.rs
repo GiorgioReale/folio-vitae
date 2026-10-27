@@ -15,6 +15,7 @@ use crate::{
     app::{
         email::Mailer,
         environment::Environment,
+        limits::{MAX_HTML_CACHE_ENTRIES, MAX_HTML_PAGE_BYTES, MAX_PDF_CACHE_BYTES},
         localization::{
             Language, Localizations, LocalizedResources, detect_languages_with_last_change,
             load_language_names, load_localizations, match_accept_language,
@@ -272,6 +273,10 @@ impl AppState {
     }
 
     pub(crate) fn store_cv_pdf(&self, language: Language, bytes: Arc<Vec<u8>>) {
+        if bytes.len() > MAX_PDF_CACHE_BYTES {
+            return;
+        }
+
         self.cv_pdf_cache
             .write()
             .unwrap_or_else(|error| error.into_inner())
@@ -299,7 +304,15 @@ impl AppState {
             return;
         }
 
-        self.html_page_cache.write().unwrap_or_else(|error| error.into_inner()).insert(key, html);
+        if html.len() > MAX_HTML_PAGE_BYTES {
+            return;
+        }
+
+        let mut cache = self.html_page_cache.write().unwrap_or_else(|error| error.into_inner());
+        if cache.len() >= MAX_HTML_CACHE_ENTRIES && !cache.contains_key(&key) {
+            cache.clear();
+        }
+        cache.insert(key, html);
     }
 }
 

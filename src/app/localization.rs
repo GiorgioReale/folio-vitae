@@ -5,7 +5,10 @@ use serde_json::Value;
 use strsim::jaro_winkler;
 
 use crate::{
-    app::models::{SiteData, expected_fields_for_container},
+    app::{
+        limits::MAX_CONTENT_FILE_BYTES,
+        models::{SiteData, expected_fields_for_container},
+    },
     config::data_dir,
     error::{AppError, AppResult, ResultExt},
 };
@@ -470,6 +473,28 @@ pub(crate) fn load_language_names(languages: &[Language]) -> AppResult<HashMap<L
 }
 
 fn read_language_file(path: &Path, language: &Language, label: &str) -> AppResult<String> {
+    match fs::metadata(path) {
+        Ok(metadata) if metadata.len() > MAX_CONTENT_FILE_BYTES => {
+            return Err(AppError::msg(format!(
+                "{label} file for language '{}' at {} is {} bytes; maximum allowed is {MAX_CONTENT_FILE_BYTES} bytes",
+                language.as_code(),
+                path.display(),
+                metadata.len()
+            )));
+        },
+        Ok(_) => {},
+        Err(error) if error.kind() == ErrorKind::NotFound => {
+            return Err(AppError::msg(format!(
+                "Unsupported language '{}': missing {label} file at {}",
+                language.as_code(),
+                path.display()
+            )));
+        },
+        Err(error) => {
+            return Err(AppError::from(error).with_context(format!("reading {}", path.display())));
+        },
+    }
+
     match fs::read_to_string(path) {
         Ok(contents) => Ok(contents),
         Err(error) if error.kind() == ErrorKind::NotFound => Err(AppError::msg(format!(

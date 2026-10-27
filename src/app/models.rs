@@ -1,6 +1,8 @@
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 
+use crate::app::limits::MAX_PROFILE_LIST_ITEMS;
+
 #[derive(Deserialize, Serialize, Clone)]
 pub(crate) struct SiteData {
     pub person: Person,
@@ -413,6 +415,27 @@ impl SiteData {
             );
         }
 
+        let profile = &self.sites.cv.profile;
+        push_if_list_too_long(
+            &mut errors,
+            profile.work_experiences.len(),
+            "sites.cv.profile.work_experiences",
+        );
+        push_if_list_too_long(
+            &mut errors,
+            profile.other_projects.len(),
+            "sites.cv.profile.other_projects",
+        );
+        push_if_list_too_long(&mut errors, profile.educations.len(), "sites.cv.profile.educations");
+        push_if_list_too_long(&mut errors, profile.skills.len(), "sites.cv.profile.skills");
+        push_if_list_too_long(
+            &mut errors,
+            profile.courses_certifications.len(),
+            "sites.cv.profile.courses_certifications",
+        );
+        push_if_list_too_long(&mut errors, self.contact.socials.len(), "contact.socials");
+        push_if_list_too_long(&mut errors, self.sites.additional.len(), "sites.additional");
+
         errors
     }
 }
@@ -490,6 +513,13 @@ fn push_if_invalid_http_url(errors: &mut Vec<String>, value: &str, path: &str) {
     let is_http = trimmed.starts_with("https://") || trimmed.starts_with("http://");
     if !is_http {
         errors.push(format!("`{path}` must start with `http://` or `https://`"));
+    }
+}
+
+fn push_if_list_too_long(errors: &mut Vec<String>, len: usize, path: &str) {
+    if len > MAX_PROFILE_LIST_ITEMS {
+        errors
+            .push(format!("`{path}` has {len} items; maximum allowed is {MAX_PROFILE_LIST_ITEMS}"));
     }
 }
 
