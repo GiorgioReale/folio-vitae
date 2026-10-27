@@ -26,14 +26,25 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  const isSafePath = (path) =>
-    Boolean(
-      path &&
-        path.startsWith("/") &&
-        !path.startsWith("//") &&
-        !path.includes("://") &&
-        !path.includes("\\")
-    );
+  const isSafePath = (path) => {
+    if (typeof path !== "string" || !path.startsWith("/") || path.startsWith("//")) {
+      return false;
+    }
+    if (path.includes("\\") || path.includes("\0")) {
+      return false;
+    }
+
+    try {
+      const url = new URL(path, window.location.origin);
+      return (
+        url.origin === window.location.origin &&
+        url.pathname.startsWith("/") &&
+        !url.pathname.startsWith("//")
+      );
+    } catch {
+      return false;
+    }
+  };
 
   const pathSuffix = (pathname) => {
     const segments = pathname.split("/").filter(Boolean);
