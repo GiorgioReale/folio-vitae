@@ -11,6 +11,12 @@ services:
     ports:
       - "127.0.0.1:36546:36546" # main site
       - "127.0.0.1:36547:36547" # CV site
+    # Immutable rootfs: the process cannot modify the image. Writable scratch is
+    # provided via tmpfs so startup can materialize embedded assets under /app.
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+      - /app:size=512m,uid=10001,gid=10001,mode=0755
     volumes:
       # Your YAML content and images (read-only is fine)
       - ./data:/app/data:ro
