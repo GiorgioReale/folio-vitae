@@ -543,7 +543,7 @@ pub(crate) fn compile_static_assets(
     Ok(StaticAssets {
         robots: render_static_template(&mut tera, path, "robots.txt", &context)?,
         sitemap: Arc::from(render_sitemap(site, data, localization)?),
-        manifest: render_static_template(&mut tera, path, "site.webmanifest", &context)?,
+        manifest: Arc::from(render_manifest(site, data, localization, asset_version)?),
         security_txt: render_static_template(
             &mut tera,
             path,
@@ -581,6 +581,95 @@ fn build_static_context(
     context.insert("security_txt_expires", &security_txt_expires);
 
     Ok(context)
+}
+
+fn render_manifest(
+    site: SiteKind,
+    data: &SiteData,
+    localization: &LocalizationState,
+    asset_version: &str,
+) -> AppResult<String> {
+    let (title, description, icons_site) = match site {
+        SiteKind::Main => {
+            let main = data.sites.resolved_main();
+            (main.title.as_str(), main.description.as_str(), "main")
+        },
+        SiteKind::Cv => {
+            let cv = data.sites.resolved_cv();
+            (cv.title.as_str(), cv.description.as_str(), "cv")
+        },
+    };
+
+    render_manifest_json(
+        localization.default_language.as_code(),
+        title,
+        description,
+        icons_site,
+        asset_version,
+    )
+}
+
+fn render_manifest_json(
+    lang: &str,
+    title: &str,
+    description: &str,
+    icons_site: &str,
+    asset_version: &str,
+) -> AppResult<String> {
+    #[derive(Serialize)]
+    struct WebManifest<'a> {
+        lang: &'a str,
+        name: &'a str,
+        short_name: &'a str,
+        description: &'a str,
+        start_url: &'static str,
+        background_color: &'static str,
+        theme_color: &'static str,
+        display: &'static str,
+        orientation: &'static str,
+        icons: [WebManifestIcon; 2],
+    }
+
+    #[derive(Serialize)]
+    struct WebManifestIcon {
+        src: String,
+        sizes: &'static str,
+        #[serde(rename = "type")]
+        icon_type: &'static str,
+    }
+
+    let manifest = WebManifest {
+        lang,
+        name: title,
+        short_name: title,
+        description,
+        start_url: "/",
+        background_color: "#000000",
+        theme_color: "#000000",
+        display: "standalone",
+        orientation: "portrait",
+        icons: [
+            WebManifestIcon {
+                src: format!(
+                    "/assets/icons/{icons_site}/logos/android-chrome-192x192.png?v={asset_version}"
+                ),
+                sizes: "192x192",
+                icon_type: "image/png",
+            },
+            WebManifestIcon {
+                src: format!(
+                    "/assets/icons/{icons_site}/logos/android-chrome-512x512.png?v={asset_version}"
+                ),
+                sizes: "512x512",
+                icon_type: "image/png",
+            },
+        ],
+    };
+
+    let mut json =
+        serde_json::to_string_pretty(&manifest).with_context(|| "serializing site.webmanifest")?;
+    json.push('\n');
+    Ok(json)
 }
 
 fn render_sitemap(
@@ -803,6 +892,24 @@ mod tests {
             "https://ex.com/a&amp;b&lt;&quot;c&quot;&gt;&apos;d"
         );
         assert_eq!(xml_escape("https://example.com/"), "https://example.com/");
+    }
+
+    #[test]
+    fn manifest_json_escapes_special_characters() {
+        let json = render_manifest_json(
+            "en",
+            r#"Name "quoted" & <tag>"#,
+            r#"Desc "quoted" & <tag>"#,
+            "main",
+            "abc123",
+        )
+        .unwrap();
+
+        let value: serde_json::Value = serde_json::from_str(&json).unwrap();
+        assert_eq!(value["name"], r#"Name "quoted" & <tag>"#);
+        assert_eq!(value["description"], r#"Desc "quoted" & <tag>"#);
+        assert!(json.contains(r#""name": "Name \"quoted\" & <tag>""#));
+        assert!(json.contains("/assets/icons/main/logos/android-chrome-192x192.png?v=abc123"));
     }
 
     #[test]
