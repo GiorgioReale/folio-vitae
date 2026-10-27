@@ -385,10 +385,31 @@ impl SiteData {
                 &format!("contact.socials[{index}].social_full_name"),
             );
             push_if_empty(&mut errors, &social.link, &format!("contact.socials[{index}].link"));
+            push_if_invalid_http_url(
+                &mut errors,
+                &social.link,
+                &format!("contact.socials[{index}].link"),
+            );
             push_if_empty(
                 &mut errors,
                 &social.profile_nickname,
                 &format!("contact.socials[{index}].profile_nickname"),
+            );
+        }
+
+        for (index, project) in self.sites.cv.profile.other_projects.iter().enumerate() {
+            push_if_invalid_http_url(
+                &mut errors,
+                &project.link,
+                &format!("sites.cv.profile.other_projects[{index}].link"),
+            );
+        }
+
+        for (index, course) in self.sites.cv.profile.courses_certifications.iter().enumerate() {
+            push_if_invalid_http_url(
+                &mut errors,
+                &course.link,
+                &format!("sites.cv.profile.courses_certifications[{index}].link"),
             );
         }
 
@@ -460,6 +481,18 @@ fn push_if_empty(errors: &mut Vec<String>, value: &str, path: &str) {
     }
 }
 
+fn push_if_invalid_http_url(errors: &mut Vec<String>, value: &str, path: &str) {
+    let trimmed = value.trim();
+    if trimmed.is_empty() {
+        return;
+    }
+
+    let is_http = trimmed.starts_with("https://") || trimmed.starts_with("http://");
+    if !is_http {
+        errors.push(format!("`{path}` must start with `http://` or `https://`"));
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -507,6 +540,38 @@ mod tests {
         let errors = data.validate();
 
         assert!(errors.iter().any(|error| error.contains("at least one site must be configured")));
+    }
+
+    #[test]
+    fn validation_rejects_non_http_social_links() {
+        let mut data = sample_data();
+        data.sites.main.domain = "example.com".to_string();
+        data.contact.socials.push(Social {
+            social_name: "GitHub".to_string(),
+            social_full_name: "GitHub".to_string(),
+            link: "javascript:alert(1)".to_string(),
+            profile_nickname: "alex".to_string(),
+        });
+
+        let errors = data.validate();
+        assert!(
+            errors.iter().any(|error| error.contains("must start with `http://` or `https://`")),
+            "{errors:?}"
+        );
+    }
+
+    #[test]
+    fn validation_allows_https_social_links() {
+        let mut data = sample_data();
+        data.sites.main.domain = "example.com".to_string();
+        data.contact.socials.push(Social {
+            social_name: "GitHub".to_string(),
+            social_full_name: "GitHub".to_string(),
+            link: "https://github.com/alex".to_string(),
+            profile_nickname: "alex".to_string(),
+        });
+
+        assert!(data.validate().is_empty());
     }
 
     #[test]
