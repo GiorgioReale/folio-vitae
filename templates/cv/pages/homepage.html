@@ -1,5 +1,9 @@
 {% extends "cv/base.html" %}
 {% block body_id %}homepage{% endblock body_id %}
+{% block head_preload %}
+  <link rel="preload" as="image" href="/assets/images/cv/home-background/home-background-mobile.avif?v={{ asset_version }}" type="image/avif" media="(max-width: 992px)" />
+  <link rel="preload" as="image" href="/assets/images/cv/home-background/home-background.avif?v={{ asset_version }}" type="image/avif" media="(min-width: 993px)" />
+{% endblock head_preload %}
 {% block aside %}
 <div class="hero-media" aria-hidden="true">
   <picture>
