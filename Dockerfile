@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM rust:1.99-alpine AS builder
+FROM rust:1.99.1-alpine3.24 AS builder
 
 RUN apk add --no-cache musl-dev
 
@@ -23,7 +23,7 @@ RUN --mount=type=cache,id=cargo-registry,target=/usr/local/cargo/registry,sharin
     cargo build --release --locked --all-features \
     && cp /src/target/release/folio-vitae /folio-vitae
 
-FROM alpine:3.24 AS runtime
+FROM alpine:3.24.3 AS runtime
 
 RUN apk add --no-cache ca-certificates \
     && addgroup -S -g 10001 app \
