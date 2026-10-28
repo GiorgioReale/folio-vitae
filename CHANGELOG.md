@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.13](https://github.com/GiorgioReale/folio-vitae/compare/v0.1.12...v0.1.13) - 2026-10-28
+
+### Fixed
+
+- preload hero image by viewport media query ([#76](https://github.com/GiorgioReale/folio-vitae/pull/76))
+
 ## [0.1.12](https://github.com/GiorgioReale/folio-vitae/compare/v0.1.11...v0.1.12) - 2026-10-28
 
 ### Fixed
