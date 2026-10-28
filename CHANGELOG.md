@@ -6,6 +6,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.12](https://github.com/GiorgioReale/folio-vitae/compare/v0.1.11...v0.1.12) - 2026-10-28
+
+### Fixed
+
+- silence SVG @media rasterization warnings ([#73](https://github.com/GiorgioReale/folio-vitae/pull/73))
+
+### Other
+
+- replace remaining data_example images with placehold.co ([#75](https://github.com/GiorgioReale/folio-vitae/pull/75))
+- update dependencies to latest releases ([#74](https://github.com/GiorgioReale/folio-vitae/pull/74))
+- mention cargo-watch for local Rust development ([#72](https://github.com/GiorgioReale/folio-vitae/pull/72))
+- Keep the theme cookie host-only ([#61](https://github.com/GiorgioReale/folio-vitae/pull/61))
+
+### Security
+
+- deny unknown Cargo registries and git sources ([#71](https://github.com/GiorgioReale/folio-vitae/pull/71))
+- read-only Compose root filesystem ([#70](https://github.com/GiorgioReale/folio-vitae/pull/70))
+- tighten JS menu/language return paths ([#69](https://github.com/GiorgioReale/folio-vitae/pull/69))
+- bound YAML, image, and cache sizes ([#68](https://github.com/GiorgioReale/folio-vitae/pull/68))
+- serialize site.webmanifest as JSON ([#67](https://github.com/GiorgioReale/folio-vitae/pull/67))
+- trust X-Forwarded-Proto only from trusted proxies ([#66](https://github.com/GiorgioReale/folio-vitae/pull/66))
+- escape sitemap XML special characters ([#63](https://github.com/GiorgioReale/folio-vitae/pull/63))
+- allow only http(s) links in YAML ([#62](https://github.com/GiorgioReale/folio-vitae/pull/62))
+
 ## [0.1.11](https://github.com/GiorgioReale/folio-vitae/compare/v0.1.10...v0.1.11) - 2026-10-24
 
 ### Other
