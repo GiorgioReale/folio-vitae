@@ -24,7 +24,6 @@ jobs:
     timeout-minutes: 5
     outputs:
       rust: ${{ steps.flags.outputs.rust }}
-      deps: ${{ steps.flags.outputs.deps }}
     steps:
       - name: Checkout repository
         if: github.event_name != 'workflow_dispatch'
@@ -50,21 +49,14 @@ jobs:
               - 'i18n/**'
               - 'data_example/**'
               - '.github/workflows/rust-ci.yml'
-            deps:
-              - 'Cargo.toml'
-              - 'Cargo.lock'
-              - 'deny.toml'
-              - '.github/workflows/rust-ci.yml'
 
       - name: Set job flags
         id: flags
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "rust=true" >> "$GITHUB_OUTPUT"
-            echo "deps=true" >> "$GITHUB_OUTPUT"
           else
             echo "rust=${{ steps.filter.outputs.rust }}" >> "$GITHUB_OUTPUT"
-            echo "deps=${{ steps.filter.outputs.deps }}" >> "$GITHUB_OUTPUT"
           fi
 
   checks:
@@ -100,40 +92,6 @@ jobs:
 
       - name: Cache cargo
         uses: Swatinem/rust-cache@v2
-
-      - name: Run ${{ matrix.name }}
-        run: ${{ matrix.command }}
-
-  security:
-    name: ${{ matrix.name }}
-    needs: changes
-    if: needs.changes.outputs.deps == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - name: Cargo Audit
-            installer: cargo-audit
-            command: cargo audit
-          - name: Cargo Deny
-            installer: cargo-deny
-            command: cargo deny check
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v7
-
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache cargo
-        uses: Swatinem/rust-cache@v2
-
-      - name: Install ${{ matrix.installer }}
-        uses: taiki-e/install-action@v2
-        with:
-          tool: ${{ matrix.installer }}
 
       - name: Run ${{ matrix.name }}
         run: ${{ matrix.command }}

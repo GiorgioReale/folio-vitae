@@ -1,0 +1,57 @@
+name: Rust Security
+
+on:
+  pull_request:
+    paths:
+      - Cargo.toml
+      - Cargo.lock
+      - deny.toml
+      - rust-toolchain.toml
+      - .github/workflows/rust-security.yml
+  schedule:
+    # Weekly re-check for newly disclosed Rust crate advisories.
+    - cron: "27 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rust-security-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  security:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Cargo Audit
+            installer: cargo-audit
+            command: cargo audit
+          - name: Cargo Deny
+            installer: cargo-deny
+            command: cargo deny check
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install ${{ matrix.installer }}
+        uses: taiki-e/install-action@v2
+        with:
+          tool: ${{ matrix.installer }}
+
+      - name: Run ${{ matrix.name }}
+        run: ${{ matrix.command }}
