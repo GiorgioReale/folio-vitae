@@ -1,21 +1,11 @@
 name: Docker
 
 on:
+  # Always run on PRs to main so the "Docker gate" check is reported for branch
+  # protection. Expensive builds stay behind the path filter in the changes job.
   pull_request:
-    paths:
-      - Dockerfile
-      - .dockerignore
-      - .github/workflows/docker.yml
-      - .github/workflows/trivy.yml
-      - Cargo.toml
-      - Cargo.lock
-      - rust-toolchain.toml
-      - src/**
-      - assets/**
-      - templates/**
-      - static/**
-      - i18n/**
-      - data_example/**
+    branches:
+      - main
   workflow_call:
     inputs:
       git_ref:
@@ -54,6 +44,7 @@ on:
 permissions:
   contents: read
   packages: write
+  pull-requests: read
   security-events: write
   actions: read
 
@@ -66,11 +57,55 @@ env:
   TRIVY_SEVERITY: CRITICAL,HIGH
 
 jobs:
+  changes:
+    name: Detect Docker changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      docker: ${{ steps.flags.outputs.docker }}
+    steps:
+      - name: Checkout repository
+        if: github.event_name == 'pull_request'
+        uses: actions/checkout@v7
+
+      - name: Detect path filters
+        if: github.event_name == 'pull_request'
+        uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          filters: |
+            docker:
+              - 'Dockerfile'
+              - '.dockerignore'
+              - '.github/workflows/docker.yml'
+              - '.github/workflows/trivy.yml'
+              - 'Cargo.toml'
+              - 'Cargo.lock'
+              - 'rust-toolchain.toml'
+              - 'src/**'
+              - 'assets/**'
+              - 'templates/**'
+              - 'static/**'
+              - 'i18n/**'
+              - 'data_example/**'
+
+      - name: Set job flags
+        id: flags
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "docker=${{ steps.filter.outputs.docker }}" >> "$GITHUB_OUTPUT"
+          else
+            # workflow_call / workflow_dispatch / schedule callers always build.
+            echo "docker=true" >> "$GITHUB_OUTPUT"
+          fi
+
   # Native runners per arch (no QEMU). Digests are merged into a multi-arch
   # manifest on non-PR events; PRs only verify that each platform builds.
   # Build-time Trivy stays here (same runner as the loaded/pushed image).
   # Scheduled and post-publish scans live in trivy.yml.
   build:
+    needs: changes
+    if: needs.changes.outputs.docker == 'true'
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 45
     strategy:
@@ -210,7 +245,7 @@ jobs:
 
       - name: Upload digest
         if: github.event_name != 'pull_request'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: digests-${{ env.PLATFORM_PAIR }}
           path: /tmp/digests/*
@@ -218,8 +253,8 @@ jobs:
           retention-days: 1
 
   merge:
-    if: github.event_name != 'pull_request'
-    needs: build
+    if: github.event_name != 'pull_request' && needs.changes.outputs.docker == 'true'
+    needs: [changes, build]
     runs-on: ubuntu-26.04
     timeout-minutes: 15
     outputs:
@@ -252,7 +287,7 @@ jobs:
         run: echo "IMAGE_NAME=${REGISTRY}/$(echo '${{ github.repository }}' | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_ENV"
 
       - name: Download digests
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: /tmp/digests
           pattern: digests-*
@@ -327,3 +362,23 @@ jobs:
       packages: read
       security-events: write
       actions: read
+
+  # Always reports a conclusion so required status checks are never left "missing"
+  # when Docker paths did not change (build skipped).
+  docker-gate:
+    name: Docker gate
+    needs: [changes, build]
+    if: always() && needs.changes.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Evaluate Docker build requirement
+        run: |
+          set -euo pipefail
+          if [ "${{ needs.changes.outputs.docker }}" != "true" ]; then
+            echo "Docker build not required for this change set"
+            exit 0
+          fi
+          result="${{ needs.build.result }}"
+          echo "Docker build result: ${result}"
+          [ "${result}" = "success" ]
