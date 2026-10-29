@@ -45,6 +45,8 @@ permissions:
   contents: read
   packages: write
   pull-requests: read
+  security-events: write
+  actions: read
 
 concurrency:
   group: docker-${{ inputs.git_ref || github.ref }}
@@ -52,6 +54,7 @@ concurrency:
 
 env:
   REGISTRY: ghcr.io
+  TRIVY_SEVERITY: CRITICAL,HIGH
 
 jobs:
   changes:
@@ -75,6 +78,7 @@ jobs:
               - 'Dockerfile'
               - '.dockerignore'
               - '.github/workflows/docker.yml'
+              - '.github/workflows/trivy.yml'
               - 'Cargo.toml'
               - 'Cargo.lock'
               - 'rust-toolchain.toml'
@@ -97,6 +101,8 @@ jobs:
 
   # Native runners per arch (no QEMU). Digests are merged into a multi-arch
   # manifest on non-PR events; PRs only verify that each platform builds.
+  # Build-time Trivy stays here (same runner as the loaded/pushed image).
+  # Scheduled and post-publish scans live in trivy.yml.
   build:
     needs: changes
     if: needs.changes.outputs.docker == 'true'
@@ -161,15 +167,42 @@ jobs:
           images: ${{ env.IMAGE_NAME }}
 
       - name: Build (PR verify only)
+        id: build_pr
         if: github.event_name == 'pull_request'
         uses: docker/build-push-action@v7
         with:
           context: .
           platforms: ${{ matrix.platform }}
           push: false
+          load: true
+          tags: folio-vitae:pr-${{ env.PLATFORM_PAIR }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha,scope=build-${{ env.PLATFORM_PAIR }}
           cache-to: type=gha,mode=max,scope=build-${{ env.PLATFORM_PAIR }}
+
+      - name: Trivy scan (PR image)
+        id: trivy_pr
+        if: github.event_name == 'pull_request' && steps.build_pr.outcome == 'success'
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: folio-vitae:pr-${{ env.PLATFORM_PAIR }}
+          format: sarif
+          output: trivy-results.sarif
+          exit-code: "1"
+          ignore-unfixed: true
+          severity: ${{ env.TRIVY_SEVERITY }}
+          vuln-type: os,library
+
+      - name: Upload Trivy SARIF (PR)
+        if: >-
+          always()
+          && github.event_name == 'pull_request'
+          && github.event.pull_request.head.repo.full_name == github.repository
+          && steps.trivy_pr.outcome != 'skipped'
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: trivy-results.sarif
+          category: trivy-pr-${{ env.PLATFORM_PAIR }}
 
       - name: Build and push by digest
         id: build
@@ -182,6 +215,26 @@ jobs:
           outputs: type=image,name=${{ env.IMAGE_NAME }},push-by-digest=true,name-canonical=true,push=true
           cache-from: type=gha,scope=build-${{ env.PLATFORM_PAIR }}
           cache-to: type=gha,mode=max,scope=build-${{ env.PLATFORM_PAIR }}
+
+      - name: Trivy scan (pushed digest)
+        id: trivy_digest
+        if: github.event_name != 'pull_request' && steps.build.outcome == 'success'
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: ${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }}
+          format: sarif
+          output: trivy-results.sarif
+          exit-code: "1"
+          ignore-unfixed: true
+          severity: ${{ env.TRIVY_SEVERITY }}
+          vuln-type: os,library
+
+      - name: Upload Trivy SARIF (digest)
+        if: always() && github.event_name != 'pull_request' && steps.trivy_digest.outcome != 'skipped'
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: trivy-results.sarif
+          category: trivy-digest-${{ env.PLATFORM_PAIR }}
 
       - name: Export digest
         if: github.event_name != 'pull_request'
@@ -204,6 +257,8 @@ jobs:
     needs: [changes, build]
     runs-on: ubuntu-26.04
     timeout-minutes: 15
+    outputs:
+      image_ref: ${{ steps.image_ref.outputs.ref }}
     steps:
       - name: Resolve checkout ref
         id: checkout_ref
@@ -290,6 +345,23 @@ jobs:
       - name: Inspect image
         run: |
           docker buildx imagetools inspect "${IMAGE_NAME}:${{ steps.meta.outputs.version }}"
+
+      - name: Export published image ref
+        id: image_ref
+        run: echo "ref=${IMAGE_NAME}:${{ steps.meta.outputs.version }}" >> "$GITHUB_OUTPUT"
+
+  trivy:
+    if: github.event_name != 'pull_request'
+    needs: merge
+    uses: ./.github/workflows/trivy.yml
+    with:
+      image_ref: ${{ needs.merge.outputs.image_ref }}
+      sarif_category: trivy-published
+    permissions:
+      contents: read
+      packages: read
+      security-events: write
+      actions: read
 
   # Always reports a conclusion so required status checks are never left "missing"
   # when Docker paths did not change (build skipped).
