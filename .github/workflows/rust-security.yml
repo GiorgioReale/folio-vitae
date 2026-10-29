@@ -1,13 +1,11 @@
 name: Rust Security
 
 on:
+  # Always run on PRs to main so the "Rust Security gate" check is reported for
+  # branch protection. Audit/deny stay behind the path filter in the changes job.
   pull_request:
-    paths:
-      - Cargo.toml
-      - Cargo.lock
-      - deny.toml
-      - rust-toolchain.toml
-      - .github/workflows/rust-security.yml
+    branches:
+      - main
   schedule:
     # Weekly re-check for newly disclosed Rust crate advisories.
     - cron: "27 5 * * 1"
@@ -15,6 +13,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: read
 
 concurrency:
   group: rust-security-${{ github.event.pull_request.number || github.ref }}
@@ -24,8 +23,44 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  changes:
+    name: Detect dependency changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      security: ${{ steps.flags.outputs.security }}
+    steps:
+      - name: Checkout repository
+        if: github.event_name == 'pull_request'
+        uses: actions/checkout@v7
+
+      - name: Detect path filters
+        if: github.event_name == 'pull_request'
+        uses: dorny/paths-filter@v4
+        id: filter
+        with:
+          filters: |
+            security:
+              - 'Cargo.toml'
+              - 'Cargo.lock'
+              - 'deny.toml'
+              - 'rust-toolchain.toml'
+              - '.github/workflows/rust-security.yml'
+
+      - name: Set job flags
+        id: flags
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "security=${{ steps.filter.outputs.security }}" >> "$GITHUB_OUTPUT"
+          else
+            # schedule / workflow_dispatch always run advisory checks.
+            echo "security=true" >> "$GITHUB_OUTPUT"
+          fi
+
   security:
     name: ${{ matrix.name }}
+    needs: changes
+    if: needs.changes.outputs.security == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
@@ -55,3 +90,21 @@ jobs:
 
       - name: Run ${{ matrix.name }}
         run: ${{ matrix.command }}
+
+  rust-security-gate:
+    name: Rust Security gate
+    needs: [changes, security]
+    if: always() && needs.changes.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Evaluate Rust security requirement
+        run: |
+          set -euo pipefail
+          if [ "${{ needs.changes.outputs.security }}" != "true" ]; then
+            echo "Dependency security checks not required for this change set"
+            exit 0
+          fi
+          result="${{ needs.security.result }}"
+          echo "Rust security result: ${result}"
+          [ "${result}" = "success" ]
