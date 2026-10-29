@@ -43,6 +43,9 @@ jobs:
     runs-on: ubuntu-26.04
     timeout-minutes: 15
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
       - name: Resolve image reference
         id: image
         env:
@@ -91,6 +94,8 @@ jobs:
           ignore-unfixed: true
           severity: ${{ env.TRIVY_SEVERITY }}
           vuln-type: os,library
+          trivyignores: .trivyignore
+
 
       - name: Upload Trivy SARIF
         if: always() && steps.trivy.outcome != 'skipped'

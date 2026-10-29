@@ -79,6 +79,7 @@ jobs:
             docker:
               - 'Dockerfile'
               - '.dockerignore'
+              - '.trivyignore'
               - '.github/workflows/docker.yml'
               - '.github/workflows/trivy.yml'
               - 'Cargo.toml'
@@ -103,8 +104,8 @@ jobs:
 
   # Native runners per arch (no QEMU). Digests are merged into a multi-arch
   # manifest on non-PR events; PRs only verify that each platform builds.
-  # Build-time Trivy stays here (same runner as the loaded/pushed image).
-  # Scheduled and post-publish scans live in trivy.yml.
+  # PR image scans run in trivy-pr (separate required gate). Digest scans stay
+  # here; scheduled / post-publish scans live in trivy.yml.
   build:
     needs: changes
     if: needs.changes.outputs.docker == 'true'
@@ -176,35 +177,21 @@ jobs:
           context: .
           platforms: ${{ matrix.platform }}
           push: false
-          load: true
-          tags: folio-vitae:pr-${{ env.PLATFORM_PAIR }}
+          # Export a tar so the dedicated Trivy job can scan without sharing the
+          # local image store across jobs.
+          outputs: type=docker,dest=/tmp/folio-vitae-${{ env.PLATFORM_PAIR }}.tar
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha,scope=build-${{ env.PLATFORM_PAIR }}
           cache-to: type=gha,mode=max,scope=build-${{ env.PLATFORM_PAIR }}
 
-      - name: Trivy scan (PR image)
-        id: trivy_pr
-        if: github.event_name == 'pull_request' && steps.build_pr.outcome == 'success'
-        uses: aquasecurity/trivy-action@v0.36.0
+      - name: Upload PR image tar
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v7
         with:
-          image-ref: folio-vitae:pr-${{ env.PLATFORM_PAIR }}
-          format: sarif
-          output: trivy-results.sarif
-          exit-code: "1"
-          ignore-unfixed: true
-          severity: ${{ env.TRIVY_SEVERITY }}
-          vuln-type: os,library
-
-      - name: Upload Trivy SARIF (PR)
-        if: >-
-          always()
-          && github.event_name == 'pull_request'
-          && github.event.pull_request.head.repo.full_name == github.repository
-          && steps.trivy_pr.outcome != 'skipped'
-        uses: github/codeql-action/upload-sarif@v4
-        with:
-          sarif_file: trivy-results.sarif
-          category: trivy-pr-${{ env.PLATFORM_PAIR }}
+          name: pr-image-${{ env.PLATFORM_PAIR }}
+          path: /tmp/folio-vitae-${{ env.PLATFORM_PAIR }}.tar
+          if-no-files-found: error
+          retention-days: 1
 
       - name: Build and push by digest
         id: build
@@ -233,6 +220,7 @@ jobs:
           ignore-unfixed: true
           severity: ${{ env.TRIVY_SEVERITY }}
           vuln-type: os,library
+          trivyignores: .trivyignore
 
       - name: Upload Trivy SARIF (digest)
         if: always() && github.event_name != 'pull_request' && steps.trivy_digest.outcome != 'skipped'
@@ -256,6 +244,63 @@ jobs:
           path: /tmp/digests/*
           if-no-files-found: error
           retention-days: 1
+
+  # Dedicated PR scan job so branch protection can require "Trivy gate" separately
+  # from "Docker gate" (build-only failures vs vulnerability findings).
+  trivy-pr:
+    name: Trivy (${{ matrix.platform }})
+    needs: [changes, build]
+    if: >-
+      github.event_name == 'pull_request'
+      && needs.changes.outputs.docker == 'true'
+      && needs.build.result == 'success'
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: linux/amd64
+            runner: ubuntu-26.04
+          - platform: linux/arm64
+            runner: ubuntu-26.04-arm
+    steps:
+      - name: Prepare
+        run: |
+          platform=${{ matrix.platform }}
+          echo "PLATFORM_PAIR=${platform//\//-}" >> "$GITHUB_ENV"
+
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Download PR image tar
+        uses: actions/download-artifact@v8
+        with:
+          name: pr-image-${{ env.PLATFORM_PAIR }}
+          path: /tmp
+
+      - name: Trivy scan (PR image)
+        id: trivy_pr
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          input: /tmp/folio-vitae-${{ env.PLATFORM_PAIR }}.tar
+          format: sarif
+          output: trivy-results.sarif
+          exit-code: "1"
+          ignore-unfixed: true
+          severity: ${{ env.TRIVY_SEVERITY }}
+          vuln-type: os,library
+          trivyignores: .trivyignore
+
+      - name: Upload Trivy SARIF (PR)
+        if: >-
+          always()
+          && github.event.pull_request.head.repo.full_name == github.repository
+          && steps.trivy_pr.outcome != 'skipped'
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: trivy-results.sarif
+          category: trivy-pr-${{ env.PLATFORM_PAIR }}
 
   merge:
     if: github.event_name != 'pull_request' && needs.changes.outputs.docker == 'true'
@@ -425,4 +470,30 @@ jobs:
           fi
           result="${{ needs.build.result }}"
           echo "Docker build result: ${result}"
+          [ "${result}" = "success" ]
+
+  trivy-gate:
+    name: Trivy gate
+    needs: [changes, build, trivy-pr]
+    if: always() && needs.changes.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Evaluate Trivy scan requirement
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "Trivy gate applies to pull requests only"
+            exit 0
+          fi
+          if [ "${{ needs.changes.outputs.docker }}" != "true" ]; then
+            echo "Trivy scan not required for this change set"
+            exit 0
+          fi
+          if [ "${{ needs.build.result }}" != "success" ]; then
+            echo "Skipping Trivy gate evaluation because the Docker build did not succeed"
+            exit 1
+          fi
+          result="${{ needs.trivy-pr.result }}"
+          echo "Trivy PR scan result: ${result}"
           [ "${result}" = "success" ]
