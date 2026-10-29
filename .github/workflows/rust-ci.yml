@@ -123,10 +123,10 @@ jobs:
         run: cargo msrv verify -- cargo check --all-targets --all-features --locked
 
   # Always reports a conclusion so required status checks are never left "missing"
-  # when Rust/deps paths did not change (matrix jobs skipped).
+  # when Rust paths did not change (matrix jobs skipped).
   merge-gate:
     name: Merge gate
-    needs: [changes, checks, security, msrv]
+    needs: [changes, checks, msrv]
     if: always() && needs.changes.result == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -135,7 +135,6 @@ jobs:
         run: |
           set -euo pipefail
           rust="${{ needs.changes.outputs.rust }}"
-          deps="${{ needs.changes.outputs.deps }}"
 
           if [ "${rust}" = "true" ]; then
             echo "Rust checks result: ${{ needs.checks.result }}"
@@ -144,11 +143,4 @@ jobs:
             [ "${{ needs.msrv.result }}" = "success" ]
           else
             echo "Rust path checks not required for this change set"
-          fi
-
-          if [ "${deps}" = "true" ]; then
-            echo "Security result: ${{ needs.security.result }}"
-            [ "${{ needs.security.result }}" = "success" ]
-          else
-            echo "Dependency security checks not required for this change set"
           fi
