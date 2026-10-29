@@ -1,7 +1,13 @@
 [advisories]
+# Every ignored advisory must include:
+# - reason: why the risk is accepted
+# - what would replace / clear it
+# - revisit-by date inside the reason (re-evaluate on or before that date)
+# Do not leave permanent ignores without a revisit date.
 ignore = [
-    "RUSTSEC-2024-0436", # paste - no maintained alternative available currently
+    { id = "RUSTSEC-2024-0436", reason = "Transitive paste 1.x via image→exr/ravif (pulp, rav1e). Unmaintained proc-macro only (no runtime CVE surface). Clear by migrating upstream to pastey (or dropping image/exr paths). Revisit by 2027-04-01." },
 ]
+unused-ignored-advisory = "deny"
 git-fetch-with-cli = true
 
 [licenses]
