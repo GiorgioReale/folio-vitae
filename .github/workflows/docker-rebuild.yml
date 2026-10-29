@@ -1,0 +1,41 @@
+name: Docker Rebuild
+
+# Rebuild and republish the multi-arch image from the default branch so base
+# image / Alpine package patches land on current tags (latest + Cargo version)
+# even when application code has not changed.
+on:
+  schedule:
+    # Weekly Monday 04:07 UTC (before the Trivy re-scan window).
+    - cron: "7 4 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+  # Forward-compatible with Docker workflow jobs that upload SARIF / attestations.
+  actions: read
+  security-events: write
+  id-token: write
+  attestations: write
+
+concurrency:
+  group: docker-rebuild
+  cancel-in-progress: false
+
+jobs:
+  rebuild:
+    uses: ./.github/workflows/docker.yml
+    with:
+      # Empty ref → docker.yml checks out the caller SHA (default branch tip).
+      git_ref: ""
+      # Retag both latest and the current Cargo.toml version (e.g. 0.1.13 / 0.1)
+      # so pinned version tags pick up base-image OS patches without an app release.
+      update_latest: true
+      update_version_tags: true
+    permissions:
+      contents: read
+      packages: write
+      actions: read
+      security-events: write
+      id-token: write
+      attestations: write
