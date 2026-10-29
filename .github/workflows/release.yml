@@ -16,6 +16,8 @@ on:
 permissions:
   contents: read
   packages: write
+  id-token: write
+  attestations: write
 
 concurrency:
   group: release-${{ github.event.release.tag_name || inputs.tag }}
@@ -114,3 +116,5 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write
+      attestations: write
