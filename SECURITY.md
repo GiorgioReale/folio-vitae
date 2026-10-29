@@ -17,3 +17,14 @@ When sharing proof-of-concept material, please minimize sensitive or personal da
 ## Coordinated Disclosure
 
 We appreciate coordinated disclosure. Once a fix is available, we will agree on a public disclosure timeline with the reporter, crediting those who responsibly report vulnerabilities (unless anonymity is requested).
+
+## Ignoring advisories
+
+Ignored findings must never be open-ended.
+
+| Where | How |
+|-------|-----|
+| Rust (`deny.toml`) | Use `{ id = "RUSTSEC-…", reason = "…" }` and put **why**, **what clears it**, and **revisit by YYYY-MM-DD** in `reason`. |
+| Container (`/.trivyignore`) | Prefer `CVE-… exp:YYYY-MM-DD` so the ignore expires automatically. |
+
+Before adding an ignore: confirm impact on this project, prefer upgrading first, and schedule a revisit. Remove the entry when upstream is fixed or the dependency is gone.

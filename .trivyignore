@@ -1,0 +1,10 @@
+# Trivy ignore policy (same spirit as deny.toml advisories.ignore):
+#
+# - Prefer fixing or upgrading over ignoring.
+# - Every ignored finding needs: why it is accepted, what clears it, and an expiry.
+# - Use Trivy's expiry syntax so ignores cannot live forever:
+#     CVE-YYYY-NNNN exp:YYYY-MM-DD
+# - Revisit on or before the expiry date; remove the line when fixed or no longer needed.
+# - Prefer ignoring only fixable noise that does not affect this image's runtime.
+#
+# No ignores are active yet. Add entries below this line when needed.
