@@ -18,6 +18,8 @@ permissions:
   packages: write
   id-token: write
   attestations: write
+  security-events: write
+  actions: read
 
 concurrency:
   group: release-${{ github.event.release.tag_name || inputs.tag }}
@@ -118,3 +120,5 @@ jobs:
       packages: write
       id-token: write
       attestations: write
+      security-events: write
+      actions: read
