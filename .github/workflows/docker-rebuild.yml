@@ -12,6 +12,7 @@ on:
 permissions:
   contents: read
   packages: write
+  pull-requests: read
   # Forward-compatible with Docker workflow jobs that upload SARIF / attestations.
   actions: read
   security-events: write
@@ -26,8 +27,7 @@ jobs:
   rebuild:
     uses: ./.github/workflows/docker.yml
     with:
-      # Empty ref → docker.yml checks out the caller SHA (default branch tip).
-      git_ref: ""
+      # Omit git_ref → docker.yml checks out the caller SHA (default branch tip).
       # Retag both latest and the current Cargo.toml version (e.g. 0.1.13 / 0.1)
       # so pinned version tags pick up base-image OS patches without an app release.
       update_latest: true
@@ -35,6 +35,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      pull-requests: read
       actions: read
       security-events: write
       id-token: write
