@@ -212,6 +212,10 @@ jobs:
         id: trivy_digest
         if: github.event_name != 'pull_request' && steps.build.outcome == 'success'
         uses: aquasecurity/trivy-action@v0.36.0
+        env:
+          # Push-by-digest with attestations yields an OCI index; Trivy defaults to
+          # linux/amd64 and fails on arm64 runners without an explicit platform.
+          TRIVY_PLATFORM: ${{ matrix.platform }}
         with:
           image-ref: ${{ env.IMAGE_NAME }}@${{ steps.build.outputs.digest }}
           format: sarif
@@ -223,7 +227,11 @@ jobs:
           trivyignores: .trivyignore
 
       - name: Upload Trivy SARIF (digest)
-        if: always() && github.event_name != 'pull_request' && steps.trivy_digest.outcome != 'skipped'
+        if: >-
+          always()
+          && github.event_name != 'pull_request'
+          && steps.trivy_digest.outcome != 'skipped'
+          && hashFiles('trivy-results.sarif') != ''
         uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: trivy-results.sarif
