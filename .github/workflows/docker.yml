@@ -44,6 +44,8 @@ on:
 permissions:
   contents: read
   packages: write
+  id-token: write
+  attestations: write
   pull-requests: read
   security-events: write
   actions: read
@@ -212,6 +214,9 @@ jobs:
           context: .
           platforms: ${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
+          # Registry-attached BuildKit attestations (per-platform digests).
+          sbom: true
+          provenance: mode=max
           outputs: type=image,name=${{ env.IMAGE_NAME }},push-by-digest=true,name-canonical=true,push=true
           cache-from: type=gha,scope=build-${{ env.PLATFORM_PAIR }}
           cache-to: type=gha,mode=max,scope=build-${{ env.PLATFORM_PAIR }}
@@ -256,7 +261,7 @@ jobs:
     if: github.event_name != 'pull_request' && needs.changes.outputs.docker == 'true'
     needs: [changes, build]
     runs-on: ubuntu-26.04
-    timeout-minutes: 15
+    timeout-minutes: 20
     outputs:
       image_ref: ${{ steps.image_ref.outputs.ref }}
     steps:
@@ -343,12 +348,51 @@ jobs:
             $(printf '${{ env.IMAGE_NAME }}@sha256:%s ' *)
 
       - name: Inspect image
+        id: inspect
+        env:
+          IMAGE_TAG: ${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.version }}
         run: |
-          docker buildx imagetools inspect "${IMAGE_NAME}:${{ steps.meta.outputs.version }}"
+          set -euo pipefail
+          docker buildx imagetools inspect "${IMAGE_TAG}"
+          digest="$(docker buildx imagetools inspect "${IMAGE_TAG}" --format '{{.Manifest.Digest}}')"
+          if [ -z "${digest}" ] || [ "${digest}" = "null" ]; then
+            echo "Unable to resolve digest for ${IMAGE_TAG}"
+            exit 1
+          fi
+          echo "digest=${digest}" >> "$GITHUB_OUTPUT"
+          echo "Published ${IMAGE_TAG} @ ${digest}"
 
       - name: Export published image ref
         id: image_ref
         run: echo "ref=${IMAGE_NAME}:${{ steps.meta.outputs.version }}" >> "$GITHUB_OUTPUT"
+
+      - name: Generate Syft SBOM
+        uses: anchore/sbom-action@v0.24.3
+        with:
+          image: ${{ env.IMAGE_NAME }}@${{ steps.inspect.outputs.digest }}
+          registry-username: ${{ github.actor }}
+          registry-password: ${{ secrets.GITHUB_TOKEN }}
+          format: spdx-json
+          output-file: folio-vitae.spdx.json
+          artifact-name: folio-vitae-sbom
+          upload-artifact: true
+          upload-release-assets: false
+          dependency-snapshot: false
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v4.2.2
+        with:
+          subject-name: ${{ env.IMAGE_NAME }}
+          subject-digest: ${{ steps.inspect.outputs.digest }}
+          push-to-registry: true
+
+      - name: Attest Syft SBOM
+        uses: actions/attest-sbom@v4.1.0
+        with:
+          subject-name: ${{ env.IMAGE_NAME }}
+          subject-digest: ${{ steps.inspect.outputs.digest }}
+          sbom-path: folio-vitae.spdx.json
+          push-to-registry: true
 
   trivy:
     if: github.event_name != 'pull_request'
