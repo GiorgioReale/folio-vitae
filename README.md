@@ -1,3 +1,6 @@
+<img width="1920" height="540" alt="New Project" src="https://github.com/user-attachments/assets/971e110a-f8cc-4730-afe4-a6bd6136f36b" />
+
+
 # folio-vitae
 
 A small Rust CLI that runs two personal sites from YAML:
