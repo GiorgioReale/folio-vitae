@@ -29,11 +29,29 @@ Thank you for considering a contribution to this project! This document outlines
 
 ## Commit Guidelines
 
-- Write concise commit messages in the imperative mood (e.g., "Add CONTRIBUTING guide").
-- Group related changes into a single commit where practical.
+Use [Conventional Commits](https://www.conventionalcommits.org/). CI rejects pull requests whose **title** or **commit messages** do not match.
+
+Format:
+
+```text
+<type>(optional scope): <description>
+```
+
+Allowed types: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`, `security`.
+
+Examples:
+
+- `feat: add SMTP contact form option`
+- `fix(cv): correct PDF page margins`
+- `docs: clarify Docker quick start`
+- `chore(deps): bump axum`
+- `security: ignore advisory with revisit date`
+
+Write the description in the imperative mood (`add`, `fix`, `update`), keep commits focused, and group related changes when practical.
 
 ## Pull Requests
 
+- Use a Conventional Commits title (same rules as commit messages). With squash merge, the PR title becomes the commit on `main`.
 - Clearly describe the problem being solved and the approach taken.
 - Reference related issues or discussions when applicable.
 - Include any manual testing steps or screenshots if the change affects the UI.
