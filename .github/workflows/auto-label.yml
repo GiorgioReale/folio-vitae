@@ -1,0 +1,106 @@
+name: Auto label
+
+on:
+  pull_request_target:
+    types: [opened, edited, synchronize, reopened]
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: auto-label-${{ github.event.pull_request.number || github.event.issue.number }}-${{ github.event_name }}
+  cancel-in-progress: true
+
+jobs:
+  # Area labels from changed paths. Uses pull_request_target so fork PRs work;
+  # this job must never checkout or execute untrusted PR code.
+  paths:
+    name: Label PR by paths
+    if: github.event_name == 'pull_request_target'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Apply path labels
+        uses: actions/labeler@v6
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          configuration-path: .github/labeler.yml
+          sync-labels: true
+
+  # Type labels from Conventional Commits-style PR titles.
+  title:
+    name: Label PR by title
+    if: github.event_name == 'pull_request_target'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Apply type labels from title
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+
+          # Synced from the title only. docs/ci/security can also come from
+          # path rules, so this job adds them but never removes them.
+          sync_labels=(bug enhancement refactor chore)
+
+          label=""
+          add_only=""
+          if [[ "$PR_TITLE" =~ ^([a-zA-Z]+)(\([^)]*\))?(!)?:[[:space:]] ]]; then
+            prefix="$(printf '%s' "${BASH_REMATCH[1]}" | tr '[:upper:]' '[:lower:]')"
+            case "$prefix" in
+              fix|bugfix) label=bug ;;
+              feat|feature) label=enhancement ;;
+              refactor) label=refactor ;;
+              chore|build) label=chore ;;
+              docs|doc) add_only=docs ;;
+              ci) add_only=ci ;;
+              security|sec) add_only=security ;;
+            esac
+          fi
+
+          current="$(gh api "repos/${REPO}/issues/${PR_NUMBER}/labels" --jq '.[].name')"
+          has_label() { printf '%s\n' "$current" | grep -qxF "$1"; }
+
+          for candidate in "${sync_labels[@]}"; do
+            if [[ -n "$label" && "$candidate" == "$label" ]]; then
+              if ! has_label "$candidate"; then
+                gh pr edit "$PR_NUMBER" --repo "$REPO" --add-label "$candidate"
+                current="$(printf '%s\n%s\n' "$current" "$candidate")"
+              fi
+            else
+              if has_label "$candidate"; then
+                gh pr edit "$PR_NUMBER" --repo "$REPO" --remove-label "$candidate" || true
+              fi
+            fi
+          done
+
+          if [[ -n "$add_only" ]] && ! has_label "$add_only"; then
+            gh pr edit "$PR_NUMBER" --repo "$REPO" --add-label "$add_only"
+          fi
+
+  # Fresh issues always get triage; type labels still come from issue templates.
+  issue-triage:
+    name: Label new issues
+    if: github.event_name == 'issues'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Add needs triage
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          current="$(gh api "repos/${REPO}/issues/${ISSUE_NUMBER}/labels" --jq '.[].name')"
+          if ! printf '%s\n' "$current" | grep -qxF 'needs triage'; then
+            gh issue edit "$ISSUE_NUMBER" --repo "$REPO" --add-label 'needs triage'
+          fi
