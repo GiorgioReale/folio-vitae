@@ -1,8 +1,13 @@
 name: Conventional Commits
 
 on:
+  # PRs targeting main: validate title + all commits in the PR.
   pull_request:
     types: [opened, edited, synchronize, reopened]
+    branches:
+      - main
+  # Defense in depth if anything lands on main (squash merge / rare direct push).
+  push:
     branches:
       - main
 
@@ -17,6 +22,7 @@ concurrency:
 jobs:
   pr-title:
     name: PR title
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -55,7 +61,7 @@ jobs:
         with:
           configFile: commitlint.config.mjs
 
-  # Always reports a conclusion so it can be a required status check.
+  # Always reports a conclusion so it can be a required status check on PRs.
   conventional-commits-gate:
     name: Conventional Commits gate
     needs: [pr-title, commit-messages]
@@ -66,7 +72,11 @@ jobs:
       - name: Evaluate conventional commits jobs
         run: |
           set -euo pipefail
+          echo "event=${{ github.event_name }}"
           echo "PR title: ${{ needs.pr-title.result }}"
-          [ "${{ needs.pr-title.result }}" = "success" ]
           echo "Commit messages: ${{ needs.commit-messages.result }}"
+
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            [ "${{ needs.pr-title.result }}" = "success" ]
+          fi
           [ "${{ needs.commit-messages.result }}" = "success" ]
