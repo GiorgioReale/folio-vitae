@@ -8,11 +8,13 @@ Branch ruleset **Protect main** requires these checks before merge:
 | `Rust Security gate` | Rust Security | `cargo audit` / `cargo deny` when dependency paths change |
 | `Docker gate` | Docker | Multi-arch image **build** when Docker-related paths change |
 | `Trivy gate` | Docker | Image vulnerability scan on PR builds (separate from build failures) |
-| `Conventional Commits gate` | Conventional Commits | PR title and commit messages follow Conventional Commits |
+| `Conventional Commits gate` | Conventional Commits | PR title and commit messages follow Conventional Commits (PRs to `main`) |
 
 Gates always run on PRs to `main`. If the underlying jobs are skipped (paths unchanged), the gate reports **success**. If a required job fails, the gate fails.
 
-After merging the Conventional Commits workflow, add `Conventional Commits gate` to the **Protect main** ruleset required checks (same place as the other gates).
+Auto-label runs only on issues and on PRs targeting `main`. Conventional Commits enforcement is scoped the same way for PRs (plus a `push` check on `main`).
+
+Add `Conventional Commits gate` to the **Protect main** ruleset required checks if it is not already listed (same place as the other gates).
 
 `Docker gate` and `Trivy gate` are separate on purpose: a broken Dockerfile fails Docker; a vulnerable image fails Trivy.
 

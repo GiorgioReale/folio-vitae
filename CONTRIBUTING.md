@@ -29,7 +29,7 @@ Thank you for considering a contribution to this project! This document outlines
 
 ## Commit Guidelines
 
-Use [Conventional Commits](https://www.conventionalcommits.org/). CI rejects pull requests whose **title** or **commit messages** do not match.
+Use [Conventional Commits](https://www.conventionalcommits.org/). On pull requests **targeting `main`**, CI rejects a non-conforming **PR title** or **commit messages** in that PR (and also checks commits that land on `main`).
 
 Format:
 

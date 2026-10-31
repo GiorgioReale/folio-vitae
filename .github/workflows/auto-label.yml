@@ -1,8 +1,11 @@
 name: Auto label
 
 on:
+  # Base-branch filter: only PRs targeting main.
   pull_request_target:
     types: [opened, edited, synchronize, reopened]
+    branches:
+      - main
   issues:
     types: [opened]
 
@@ -20,12 +23,12 @@ jobs:
   # this job must never checkout or execute untrusted PR code.
   paths:
     name: Label PR by paths
-    if: github.event_name == 'pull_request_target'
+    if: github.event_name == 'pull_request_target' && github.base_ref == 'main'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - name: Apply path labels
-        uses: actions/labeler@v7
+        uses: actions/labeler@v6
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           configuration-path: .github/labeler.yml
@@ -34,7 +37,7 @@ jobs:
   # Type labels from Conventional Commits-style PR titles.
   title:
     name: Label PR by title
-    if: github.event_name == 'pull_request_target'
+    if: github.event_name == 'pull_request_target' && github.base_ref == 'main'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -67,7 +70,6 @@ jobs:
               security|sec) add_only=security ;;
             esac
           fi
-
 
           current="$(gh api "repos/${REPO}/issues/${PR_NUMBER}/labels" --jq '.[].name')"
           has_label() { printf '%s\n' "$current" | grep -qxF "$1"; }
