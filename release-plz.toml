@@ -19,8 +19,25 @@ header = """
 # Changelog
 
 All notable changes to this project will be documented in this file.
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 """
+# Flat list: full PR/commit title + PR link (no Fixed/Added/Other sections).
+body = """
+## [{{ version }}]{%- if release_link -%}({{ release_link }}){% endif %} - {{ timestamp | date(format="%Y-%m-%d") }}
+
+{% for commit in commits -%}
+- {% if commit.remote.pr_title -%}
+{{ commit.remote.pr_title }} ([#{{ commit.remote.pr_number }}]({{ remote.link }}/pull/{{ commit.remote.pr_number }}))
+{%- else -%}
+{{ commit.raw_message | split(pat="\n") | first }}
+{%- endif -%}
+{% if commit.remote.username %} by @{{ commit.remote.username }}{% endif %}
+{% endfor %}
+"""
+sort_commits = "newest"
+# Single group so nothing is skipped; sections are omitted by the body template above.
+commit_parsers = [
+  { message = "^.*", group = "changes" },
+]
