@@ -16,6 +16,7 @@ on:
 permissions:
   contents: read
   packages: write
+  pull-requests: read
   id-token: write
   attestations: write
   security-events: write
@@ -118,6 +119,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      pull-requests: read
       id-token: write
       attestations: write
       security-events: write
