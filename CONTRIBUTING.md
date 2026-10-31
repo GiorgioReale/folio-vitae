@@ -52,6 +52,7 @@ Write the description in the imperative mood (`add`, `fix`, `update`), keep comm
 ## Pull Requests
 
 - Use a Conventional Commits title (same rules as commit messages). With squash merge, the PR title becomes the commit on `main`.
+- Pull requests targeting `main` automatically request `@GiorgioReale` as reviewer (via `CODEOWNERS` and CI). GitHub cannot add the PR author as a reviewer on their own PR.
 - Clearly describe the problem being solved and the approach taken.
 - Reference related issues or discussions when applicable.
 - Include any manual testing steps or screenshots if the change affects the UI.
