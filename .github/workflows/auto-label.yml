@@ -53,7 +53,9 @@ jobs:
 
           label=""
           add_only=""
-          if [[ "$PR_TITLE" =~ ^([a-zA-Z]+)(\([^)]*\))?(!)?:[[:space:]] ]]; then
+          # Keep the pattern in a variable: an inline =~ regex with ) breaks bash parsing.
+          title_re='^([a-zA-Z]+)(\([^)]*\))?(!)?:[[:space:]]'
+          if [[ "$PR_TITLE" =~ $title_re ]]; then
             prefix="$(printf '%s' "${BASH_REMATCH[1]}" | tr '[:upper:]' '[:lower:]')"
             case "$prefix" in
               fix|bugfix) label=bug ;;
@@ -65,6 +67,7 @@ jobs:
               security|sec) add_only=security ;;
             esac
           fi
+
 
           current="$(gh api "repos/${REPO}/issues/${PR_NUMBER}/labels" --jq '.[].name')"
           has_label() { printf '%s\n' "$current" | grep -qxF "$1"; }
