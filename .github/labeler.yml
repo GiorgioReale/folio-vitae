@@ -1,0 +1,81 @@
+# Path-based PR labels (actions/labeler).
+# Keep names in sync with .github/labels.yml.
+
+cli:
+  - changed-files:
+      - any-glob-to-any-file:
+          - src/main.rs
+          - src/config.rs
+          - src/lib.rs
+          - src/logging.rs
+          - src/error.rs
+          - src/resources.rs
+          - src/app/environment.rs
+          - src/app/setup.rs
+          - .env.example
+
+templates:
+  - changed-files:
+      - any-glob-to-any-file:
+          - templates/**
+
+assets:
+  - changed-files:
+      - any-glob-to-any-file:
+          - assets/**
+          - src/app/styles.rs
+          - src/app/scripts.rs
+          - src/app/images.rs
+
+i18n:
+  - changed-files:
+      - any-glob-to-any-file:
+          - i18n/**
+          - src/app/localization.rs
+
+"site:main":
+  - changed-files:
+      - any-glob-to-any-file:
+          - templates/main/**
+          - static/main/**
+          - src/http/**
+
+"site:cv":
+  - changed-files:
+      - any-glob-to-any-file:
+          - templates/cv/**
+          - static/cv/**
+          - src/app/pdf.rs
+
+docker:
+  - changed-files:
+      - any-glob-to-any-file:
+          - Dockerfile*
+          - compose.yaml
+          - .dockerignore
+          - .github/workflows/docker.yml
+          - .github/workflows/docker-rebuild.yml
+
+ci:
+  - changed-files:
+      - any-glob-to-any-file:
+          - .github/workflows/**
+          - .github/labeler.yml
+          - .github/labels.yml
+          - .github/dependabot.yml
+          - .github/required-status-checks.md
+
+docs:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "**/*.md"
+          - docs/**
+
+security:
+  - changed-files:
+      - any-glob-to-any-file:
+          - SECURITY.md
+          - deny.toml
+          - .trivyignore
+          - .github/workflows/rust-security.yml
+          - .github/workflows/trivy.yml
