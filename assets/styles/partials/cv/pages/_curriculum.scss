@@ -216,6 +216,16 @@ body#curriculum {
           padding: 1.5rem 1.25rem 1.75rem 1.25rem;
           background-color: var(--background-main-reverse);
           color: var(--color-text-primary-reverse);
+
+          > a {
+            background-color: var(--background-buttons-primary-reverse);
+            color: var(--color-buttons-primary-reverse);
+
+            &:hover {
+              background-color: var(--background-buttons-primary-hover-reverse);
+              color: var(--color-buttons-primary-hover-reverse);
+            }
+          }
         }
 
         &.contact {
