@@ -76,6 +76,7 @@
     "contact_heading": "Contact Me",
     "contact_description": "Fill out the form to send me a direct message.",
     "contact_submit": "Send Message",
+    "contact_close": "Close",
     "contact_labels": {
       "full_name": "Full Name",
       "company": "Company",

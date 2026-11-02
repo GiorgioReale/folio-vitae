@@ -76,6 +76,7 @@
     "contact_heading": "Kontakt aufnehmen",
     "contact_description": "Füllen Sie das Formular aus, um mir eine direkte Nachricht zu senden.",
     "contact_submit": "Nachricht senden",
+    "contact_close": "Schließen",
     "contact_labels": {
       "full_name": "Vor- und Nachname",
       "company": "Unternehmen",

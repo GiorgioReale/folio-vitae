@@ -76,6 +76,7 @@
     "contact_heading": "お問い合わせ",
     "contact_description": "直接メッセージを送るには、フォームにご入力ください。",
     "contact_submit": "メッセージを送信",
+    "contact_close": "閉じる",
     "contact_labels": {
       "full_name": "氏名",
       "company": "会社名",

@@ -76,6 +76,7 @@
     "contact_heading": "اتصل بي",
     "contact_description": "املأ النموذج لإرسال رسالة مباشرة إليّ.",
     "contact_submit": "إرسال الرسالة",
+    "contact_close": "إغلاق",
     "contact_labels": {
       "full_name": "الاسم الكامل",
       "company": "الشركة",

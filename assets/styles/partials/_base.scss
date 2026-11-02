@@ -150,6 +150,7 @@ html {
   text-rendering: optimizeSpeed;
   font-variant-ligatures: common-ligatures;
   overflow-anchor: auto;
+  scrollbar-gutter: stable;
 
   > body {
     min-height: 100vh;

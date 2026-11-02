@@ -76,6 +76,7 @@
     "contact_heading": "문의하기",
     "contact_description": "직접 메시지를 보내려면 양식을 작성하세요.",
     "contact_submit": "메시지 보내기",
+    "contact_close": "닫기",
     "contact_labels": {
       "full_name": "성명",
       "company": "회사",

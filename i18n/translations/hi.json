@@ -76,6 +76,7 @@
     "contact_heading": "मुझसे संपर्क करें",
     "contact_description": "मुझे सीधे संदेश भेजने के लिए फ़ॉर्म भरें।",
     "contact_submit": "संदेश भेजें",
+    "contact_close": "बंद करें",
     "contact_labels": {
       "full_name": "पूरा नाम",
       "company": "कंपनी",
