@@ -76,6 +76,7 @@
     "contact_heading": "Benimle iletişime geçin",
     "contact_description": "Bana doğrudan mesaj göndermek için formu doldurun.",
     "contact_submit": "Mesaj gönder",
+    "contact_close": "Kapat",
     "contact_labels": {
       "full_name": "Ad soyad",
       "company": "Şirket",

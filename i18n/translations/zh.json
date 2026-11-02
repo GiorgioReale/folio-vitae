@@ -76,6 +76,7 @@
     "contact_heading": "联系我",
     "contact_description": "填写表单向我发送直接消息。",
     "contact_submit": "发送消息",
+    "contact_close": "关闭",
     "contact_labels": {
       "full_name": "姓名",
       "company": "公司",

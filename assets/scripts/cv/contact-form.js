@@ -4,8 +4,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // Native constraint validation stays available when this script does not run.
-  // With script, messages follow the page language and stay associated with each field.
   form.noValidate = true;
 
   const feedback = document.querySelector("[data-contact-feedback]");

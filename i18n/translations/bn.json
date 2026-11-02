@@ -76,6 +76,7 @@
     "contact_heading": "আমার সাথে যোগাযোগ করুন",
     "contact_description": "আমাকে সরাসরি বার্তা পাঠাতে ফর্মটি পূরণ করুন।",
     "contact_submit": "বার্তা পাঠান",
+    "contact_close": "বন্ধ করুন",
     "contact_labels": {
       "full_name": "পূর্ণ নাম",
       "company": "কোম্পানি",

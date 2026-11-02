@@ -76,6 +76,7 @@
     "contact_heading": "Связаться со мной",
     "contact_description": "Заполните форму, чтобы отправить мне сообщение.",
     "contact_submit": "Отправить сообщение",
+    "contact_close": "Закрыть",
     "contact_labels": {
       "full_name": "Имя и фамилия",
       "company": "Компания",
