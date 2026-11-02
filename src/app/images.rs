@@ -86,6 +86,7 @@ fn generate_cv_assets(root: &Path) -> AppResult<()> {
     let home_background = find_supported_image(&images_root, &["cv"], "home-background")?;
     let home_background_mobile =
         find_supported_image(&images_root, &["cv"], "home-background-mobile")?;
+    let cv_icon = find_supported_image(&images_root, &["cv"], "icon")?;
     let cv_profile_picture = find_supported_image(&images_root, &["cv"], "profile-picture")?;
     let cv_social_card = find_supported_image(&images_root, &["cv"], "social-card")?;
 
@@ -102,7 +103,11 @@ fn generate_cv_assets(root: &Path) -> AppResult<()> {
 
     let chrome_192 = outputs.icon(&["logos"], "android-chrome-192x192.png");
     let chrome_512 = outputs.icon(&["logos"], "android-chrome-512x512.png");
-    export_resized(&favicon_path, &[(&chrome_192, 192, 192), (&chrome_512, 512, 512)])?;
+    let apple_touch = outputs.icon(&["logos"], "apple-touch-icon.png");
+    export_resized(
+        &cv_icon,
+        &[(&chrome_192, 192, 192), (&chrome_512, 512, 512), (&apple_touch, 180, 180)],
+    )?;
 
     let profile_avif = outputs.image(&["profile-pictures"], "profile-picture.avif");
     let profile_png = outputs.image(&["profile-pictures"], "profile-picture.png");
@@ -129,7 +134,11 @@ fn generate_main_assets(root: &Path) -> AppResult<()> {
 
     let chrome_192 = outputs.icon(&["logos"], "android-chrome-192x192.png");
     let chrome_512 = outputs.icon(&["logos"], "android-chrome-512x512.png");
-    export_resized(&main_icon, &[(&chrome_192, 192, 192), (&chrome_512, 512, 512)])?;
+    let apple_touch = outputs.icon(&["logos"], "apple-touch-icon.png");
+    export_resized(
+        &main_icon,
+        &[(&chrome_192, 192, 192), (&chrome_512, 512, 512), (&apple_touch, 180, 180)],
+    )?;
 
     let profile_avif = outputs.image(&["profile-pictures"], "profile-picture.avif");
     let profile_png = outputs.image(&["profile-pictures"], "profile-picture.png");
@@ -247,7 +256,6 @@ fn resize_cover(image: &DynamicImage, width: u32, height: u32) -> DynamicImage {
 }
 
 fn generate_favicon_set(source: &Path, output_dir: &Path) -> AppResult<()> {
-    let apple_touch = output_dir.join("apple-touch-icon.png");
     let favicon_16 = output_dir.join("favicon-16x16.png");
     let favicon_32 = output_dir.join("favicon-32x32.png");
     let ico_output = output_dir.join("favicon.ico");
@@ -263,9 +271,7 @@ fn generate_favicon_set(source: &Path, output_dir: &Path) -> AppResult<()> {
 
     let source_image = load_rgba_image(source)?;
 
-    for (output, width, height) in
-        [(&apple_touch, 180, 180), (&favicon_16, 16, 16), (&favicon_32, 32, 32)]
-    {
+    for (output, width, height) in [(&favicon_16, 16, 16), (&favicon_32, 32, 32)] {
         let resized = resize_cover(&source_image, width, height);
         ensure_parent_directory(output)?;
         resized.save(output).with_context(|| format!("writing {output:?}"))?;
