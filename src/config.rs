@@ -20,6 +20,19 @@ pub const DEFAULT_MAIN_PORT: u16 = 36546;
 /// Default port used when the CV website port is not provided.
 pub const DEFAULT_CV_PORT: u16 = 36547;
 
+/// Bound listener ports for the main and CV sites.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct SitePorts {
+    pub main: u16,
+    pub cv: u16,
+}
+
+impl Default for SitePorts {
+    fn default() -> Self {
+        Self { main: DEFAULT_MAIN_PORT, cv: DEFAULT_CV_PORT }
+    }
+}
+
 /// Default directory used for localized content and source images.
 pub const DEFAULT_DATA_DIR: &str = "data";
 

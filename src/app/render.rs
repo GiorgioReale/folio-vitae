@@ -248,9 +248,9 @@ fn base_context(
     context.insert("websites", &sites.additional);
 
     let website_main_url =
-        site_public_url(state.environment, sites.resolved_main().domain.as_str(), state.main_port);
+        site_public_url(state.environment, sites.resolved_main().domain.as_str(), state.ports.main);
     let website_cv_url =
-        site_public_url(state.environment, sites.resolved_cv().domain.as_str(), state.cv_port);
+        site_public_url(state.environment, sites.resolved_cv().domain.as_str(), state.ports.cv);
     context.insert("website_main_url", &website_main_url);
     context.insert("website_cv_url", &website_cv_url);
 
