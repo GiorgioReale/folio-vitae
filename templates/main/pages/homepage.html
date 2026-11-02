@@ -18,7 +18,7 @@
     <h2 id="websites-heading">{{ translations.main_page.websites }}</h2>
     <ul class="inline-list">
       {% if has_website_cv %}
-      <li><a href="https://{{ website_cv.domain }}/" target="_blank" rel="noopener noreferrer">{{ website_cv.domain }}<span class="sr-only"> ({{ translations.accessibility.new_window }})</span></a></li>
+      <li><a href="{{ website_cv_url }}/">{{ website_cv.domain }}</a></li>
       {% endif %}
       {% for website in websites %}
       <li><a href="https://{{ website.domain }}/" target="_blank" rel="noopener noreferrer">{{ website.domain }}<span class="sr-only"> ({{ translations.accessibility.new_window }})</span></a></li>

@@ -12,6 +12,7 @@ use tera::Context;
 use tracing::error;
 
 use crate::app::{
+    environment::Environment,
     localization::{Language, Translations},
     state::{AppState, HtmlCacheKey, SiteKind},
 };
@@ -194,6 +195,18 @@ fn load_resources(
     })
 }
 
+/// Absolute origin used for cross-site navigation `href`s.
+///
+/// In development this points at the local listeners (`http://127.0.0.1:<port>`).
+/// In production it keeps the configured public HTTPS domain.
+/// Visible link text stays the configured domain from content data.
+pub(crate) fn site_public_url(environment: Environment, domain: &str, port: u16) -> String {
+    match environment {
+        Environment::Development => format!("http://127.0.0.1:{port}"),
+        Environment::Production => format!("https://{}", domain.trim()),
+    }
+}
+
 fn translated_or<'a>(
     translations: &'a Translations,
     path: &[&str],
@@ -233,6 +246,13 @@ fn base_context(
     context.insert("has_website_main", &has_website_main);
     context.insert("has_website_cv", &has_website_cv);
     context.insert("websites", &sites.additional);
+
+    let website_main_url =
+        site_public_url(state.environment, sites.resolved_main().domain.as_str(), state.main_port);
+    let website_cv_url =
+        site_public_url(state.environment, sites.resolved_cv().domain.as_str(), state.cv_port);
+    context.insert("website_main_url", &website_main_url);
+    context.insert("website_cv_url", &website_cv_url);
 
     let contact = &data.contact;
     context.insert("email_main", &contact.emails.main);
@@ -1081,6 +1101,18 @@ mod tests {
     }
 
     #[test]
+    fn site_public_links_use_local_origins_in_development() {
+        assert_eq!(
+            site_public_url(Environment::Development, "cv.example.com", 36547),
+            "http://127.0.0.1:36547"
+        );
+        assert_eq!(
+            site_public_url(Environment::Production, "cv.example.com", 36547),
+            "https://cv.example.com"
+        );
+    }
+
+    #[test]
     fn key_pages_render_with_tera_v2() {
         if !std::path::Path::new("data").is_dir() {
             // CI and fresh checkouts do not ship a local `data/` directory.
@@ -1095,6 +1127,11 @@ mod tests {
             .expect("main homepage should render");
         assert!(main_home.contains("skip-link"));
         assert!(main_home.contains("main-content"));
+        assert!(
+            main_home.contains("http://127.0.0.1:36547/")
+                || !main_home.contains("websites-heading"),
+            "development main→cv links should use the local CV listener"
+        );
 
         let cv_home = render_cv_homepage(&prepared.cv_state, &language, "/")
             .expect("cv homepage should render");
@@ -1103,6 +1140,11 @@ mod tests {
         let curriculum = render_cv_curriculum(&prepared.cv_state, None, &language, "/curriculum")
             .expect("curriculum should render");
         assert!(curriculum.contains("main-content"));
+        assert!(
+            curriculum.contains("http://127.0.0.1:36546/")
+                || curriculum.contains("http://127.0.0.1:36547/"),
+            "development curriculum website links should use local listeners"
+        );
 
         let menu =
             render_cv_menu(&prepared.cv_state, &language, "/menu").expect("menu should render");

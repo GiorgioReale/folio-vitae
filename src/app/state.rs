@@ -38,6 +38,10 @@ pub struct AppState {
     pub(crate) cv_static: Arc<StaticAssets>,
     pub(crate) default_site: SiteKind,
     pub(crate) environment: Environment,
+    /// Bound main-site port; used for local cross-site links in development.
+    pub(crate) main_port: u16,
+    /// Bound CV-site port; used for local cross-site links in development.
+    pub(crate) cv_port: u16,
     pub(crate) asset_version: Arc<str>,
     pub(crate) generator: Arc<str>,
     pub(crate) mailer: Option<Arc<Mailer>>,
@@ -1037,6 +1041,8 @@ mod tests {
             cv_static: Arc::new(empty_static_assets()),
             default_site: SiteKind::Main,
             environment: Environment::Production,
+            main_port: crate::config::DEFAULT_MAIN_PORT,
+            cv_port: crate::config::DEFAULT_CV_PORT,
             asset_version: Arc::from(""),
             generator: Arc::from(""),
             mailer: None,

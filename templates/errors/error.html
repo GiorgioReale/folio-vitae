@@ -67,7 +67,6 @@
   <meta name="apple-mobile-web-app-title" content="{{ website.title }}" />
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="#000000" />
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000" />
-  <meta name="view-transition" content="same-origin" />
   {% if minify_assets %}
   <script src="/assets/scripts/light-dark-mode.min.js?v={{ asset_version }}" charset="utf-8" data-sprite-prefix="{{ sprite_prefix }}" data-theme-audio="/assets/audios/light-switch.mp3?v={{ asset_version }}"></script>
   {% else %}
@@ -75,6 +74,7 @@
   {% endif %}
   <link rel="preload" href="{{ stylesheet }}" as="style" />
   <link rel="stylesheet" href="{{ stylesheet }}" type="text/css" fetchpriority="high" />
+  <link rel="expect" href="#main-content" blocking="render" />
 </head>
 
 <body id="errors">

@@ -894,6 +894,8 @@ mod tests {
             cv_static: Arc::new(empty_static_assets()),
             default_site: SiteKind::Cv,
             environment: Environment::Production,
+            main_port: crate::config::DEFAULT_MAIN_PORT,
+            cv_port: crate::config::DEFAULT_CV_PORT,
             asset_version: Arc::from(""),
             generator: Arc::from(""),
             mailer: None,

@@ -81,6 +81,18 @@ pub fn load_env_file(path: &str) -> AppResult<()> {
 }
 
 pub fn prepare_application_state(environment: Environment) -> AppResult<PreparedApplication> {
+    prepare_application_state_with_ports(
+        environment,
+        crate::config::DEFAULT_MAIN_PORT,
+        crate::config::DEFAULT_CV_PORT,
+    )
+}
+
+pub fn prepare_application_state_with_ports(
+    environment: Environment,
+    main_port: u16,
+    cv_port: u16,
+) -> AppResult<PreparedApplication> {
     let (available_languages, data_last_modified) = detect_languages_with_last_change()?;
 
     #[cfg(feature = "serve")]
@@ -103,6 +115,8 @@ pub fn prepare_application_state(environment: Environment) -> AppResult<Prepared
         tera,
         environment,
         language_names,
+        main_port,
+        cv_port,
     )
     .map(|states| PreparedApplication { main_state: states.0, cv_state: states.1 })
 }
@@ -116,7 +130,8 @@ pub async fn run_servers<T>(
     shutdown_signal: impl std::future::Future<Output = AppResult<T>>,
 ) -> AppResult<T> {
     let PreparedApplication { main_state, cv_state } =
-        run_blocking(move || prepare_application_state(environment)).await?;
+        run_blocking(move || prepare_application_state_with_ports(environment, main_port, cv_port))
+            .await?;
 
     serve_prepared(main_state, cv_state, host, main_port, cv_port, shutdown_signal).await
 }
@@ -235,8 +250,10 @@ pub async fn run_servers_with_watch(
 
     loop {
         // Prepare first, then snapshot: generated asset writes must not look like a live change.
-        let PreparedApplication { main_state, cv_state } =
-            run_blocking(move || prepare_application_state(environment)).await?;
+        let PreparedApplication { main_state, cv_state } = run_blocking(move || {
+            prepare_application_state_with_ports(environment, main_port, cv_port)
+        })
+        .await?;
 
         let watched_env = env_file.clone();
         let watch_snapshot = run_blocking(move || read_watch_snapshot(&watched_env)).await?;
