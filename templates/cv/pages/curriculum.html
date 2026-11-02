@@ -22,12 +22,12 @@
     {% if has_website_main %}
     <div>
       <dt>{{ translations.cv_curriculum.website_label }}</dt>
-      <dd><a href="https://{{ website_main.domain }}/">{{ website_main.domain }}</a></dd>
+      <dd><a href="{{ website_main_url }}/">{{ website_main.domain }}</a></dd>
     </div>
     {% elif has_website_cv %}
     <div>
       <dt>{{ translations.cv_curriculum.website_label }}</dt>
-      <dd><a href="https://{{ website_cv.domain }}/">{{ website_cv.domain }}</a></dd>
+      <dd><a href="{{ website_cv_url }}/">{{ website_cv.domain }}</a></dd>
     </div>
     {% endif %}
     <div>

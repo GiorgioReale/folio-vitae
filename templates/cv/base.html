@@ -140,7 +140,6 @@
   {% endif %}
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="#000000" />
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000" />
-  <meta name="view-transition" content="same-origin" />
   {% if minify_assets %}
   <script src="/assets/scripts/light-dark-mode.min.js?v={{ asset_version }}" charset="utf-8" data-sprite-prefix="/assets/icons/cv/website/sprites.svg?v={{ asset_version }}#" data-theme-audio="/assets/audios/light-switch.mp3?v={{ asset_version }}"></script>
   {% else %}
@@ -149,6 +148,7 @@
   <link rel="preload" href="/assets/styles/cv.css?v={{ asset_version }}" as="style" />
   {% block head_preload %}{% endblock head_preload %}
   <link rel="stylesheet" href="/assets/styles/cv.css?v={{ asset_version }}" type="text/css" fetchpriority="high" />
+  <link rel="expect" href="#main-content" blocking="render" />
   {% if minify_assets %}
   <script src="/assets/scripts/cv/open-close-menu.min.js?v={{ asset_version }}" charset="utf-8" defer></script>
   <script src="/assets/scripts/cv/contact-form.min.js?v={{ asset_version }}" charset="utf-8" defer></script>

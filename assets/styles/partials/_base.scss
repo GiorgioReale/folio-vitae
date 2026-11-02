@@ -28,7 +28,6 @@
   --font-family-sans-serif: var(--font-family-text);
   --font-family-monospace: 'Fira Code VF', 'Fira Code', monospace;
   color-scheme: var(--color-scheme);
-  view-transition-name: root;
 
   @media (prefers-contrast: more) {
     --color-text-primary: #000;
@@ -439,9 +438,42 @@ main :where(section, article) {
   scroll-margin-block-start: 1rem;
 }
 
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation-duration: 0s;
+/* Cross-document view transitions: CSS-only progressive enhancement. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+
+  ::view-transition-group(root) {
+    animation-duration: 0.24s;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  ::view-transition-old(root) {
+    animation-name: folio-vt-fade-out;
+    animation-duration: 0.18s;
+    animation-timing-function: ease-out;
+    animation-fill-mode: both;
+  }
+
+  ::view-transition-new(root) {
+    animation-name: folio-vt-fade-in;
+    animation-duration: 0.24s;
+    animation-timing-function: ease-out;
+    animation-fill-mode: both;
+  }
+}
+
+@keyframes folio-vt-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes folio-vt-fade-in {
+  from {
+    opacity: 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -449,10 +481,14 @@ main :where(section, article) {
     scroll-behavior: auto;
   }
 
+  @view-transition {
+    navigation: none;
+  }
+
   ::view-transition-group(*),
   ::view-transition-old(*),
   ::view-transition-new(*) {
-    animation: none;
+    animation: none !important;
   }
 }
 

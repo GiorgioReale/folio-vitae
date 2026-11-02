@@ -37,3 +37,21 @@ pub(crate) fn compile_styles(environment: Environment) -> AppResult<()> {
 
     Ok(())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::app::environment::Environment;
+
+    #[test]
+    fn compile_styles_emits_cross_document_view_transitions() {
+        compile_styles(Environment::Development).expect("SCSS should compile");
+
+        let css = fs::read_to_string("assets/styles/main.css").expect("main.css");
+        assert!(css.contains("@view-transition"));
+        assert!(css.contains("navigation: auto"));
+        assert!(css.contains("folio-vt-fade-out"));
+        assert!(css.contains("prefers-reduced-motion: reduce"));
+        assert!(css.contains("navigation: none"));
+    }
+}

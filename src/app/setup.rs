@@ -28,6 +28,7 @@ pub(crate) fn build_app_states(
     tera: Tera,
     environment: Environment,
     language_names: HashMap<Language, String>,
+    ports: crate::config::SitePorts,
 ) -> AppResult<(AppState, AppState)> {
     let (default_language, default_from_env) = Language::default(&supported_languages)?;
     let supported_languages =
@@ -75,6 +76,7 @@ pub(crate) fn build_app_states(
         cv_static,
         default_site: SiteKind::Main,
         environment,
+        ports,
         asset_version,
         generator,
         mailer,

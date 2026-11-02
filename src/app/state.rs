@@ -38,6 +38,8 @@ pub struct AppState {
     pub(crate) cv_static: Arc<StaticAssets>,
     pub(crate) default_site: SiteKind,
     pub(crate) environment: Environment,
+    /// Bound listener ports; used for local cross-site links in development.
+    pub(crate) ports: crate::config::SitePorts,
     pub(crate) asset_version: Arc<str>,
     pub(crate) generator: Arc<str>,
     pub(crate) mailer: Option<Arc<Mailer>>,
@@ -1037,6 +1039,7 @@ mod tests {
             cv_static: Arc::new(empty_static_assets()),
             default_site: SiteKind::Main,
             environment: Environment::Production,
+            ports: crate::config::SitePorts::default(),
             asset_version: Arc::from(""),
             generator: Arc::from(""),
             mailer: None,

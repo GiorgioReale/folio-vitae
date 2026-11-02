@@ -69,7 +69,7 @@
 </header>
 {% endcomponent chrome.site_header %}
 
-{% component chrome.site_footer(site: string, @translations, @has_website_main, @website_main, @current_year, @first_name, @last_name, @show_credits, @asset_version) %}
+{% component chrome.site_footer(site: string, @translations, @has_website_main, @website_main_url, @current_year, @first_name, @last_name, @show_credits, @asset_version) %}
 {% if site == "cv" %}
 {% set sprite = "/assets/icons/cv/website/sprites.svg?v=" ~ asset_version ~ "#" %}
 {% else %}
@@ -82,7 +82,7 @@
     </svg>
     <span class="sr-only">{{ translations.accessibility.copyright }}</span>
     {% if has_website_main %}
-    {{ current_year }} - <a href="https://{{ website_main.domain }}" target="_blank" rel="noopener noreferrer">{{ first_name }} {{ last_name }}<span class="sr-only"> ({{ translations.accessibility.new_window }})</span></a>
+    {{ current_year }} - <a href="{{ website_main_url }}">{{ first_name }} {{ last_name }}</a>
     {% else %}
     {{ current_year }} - {{ first_name }} {{ last_name }}
     {% endif %}
