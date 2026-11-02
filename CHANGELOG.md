@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+## [0.1.16](https://github.com/GiorgioReale/folio-vitae/compare/v0.1.15...v0.1.16) - 2026-11-02
+
+- feat: modernize cross-document view transitions and local site links ([#104](https://github.com/GiorgioReale/folio-vitae/pull/104)) by @GiorgioReale
+- fix: block pointer events behind the open contact popover ([#102](https://github.com/GiorgioReale/folio-vitae/pull/102)) by @GiorgioReale
+- fix: generate PWA and apple-touch icons from icon.png ([#101](https://github.com/GiorgioReale/folio-vitae/pull/101)) by @GiorgioReale
 ## [0.1.15](https://github.com/GiorgioReale/folio-vitae/compare/v0.1.14...v0.1.15) - 2026-11-02
 
 - fix: invert button colors between light and dark themes ([#100](https://github.com/GiorgioReale/folio-vitae/pull/100)) by @GiorgioReale
