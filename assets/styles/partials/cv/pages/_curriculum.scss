@@ -588,4 +588,13 @@ body#curriculum {
 
 html:has(.contact-form[popover]:popover-open) {
   overflow: hidden;
+
+  body > .skip-link,
+  body > aside,
+  .page-shell > header,
+  .page-shell > footer,
+  #main-content > :not(.contact),
+  .contact > :not(.contact-form) {
+    pointer-events: none;
+  }
 }
