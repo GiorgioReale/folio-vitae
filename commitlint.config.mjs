@@ -21,5 +21,9 @@ export default {
         "security",
       ],
     ],
+    // Dependabot squash-merge bodies embed HTML release notes with long lines;
+    // URLs also routinely exceed the conventional 100-char wrap.
+    "body-max-line-length": [0],
+    "footer-max-line-length": [0],
   },
 };
