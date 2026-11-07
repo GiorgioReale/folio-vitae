@@ -19,17 +19,15 @@
   "nav": {
     "home": "होम",
     "menu": "मेनू",
-    "theme_sawitch": "लाइट/डार्क मोड",
+    "theme_switch": "लाइट/डार्क मोड",
     "language_selector_label": "भाषा",
     "current_language": "वर्तमान भाषा",
-    "close_menu": "मेनू बंद करें",
     "primary": "साइट",
     "theme_light": "हल्की थीम",
     "theme_dark": "गहरी थीम",
     "theme_auto": "सिस्टम थीम",
     "languages": "भाषाएँ",
-    "change_language": "भाषा बदलें",
-    "close_languages": "भाषा चयन बंद करें"
+    "change_language": "भाषा बदलें"
   },
   "main_page": {
     "websites": "वेबसाइट्स",

@@ -82,73 +82,6 @@ pub(crate) fn render_cv_curriculum(
     render_template(state, "cv/pages/curriculum.html", context, cache)
 }
 
-pub(crate) fn render_cv_menu(
-    state: &AppState,
-    language: &Language,
-    request_path: &str,
-) -> Result<Arc<str>, StatusCode> {
-    let resources = load_resources(state, language, "failed to load resources for menu")?;
-    let mut context = base_context(state, &resources, language, request_path, SiteKind::Cv);
-    let translations = resources.translations.as_ref();
-    let profile = &resources.data.sites.cv.profile;
-    let page_title = translated_or(translations, &["cv_menu", "title"], "Menu");
-
-    context.insert("page_title", page_title.as_ref());
-    context.insert("page_url", request_path);
-    context.insert("robots", "noindex,nofollow");
-    context.insert("has_about_section", &!profile.summary.trim().is_empty());
-    context.insert("has_experience_section", &!profile.work_experiences.is_empty());
-    context.insert("has_education_section", &!profile.educations.is_empty());
-    context.insert("has_skills_section", &!profile.skills.is_empty());
-    context.insert("has_courses_section", &!profile.courses_certifications.is_empty());
-    context.insert("has_other_projects_section", &!profile.other_projects.is_empty());
-    context.insert("has_download_section", &true);
-    context.insert("has_contact_section", &state.mailer.is_some());
-
-    render_template(
-        state,
-        "cv/pages/menu.html",
-        context,
-        Some(cache_key(SiteKind::Cv, language, "cv/pages/menu.html", request_path)),
-    )
-}
-
-pub(crate) fn render_languages_page(
-    state: &AppState,
-    language: &Language,
-    request_path: &str,
-    site: SiteKind,
-) -> Result<Arc<str>, StatusCode> {
-    let resources = load_resources(state, language, "failed to load resources for languages")?;
-    let mut context = base_context(state, &resources, language, request_path, site);
-    let translations = resources.translations.as_ref();
-    let page_title = translated_or(translations, &["nav", "languages"], "Languages");
-    let snapshot = state.localization_snapshot();
-    let home_path = {
-        let prefix =
-            language.url_prefix(&snapshot.default_language, snapshot.supported_languages.len() > 1);
-        if prefix.is_empty() { "/".to_string() } else { format!("{prefix}/") }
-    };
-    let language_choices = snapshot.language_links(language, &home_path, site);
-
-    context.insert("page_title", page_title.as_ref());
-    context.insert("page_url", request_path);
-    context.insert("robots", "noindex,nofollow");
-    context.insert("languages", &language_choices);
-
-    let template = match site {
-        SiteKind::Cv => "cv/pages/languages.html",
-        SiteKind::Main => "main/pages/languages.html",
-    };
-
-    render_template(
-        state,
-        template,
-        context,
-        Some(cache_key(site, language, template, request_path)),
-    )
-}
-
 pub(crate) fn render_error(
     state: &AppState,
     site: SiteKind,
@@ -273,6 +206,14 @@ fn base_context(
         &format_courses_certifications(&profile.courses_certifications, &dates),
     );
     context.insert("description", &profile.summary);
+    context.insert("has_about_section", &!profile.summary.trim().is_empty());
+    context.insert("has_experience_section", &!profile.work_experiences.is_empty());
+    context.insert("has_education_section", &!profile.educations.is_empty());
+    context.insert("has_skills_section", &!profile.skills.is_empty());
+    context.insert("has_courses_section", &!profile.courses_certifications.is_empty());
+    context.insert("has_other_projects_section", &!profile.other_projects.is_empty());
+    context.insert("has_download_section", &true);
+    context.insert("has_contact_section", &state.mailer.is_some());
     context.insert("current_year", &Utc::now().year());
     context.insert("minify_assets", &state.environment.should_minify_assets());
     context.insert("asset_version", state.asset_version.as_ref());
@@ -1153,16 +1094,14 @@ mod tests {
             "development curriculum website links should use local listeners"
         );
 
-        let menu =
-            render_cv_menu(&prepared.cv_state, &language, "/menu").expect("menu should render");
-        assert!(menu.contains("menu-title"));
-
-        let languages =
-            render_languages_page(&prepared.cv_state, &language, "/it/languages", SiteKind::Cv)
-                .expect("languages page should render");
-        assert!(languages.contains("languages-title"));
-        assert!(languages.contains("data-language-option"));
-        assert!(languages.contains("/en/") || languages.contains("href=\"/en"));
+        assert!(
+            cv_home.contains("id=\"site-menu\"") || curriculum.contains("id=\"site-menu\""),
+            "cv chrome should expose the section menu popover"
+        );
+        assert!(
+            cv_home.contains("id=\"language-menu\"") || main_home.contains("id=\"language-menu\""),
+            "multilingual chrome should expose the language popover"
+        );
 
         let error = render_error(
             &prepared.cv_state,

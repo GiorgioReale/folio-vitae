@@ -18,7 +18,7 @@ use crate::app::{
     localization::{Language, Translations},
     render::{
         ContactFeedback, CvContactFormContext, render_cv_curriculum, render_cv_homepage,
-        render_cv_menu, render_cv_pdf, render_error, render_languages_page, render_main_homepage,
+        render_cv_pdf, render_error, render_main_homepage,
     },
     state::{AppState, SiteKind, SitePage},
 };
@@ -309,34 +309,6 @@ where
     let mut response = render_html_page_with_status(status, render).await;
     response.headers_mut().insert(CACHE_CONTROL, HeaderValue::from_static("private, no-store"));
     response
-}
-
-pub(crate) async fn menu(State(state): State<AppState>, headers: HeaderMap, uri: Uri) -> Response {
-    let resolved = match resolve_request(&state, &headers, &uri, SitePage::Menu, Some(SiteKind::Cv))
-    {
-        ResolveOutcome::Ready(resolved) => resolved,
-        ResolveOutcome::Respond(response) => return response,
-    };
-
-    let language = resolved.language.clone();
-    let path = resolved.path.clone();
-    render_html_page(move || render_cv_menu(&state, &language, &path)).await
-}
-
-pub(crate) async fn languages(
-    State(state): State<AppState>,
-    headers: HeaderMap,
-    uri: Uri,
-) -> Response {
-    let resolved = match resolve_request(&state, &headers, &uri, SitePage::Languages, None) {
-        ResolveOutcome::Ready(resolved) => resolved,
-        ResolveOutcome::Respond(response) => return response,
-    };
-
-    let language = resolved.language.clone();
-    let path = resolved.path.clone();
-    let site = resolved.site;
-    render_html_page(move || render_languages_page(&state, &language, &path, site)).await
 }
 
 pub(crate) async fn robots(

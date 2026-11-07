@@ -1,3 +1,2 @@
 User-agent: *
-Disallow: /menu
 Sitemap: https://{{ domain }}/sitemap.xml

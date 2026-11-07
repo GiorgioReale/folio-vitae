@@ -22,14 +22,12 @@
     "theme_switch": "لائٹ/ڈارک موڈ",
     "language_selector_label": "زبان",
     "current_language": "موجودہ زبان",
-    "close_menu": "مینو بند کریں",
     "primary": "سائٹ",
     "theme_light": "ہلکی تھیم",
     "theme_dark": "گہری تھیم",
     "theme_auto": "سسٹم تھیم",
     "languages": "زبانیں",
-    "change_language": "زبان تبدیل کریں",
-    "close_languages": "زبان کا انتخاب بند کریں"
+    "change_language": "زبان تبدیل کریں"
   },
   "main_page": {
     "websites": "ویب سائٹس",

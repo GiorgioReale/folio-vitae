@@ -22,14 +22,12 @@
     "theme_switch": "Light/Dark Mode",
     "language_selector_label": "Language",
     "current_language": "Current language",
-    "close_menu": "Close menu",
     "primary": "Site",
     "theme_light": "Light theme",
     "theme_dark": "Dark theme",
     "theme_auto": "System theme",
     "languages": "Languages",
-    "change_language": "Change language",
-    "close_languages": "Close language selection"
+    "change_language": "Change language"
   },
   "main_page": {
     "websites": "Websites",

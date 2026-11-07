@@ -91,13 +91,9 @@
     {{ <chrome.site_footer site={site} /> }}
   </div>
   {% if minify_assets %}
-  {% if site == "cv" %}
-  <script src="/assets/scripts/cv/open-close-menu.min.js?v={{ asset_version }}" charset="utf-8" defer></script>
-  {% endif %}
+  <script src="/assets/scripts/site-popovers.min.js?v={{ asset_version }}" charset="utf-8" defer></script>
   {% else %}
-  {% if site == "cv" %}
-  <script src="/assets/scripts/cv/open-close-menu.js?v={{ asset_version }}" charset="utf-8" defer></script>
-  {% endif %}
+  <script src="/assets/scripts/site-popovers.js?v={{ asset_version }}" charset="utf-8" defer></script>
   {% endif %}
 </body>
 

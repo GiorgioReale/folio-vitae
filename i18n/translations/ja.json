@@ -22,14 +22,12 @@
     "theme_switch": "ライト／ダークモード",
     "language_selector_label": "言語",
     "current_language": "現在の言語",
-    "close_menu": "メニューを閉じる",
     "primary": "サイト",
     "theme_light": "ライトテーマ",
     "theme_dark": "ダークテーマ",
     "theme_auto": "システムテーマ",
     "languages": "言語",
-    "change_language": "言語を変更",
-    "close_languages": "言語選択を閉じる"
+    "change_language": "言語を変更"
   },
   "main_page": {
     "websites": "ウェブサイト",

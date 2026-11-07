@@ -22,14 +22,12 @@
     "theme_switch": "Светлая/тёмная тема",
     "language_selector_label": "Язык",
     "current_language": "Текущий язык",
-    "close_menu": "Закрыть меню",
     "primary": "Сайт",
     "theme_light": "Светлая тема",
     "theme_dark": "Тёмная тема",
     "theme_auto": "Системная тема",
     "languages": "Языки",
-    "change_language": "Сменить язык",
-    "close_languages": "Закрыть выбор языка"
+    "change_language": "Сменить язык"
   },
   "main_page": {
     "websites": "Веб-сайты",

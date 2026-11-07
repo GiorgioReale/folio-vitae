@@ -2,32 +2,41 @@
 <a class="skip-link" href="#main-content">{{ translations.accessibility.skip_to_content }}</a>
 {% endcomponent chrome.skip_link %}
 
-{% component chrome.site_header(site: string, @translations, @page_url, @language_prefix, @languages, @asset_version) %}
+{% component chrome.site_header(site: string, @translations, @page_url, @language_prefix, @languages, @asset_version, @has_about_section, @has_experience_section, @has_skills_section, @has_education_section, @has_courses_section, @has_other_projects_section, @has_download_section, @has_contact_section) %}
 {% if site == "cv" %}
 {% set sprite = "/assets/icons/cv/website/sprites.svg?v=" ~ asset_version ~ "#" %}
 {% else %}
 {% set sprite = "/assets/icons/main/website/sprites.svg?v=" ~ asset_version ~ "#" %}
 {% endif %}
 {% set normalized_path = page_url | trim_end(pat="/") %}
-{% set on_menu = normalized_path is ending_with(pat="/menu") %}
-{% set on_languages = normalized_path is ending_with(pat="/languages") %}
 {% set on_home = normalized_path == language_prefix %}
 <header>
   <nav class="site-controls" aria-label="{{ translations.nav.primary }}">
     {% if languages | length > 1 %}
     {% for language in languages %}
     {% if language.is_current %}
-    {% if on_languages %}
-    <a class="language-switcher" href="{{ language_prefix }}/" lang="{{ language.code }}" aria-current="page" data-language-control data-language-state="close">
-      {{ language.code }}
-      <span class="sr-only">{{ language.label }}, {{ translations.nav.close_languages }}</span>
-    </a>
-    {% else %}
-    <a class="language-switcher" href="{{ language_prefix }}/languages" lang="{{ language.code }}" data-language-control data-language-state="open">
-      {{ language.code }}
-      <span class="sr-only">{{ language.label }}, {{ translations.nav.change_language }}</span>
-    </a>
-    {% endif %}
+    <div class="site-popover">
+      <button type="button" id="language-switch" class="language-switcher" command="toggle-popover"
+        commandfor="language-menu" aria-controls="language-menu" aria-expanded="false"
+        aria-haspopup="dialog" lang="{{ language.code }}">
+        {{ language.code }}
+        <span class="sr-only">{{ language.label }}, {{ translations.nav.change_language }}</span>
+      </button>
+      <div id="language-menu" class="site-popover__panel" popover>
+        <nav aria-label="{{ translations.nav.languages }}">
+          <ul class="site-popover__list">
+            {% for option in languages %}
+            <li>
+              <a href="{{ option.url }}" lang="{{ option.code }}" hreflang="{{ option.code }}"{% if option.is_current %} aria-current="true"{% endif %}>
+                <span class="language-code" aria-hidden="true">{{ option.code }}</span>
+                <span>{{ option.label }}{% if option.is_current %} <span class="sr-only">({{ translations.nav.current_language }})</span>{% endif %}</span>
+              </a>
+            </li>
+            {% endfor %}
+          </ul>
+        </nav>
+      </div>
+    </div>
     {% endif %}
     {% endfor %}
     {% endif %}
@@ -39,30 +48,89 @@
       <span class="sr-only">{{ translations.nav.home }}</span>
     </a>
     {% endif %}
-    <button type="button" id="theme-switch" data-theme-action="{{ translations.nav.theme_switch }}"
-      data-theme-light="{{ translations.nav.theme_light }}" data-theme-dark="{{ translations.nav.theme_dark }}"
-      data-theme-auto="{{ translations.nav.theme_auto }}">
-      <span class="sr-only" data-theme-name>{{ translations.nav.theme_switch }}: {{ translations.nav.theme_auto }}</span>
-      <svg aria-hidden="true" focusable="false">
-        <use href="{{ sprite }}moon-auto" xlink:href="{{ sprite }}moon-auto" />
-      </svg>
-    </button>
+    <div class="site-popover theme-picker">
+      <button type="button" id="theme-switch" command="toggle-popover" commandfor="theme-menu"
+        aria-controls="theme-menu" aria-expanded="false" aria-haspopup="dialog"
+        data-theme-action="{{ translations.nav.theme_switch }}"
+        data-theme-light="{{ translations.nav.theme_light }}" data-theme-dark="{{ translations.nav.theme_dark }}"
+        data-theme-auto="{{ translations.nav.theme_auto }}">
+        <span class="sr-only" data-theme-name>{{ translations.nav.theme_switch }}: {{ translations.nav.theme_auto }}</span>
+        <svg aria-hidden="true" focusable="false">
+          <use href="{{ sprite }}moon-auto" xlink:href="{{ sprite }}moon-auto" />
+        </svg>
+      </button>
+      <div id="theme-menu" class="site-popover__panel" popover>
+        <ul class="site-popover__list" aria-label="{{ translations.nav.theme_switch }}">
+          <li>
+            <button type="button" data-theme-option="auto" aria-pressed="true">
+              <svg aria-hidden="true" focusable="false">
+                <use href="{{ sprite }}moon-auto" xlink:href="{{ sprite }}moon-auto" />
+              </svg>
+              <span>{{ translations.nav.theme_auto }}</span>
+            </button>
+          </li>
+          <li>
+            <button type="button" data-theme-option="light" aria-pressed="false">
+              <svg aria-hidden="true" focusable="false">
+                <use href="{{ sprite }}sun" xlink:href="{{ sprite }}sun" />
+              </svg>
+              <span>{{ translations.nav.theme_light }}</span>
+            </button>
+          </li>
+          <li>
+            <button type="button" data-theme-option="dark" aria-pressed="false">
+              <svg aria-hidden="true" focusable="false">
+                <use href="{{ sprite }}moon" xlink:href="{{ sprite }}moon" />
+              </svg>
+              <span>{{ translations.nav.theme_dark }}</span>
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
     {% if site == "cv" %}
-    {% if on_menu %}
-    <a href="{{ language_prefix ~ '/' }}" data-menu-control data-menu-state="close">
-      <svg aria-hidden="true" focusable="false">
-        <use href="{{ sprite }}close-menu" xlink:href="{{ sprite }}close-menu" />
-      </svg>
-      <span class="sr-only">{{ translations.nav.close_menu }}</span>
-    </a>
-    {% else %}
-    <a href="{{ language_prefix ~ '/menu' }}" data-menu-control data-menu-state="open">
-      <svg aria-hidden="true" focusable="false">
-        <use href="{{ sprite }}menu" xlink:href="{{ sprite }}menu" />
-      </svg>
-      <span class="sr-only">{{ translations.nav.menu }}</span>
-    </a>
-    {% endif %}
+    <div class="site-popover" data-site-menu>
+      <button type="button" id="site-menu-switch" command="toggle-popover" commandfor="site-menu"
+        aria-controls="site-menu" aria-expanded="false" aria-haspopup="dialog">
+        <svg class="site-popover__icon-closed" aria-hidden="true" focusable="false">
+          <use href="{{ sprite }}menu" xlink:href="{{ sprite }}menu" />
+        </svg>
+        <svg class="site-popover__icon-open" aria-hidden="true" focusable="false">
+          <use href="{{ sprite }}close-menu" xlink:href="{{ sprite }}close-menu" />
+        </svg>
+        <span class="sr-only">{{ translations.nav.menu }}</span>
+      </button>
+      <div id="site-menu" class="site-popover__panel" popover>
+        <nav aria-label="{{ translations.cv_menu.title }}">
+          <ul class="site-popover__list">
+            {% if has_about_section %}
+            <li><a href="{{ language_prefix ~ '/curriculum#info' }}">{{ translations.cv_menu.about }}</a></li>
+            {% endif %}
+            {% if has_experience_section %}
+            <li><a href="{{ language_prefix ~ '/curriculum#experience' }}">{{ translations.cv_menu.experiences }}</a></li>
+            {% endif %}
+            {% if has_skills_section %}
+            <li><a href="{{ language_prefix ~ '/curriculum#skills' }}">{{ translations.cv_menu.skills }}</a></li>
+            {% endif %}
+            {% if has_education_section %}
+            <li><a href="{{ language_prefix ~ '/curriculum#education' }}">{{ translations.cv_menu.education }}</a></li>
+            {% endif %}
+            {% if has_courses_section %}
+            <li><a href="{{ language_prefix ~ '/curriculum#courses-certifications' }}">{{ translations.cv_menu.courses }}</a></li>
+            {% endif %}
+            {% if has_other_projects_section %}
+            <li><a href="{{ language_prefix ~ '/curriculum#other-projects' }}">{{ translations.cv_curriculum.other_projects_heading }}</a></li>
+            {% endif %}
+            {% if has_download_section %}
+            <li><a href="{{ language_prefix ~ '/curriculum#download' }}">{{ translations.cv_menu.download }}</a></li>
+            {% endif %}
+            {% if has_contact_section %}
+            <li><a href="{{ language_prefix ~ '/curriculum#contact' }}">{{ translations.cv_menu.contact }}</a></li>
+            {% endif %}
+          </ul>
+        </nav>
+      </div>
+    </div>
     {% endif %}
   </nav>
   <p class="sr-only" role="status" data-theme-status></p>

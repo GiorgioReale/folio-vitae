@@ -99,8 +99,6 @@ pub(crate) enum SitePage {
     Home,
     Curriculum,
     CurriculumPdf,
-    Menu,
-    Languages,
     Contact,
 }
 
@@ -110,8 +108,6 @@ impl SitePage {
             Self::Home => "",
             Self::Curriculum => "curriculum",
             Self::CurriculumPdf => "curriculum.pdf",
-            Self::Menu => "menu",
-            Self::Languages => "languages",
             Self::Contact => "contact",
         }
     }
@@ -846,8 +842,6 @@ fn is_known_page_suffix(suffix: &str) -> bool {
         SitePage::Home,
         SitePage::Curriculum,
         SitePage::CurriculumPdf,
-        SitePage::Menu,
-        SitePage::Languages,
         SitePage::Contact,
     ]
     .into_iter()
@@ -955,7 +949,7 @@ mod tests {
         let state = app_state_with_languages(&["it"]);
 
         assert!(!state.path_matches_page("/en/curriculum", SitePage::Curriculum));
-        assert!(!state.path_matches_page("/foo/menu", SitePage::Menu));
+        assert!(!state.path_matches_page("/foo/menu", SitePage::Home));
         assert!(state.redirect_path_for_missing_language("/it/asdas", None, None).is_none());
     }
 
@@ -973,9 +967,8 @@ mod tests {
         );
         assert!(state.path_matches_page("/", SitePage::Home));
         assert!(state.path_matches_page("/curriculum", SitePage::Curriculum));
-        assert!(state.path_matches_page("/it/menu/", SitePage::Menu));
-        assert!(state.path_matches_page("/it/languages/", SitePage::Languages));
-        assert!(state.path_matches_page("/languages/", SitePage::Languages));
+        assert!(!state.path_matches_page("/it/menu/", SitePage::Home));
+        assert!(!state.path_matches_page("/languages/", SitePage::Home));
     }
 
     #[test]
@@ -995,11 +988,8 @@ mod tests {
         assert!(state.redirect_path_for_missing_language("/en/curriculum", None, None).is_none());
         assert!(state.path_matches_page("/en", SitePage::Home));
         assert!(state.path_matches_page("/it/curriculum", SitePage::Curriculum));
-        assert!(state.path_matches_page("/en/languages", SitePage::Languages));
-        assert_eq!(
-            state.redirect_path_for_missing_language("/languages", None, None),
-            Some("/en/languages".to_string())
-        );
+        assert!(!state.path_matches_page("/en/languages", SitePage::Home));
+        assert!(state.redirect_path_for_missing_language("/languages", None, None).is_none());
         assert_eq!(
             state.redirect_path_for_missing_language("/", Some("it-IT,it;q=0.9,en;q=0.8"), None),
             Some("/it".to_string())

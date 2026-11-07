@@ -22,14 +22,12 @@
     "theme_switch": "Hell/Dunkel-Modus",
     "language_selector_label": "Sprache",
     "current_language": "Aktuelle Sprache",
-    "close_menu": "Menü schließen",
     "primary": "Website",
     "theme_light": "Helles Design",
     "theme_dark": "Dunkles Design",
     "theme_auto": "Systemdesign",
     "languages": "Sprachen",
-    "change_language": "Sprache ändern",
-    "close_languages": "Sprachauswahl schließen"
+    "change_language": "Sprache ändern"
   },
   "main_page": {
     "websites": "Webseiten",
