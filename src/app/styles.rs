@@ -50,9 +50,11 @@ mod tests {
         let css = fs::read_to_string("assets/styles/main.css").expect("main.css");
         assert!(css.contains("@view-transition"));
         assert!(css.contains("navigation: auto"));
-        assert!(css.contains("folio-vt-fade-out"));
-        assert!(css.contains("view-transition-name: folio-menu"));
+        assert!(css.contains("folio-vt-open"));
+        assert!(css.contains("folio-vt-retreat"));
+        assert!(css.contains("view-transition-name: folio-nav"));
         assert!(css.contains("view-transition-name: folio-page-title"));
+        assert!(css.contains("view-transition-name: folio-page-role"));
         assert!(css.contains("prefers-reduced-motion: reduce"));
         assert!(css.contains("navigation: none"));
     }
