@@ -98,8 +98,8 @@
     <ul>
       {% for skill in skills %}
       <li>
-        <span class="sr-only">{{ skill.name }}</span>
         <span aria-hidden="true">{{ skill.icon_svg | default(value="") | safe }}</span>
+        <span>{{ skill.name }}</span>
       </li>
       {% endfor %}
     </ul>

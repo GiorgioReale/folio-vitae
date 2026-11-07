@@ -951,7 +951,10 @@ fn cv_pdf_content(
                 profile
                     .skills
                     .iter()
-                    .map(|skill| crate::app::pdf::PdfSkill { icon: skill.icon.clone() })
+                    .map(|skill| crate::app::pdf::PdfSkill {
+                        name: skill.name.clone(),
+                        icon: skill.icon.clone(),
+                    })
                     .collect(),
             )],
         });
