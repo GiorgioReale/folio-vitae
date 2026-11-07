@@ -63,12 +63,10 @@
       "hybrid": "Гибридный",
       "remote": "Удалённо"
     },
-    "more_experiences": "Полный список опыта работы доступен на {domain}.",
     "other_projects_heading": "Другие проекты",
     "education_heading": "Образование",
     "skills_heading": "Навыки",
     "courses_heading": "Курсы и сертификации",
-    "courses_more_info": "Полный список курсов и сертификаций доступен на {domain}.",
     "course_released_by": "Выдано",
     "course_released_on": "Дата выдачи",
     "certificate_link": "Сертификат",

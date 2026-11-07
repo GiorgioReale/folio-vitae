@@ -63,12 +63,10 @@
       "hybrid": "Hybride",
       "remote": "À distance"
     },
-    "more_experiences": "La liste complète des expériences professionnelles est disponible sur {domain}.",
     "other_projects_heading": "Autres projets",
     "education_heading": "Formation",
     "skills_heading": "Compétences",
     "courses_heading": "Cours et certifications",
-    "courses_more_info": "La liste complète des cours et certifications est disponible sur {domain}.",
     "course_released_by": "Délivré par",
     "course_released_on": "Délivré le",
     "certificate_link": "Certificat",
