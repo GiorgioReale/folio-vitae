@@ -63,12 +63,10 @@
       "hybrid": "Hybrid",
       "remote": "Remote"
     },
-    "more_experiences": "The full list of work experiences is available at {domain}.",
     "other_projects_heading": "Other Projects",
     "education_heading": "Education",
     "skills_heading": "Skills",
     "courses_heading": "Courses & Certifications",
-    "courses_more_info": "The complete list of courses and certifications is available at {domain}.",
     "course_released_by": "Released by",
     "course_released_on": "Released on",
     "certificate_link": "Certificate",

@@ -63,12 +63,10 @@
       "hybrid": "ハイブリッド",
       "remote": "リモート"
     },
-    "more_experiences": "完全な職務経歴一覧は {domain} でご覧いただけます。",
     "other_projects_heading": "その他のプロジェクト",
     "education_heading": "学歴",
     "skills_heading": "スキル",
     "courses_heading": "コース・認定資格",
-    "courses_more_info": "コース・認定資格の全リストは {domain} でご覧いただけます。",
     "course_released_by": "発行元",
     "course_released_on": "発行日",
     "certificate_link": "証明書",

@@ -87,9 +87,6 @@
       {% endfor %}
     </article>
     {% endfor %}
-    {% if has_website_cv and work_experiences | length > 4 %}
-    <p class="more-information-online">{{ translations.cv_curriculum.more_experiences | replace(from='{domain}', to=website_cv.domain) }}</p>
-    {% endif %}
   </section>
   {% endif %}
   {% if skills | length > 0 %}
@@ -144,9 +141,6 @@
       <a href="{{ courses_certification.link }}" target="_blank" rel="noopener noreferrer">{{ translations.cv_curriculum.certificate_link }}<span class="sr-only"> ({{ translations.accessibility.new_window }})</span></a>
     </article>
     {% endfor %}
-    {% if has_website_cv and courses_certifications | length > 4 %}
-    <p class="more-information-online">{{ translations.cv_curriculum.courses_more_info | replace(from='{domain}', to=website_cv.domain) }}</p>
-    {% endif %}
   </section>
   {% endif %}
   <section class="pdf-download" id="download" tabindex="-1">

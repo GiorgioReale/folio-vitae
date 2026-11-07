@@ -63,12 +63,10 @@
       "hybrid": "混合",
       "remote": "远程"
     },
-    "more_experiences": "完整的工作经验列表可在 {domain} 查看。",
     "other_projects_heading": "其他项目",
     "education_heading": "教育背景",
     "skills_heading": "技能",
     "courses_heading": "课程与认证",
-    "courses_more_info": "完整的课程与认证列表可在 {domain} 查看。",
     "course_released_by": "颁发机构",
     "course_released_on": "颁发日期",
     "certificate_link": "证书",

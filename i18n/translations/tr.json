@@ -63,12 +63,10 @@
       "hybrid": "Hibrit",
       "remote": "Uzaktan"
     },
-    "more_experiences": "Tüm iş deneyimleri listesi {domain} adresinde mevcuttur.",
     "other_projects_heading": "Diğer Projeler",
     "education_heading": "Eğitim",
     "skills_heading": "Yetenekler",
     "courses_heading": "Kurslar & Sertifikalar",
-    "courses_more_info": "Tüm kurs ve sertifika listesi {domain} adresinde mevcuttur.",
     "course_released_by": "Veren kurum",
     "course_released_on": "Veriliş tarihi",
     "certificate_link": "Sertifika",
