@@ -1,5 +1,14 @@
 {% extends "cv/base.html" %}
 {% block body_id %}curriculum{% endblock body_id %}
+{% block page_scripts %}
+  {% if contact_form_enabled %}
+  {% if minify_assets %}
+  <script src="/assets/scripts/cv/contact-form.min.js?v={{ asset_version }}" charset="utf-8" defer></script>
+  {% else %}
+  <script src="/assets/scripts/cv/contact-form.js?v={{ asset_version }}" charset="utf-8" defer></script>
+  {% endif %}
+  {% endif %}
+{% endblock page_scripts %}
 {% block aside %}
 <aside class="profile" aria-label="{{ translations.accessibility.profile }}">
   <picture>
