@@ -64,20 +64,20 @@
 <main id="main-content" tabindex="-1">
   {% if description %}
   <section id="info" class="info" tabindex="-1">
-    <h3>{{ translations.cv_curriculum.about_heading }}</h3>
+    <h2>{{ translations.cv_curriculum.about_heading }}</h2>
     <p>{{ description }}</p>
   </section>
   {% endif %}
   {% if work_experiences | length > 0 %}
   <section id="experience" class="experience" tabindex="-1">
-    <h3>{{ translations.cv_curriculum.experience_heading }}</h3>
+    <h2>{{ translations.cv_curriculum.experience_heading }}</h2>
     {% for work_experience in work_experiences %}
     <article>
-      <h4>{{ work_experience.company }}</h4>
+      <h3>{{ work_experience.company }}</h3>
       <p>{{ work_experience.location }}</p>
       {% for role in work_experience.roles %}
       <div>
-        <h5>{{ role.title }}</h5>
+        <h4>{{ role.title }}</h4>
         {% if role.meta %}
         <p class="meta">{{ role.meta }}</p>
         {% endif %}
@@ -94,7 +94,7 @@
   {% endif %}
   {% if skills | length > 0 %}
   <section id="skills" class="skills" tabindex="-1">
-    <h3>{{ translations.cv_curriculum.skills_heading }}</h3>
+    <h2>{{ translations.cv_curriculum.skills_heading }}</h2>
     <ul>
       {% for skill in skills %}
       <li>
@@ -107,10 +107,10 @@
   {% endif %}
   {% if other_projects | length > 0 %}
   <section id="other-projects" class="other-projects" tabindex="-1">
-    <h3>{{ translations.cv_curriculum.other_projects_heading }}</h3>
+    <h2>{{ translations.cv_curriculum.other_projects_heading }}</h2>
     {% for project in other_projects %}
     <article>
-      <h4>{{ project.title }}</h4>
+      <h3>{{ project.title }}</h3>
       <p class="dates">{{ project.start_date }} - {{ project.end_date }}{% if project.duration %} ({{ project.duration }}){% endif %}</p>
       <p>{{ project.description }}</p>
       <a href="{{ project.link }}" target="_blank" rel="noopener noreferrer">{% if project.link_title %}{{ project.link_title }}{% else %}{{ translations.cv_curriculum.project_link }}{% endif %}<span class="sr-only"> ({{ translations.accessibility.new_window }})</span></a>
@@ -120,10 +120,10 @@
   {% endif %}
   {% if educations | length > 0 %}
   <section id="education" class="formation" tabindex="-1">
-    <h3>{{ translations.cv_curriculum.education_heading }}</h3>
+    <h2>{{ translations.cv_curriculum.education_heading }}</h2>
     {% for education in educations %}
     <article>
-      <h4>{{ education.institute }}</h4>
+      <h3>{{ education.institute }}</h3>
       <p>{{ education.course_of_study }}</p>
       <p><strong>{{ education.educational_qualification }}</strong></p>
       <p class="dates">{{ education.date_start }} - {{ education.date_end }}{% if education.duration %} ({{ education.duration }}){% endif %}</p>
@@ -135,10 +135,10 @@
   {% endif %}
   {% if courses_certifications | length > 0 %}
   <section id="courses-certifications" class="training-courses" tabindex="-1">
-    <h3>{{ translations.cv_curriculum.courses_heading }}</h3>
+    <h2>{{ translations.cv_curriculum.courses_heading }}</h2>
     {% for courses_certification in courses_certifications %}
     <article>
-      <h4>{{ courses_certification.title }}</h4>
+      <h3>{{ courses_certification.title }}</h3>
       <p><strong>{{ translations.cv_curriculum.course_released_by }}</strong>: {{ courses_certification.released_by }}</p>
       <p><strong>{{ translations.cv_curriculum.course_released_on }}</strong> {{ courses_certification.released_on }}</p>
       <a href="{{ courses_certification.link }}" target="_blank" rel="noopener noreferrer">{{ translations.cv_curriculum.certificate_link }}<span class="sr-only"> ({{ translations.accessibility.new_window }})</span></a>
@@ -150,7 +150,7 @@
   </section>
   {% endif %}
   <section class="pdf-download" id="download" tabindex="-1">
-    <h3>{{ translations.cv_curriculum.pdf_heading }}</h3>
+    <h2>{{ translations.cv_curriculum.pdf_heading }}</h2>
     <p>{{ translations.cv_curriculum.pdf_description }}</p>
     <a href="{{ language_prefix ~ '/curriculum.pdf' }}">
       <svg aria-hidden="true" focusable="false">
@@ -164,7 +164,7 @@
   {% set invalid_field = contact_form.feedback?.field or "" %}
   {% set contact_success = contact_form.feedback and contact_form.feedback.status == "success" %}
   <section class="contact{% if contact_success %} contact--submitted{% endif %}" id="contact" aria-labelledby="contact-heading" tabindex="-1">
-    <h3 id="contact-heading">{{ translations.cv_curriculum.contact_heading }}</h3>
+    <h2 id="contact-heading">{{ translations.cv_curriculum.contact_heading }}</h2>
     {% if contact_success %}
     <div id="contact-feedback" class="contact-form__feedback contact-form__feedback--success" role="status" tabindex="-1" data-contact-feedback autofocus>
       <p>{{ contact_form.feedback.message }}</p>
@@ -179,7 +179,7 @@
     </button>
     <dialog id="contact-dialog" class="contact-form" closedby="any" aria-labelledby="contact-dialog-heading"{% if contact_form.feedback %} data-open-on-load{% endif %}>
       <div class="contact-form__header">
-        <h3 id="contact-dialog-heading">{{ translations.cv_curriculum.contact_heading }}</h3>
+        <h2 id="contact-dialog-heading">{{ translations.cv_curriculum.contact_heading }}</h2>
         <button type="button" class="contact-form__close" command="close" commandfor="contact-dialog">
           <svg aria-hidden="true" focusable="false">
             <use href="/assets/icons/cv/website/sprites.svg?v={{ asset_version }}#close-menu" xlink:href="/assets/icons/cv/website/sprites.svg?v={{ asset_version }}#close-menu" />

@@ -114,8 +114,9 @@ body#curriculum {
           outline-offset: 0.5rem;
         }
 
-        > h3 {
+        > h2 {
           margin: 3rem 0 0.75rem 0;
+          font-size: 1.602rem;
         }
 
         > p {
@@ -126,6 +127,7 @@ body#curriculum {
           }
         }
 
+        h2,
         h3,
         h4,
         p {
@@ -134,7 +136,7 @@ body#curriculum {
         }
 
         &.info {
-          > h3 {
+          > h2 {
             margin: 1.5rem 0 1.5rem 0;
           }
         }
@@ -147,13 +149,13 @@ body#curriculum {
             margin-block-start: 1rem;
             margin-inline-start: 1rem;
 
+            > h3 {
+              font-size: 1.424rem;
+            }
+
             > div {
               margin-block-start: 0.5rem;
               margin-inline-start: 1rem;
-
-              > h5 {
-                font-size: 1.424rem;
-              }
 
               > p {
               }
@@ -176,8 +178,9 @@ body#curriculum {
         &.contact {
           text-align: center;
 
-          > h3 {
+          > h2 {
             margin: 0 0 0.75rem 0;
+            font-size: 1.602rem;
           }
 
           > a,
@@ -353,7 +356,7 @@ body#curriculum {
         justify-content: space-between;
         gap: 1rem;
 
-        > h3 {
+        > h2 {
           margin: 0;
           font-size: 1.266rem;
         }
@@ -535,6 +538,7 @@ body#curriculum {
 
       > main {
         > section {
+          h2,
           h3,
           h4,
           p {
