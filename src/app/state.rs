@@ -838,14 +838,9 @@ fn language_code_is_supported(code: &str, snapshot: &LocalizationState) -> bool 
 }
 
 fn is_known_page_suffix(suffix: &str) -> bool {
-    [
-        SitePage::Home,
-        SitePage::Curriculum,
-        SitePage::CurriculumPdf,
-        SitePage::Contact,
-    ]
-    .into_iter()
-    .any(|page| page.slug() == suffix)
+    [SitePage::Home, SitePage::Curriculum, SitePage::CurriculumPdf, SitePage::Contact]
+        .into_iter()
+        .any(|page| page.slug() == suffix)
 }
 
 fn split_language_prefix(clean: &str) -> (Option<&str>, &str) {

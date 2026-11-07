@@ -21,8 +21,8 @@ use tower_http::{
 use crate::{
     app::state::AppState,
     http::handlers::{
-        contact_cv, curriculum, curriculum_pdf, homepage, manifest, not_found, robots, security_txt,
-        sitemap,
+        contact_cv, curriculum, curriculum_pdf, homepage, manifest, not_found, robots,
+        security_txt, sitemap,
     },
 };
 
