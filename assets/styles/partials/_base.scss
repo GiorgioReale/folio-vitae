@@ -444,7 +444,21 @@ main :where(section, article) {
     navigation: auto;
   }
 
-  ::view-transition-group(root) {
+  /* 1–2 stable names only: clearer MPA morphs without extra paint groups. */
+  .site-controls > a[data-menu-control] {
+    view-transition-name: folio-menu;
+  }
+
+  /* Shared identity title on homepage ↔ curriculum (CTA path); skip sr-only/menu titles. */
+  body#homepage > .page-shell > main > h1,
+  body#curriculum > aside.profile > div > h1 {
+    view-transition-name: folio-page-title;
+    width: fit-content;
+  }
+
+  ::view-transition-group(root),
+  ::view-transition-group(folio-menu),
+  ::view-transition-group(folio-page-title) {
     animation-duration: 0.24s;
     animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
   }
