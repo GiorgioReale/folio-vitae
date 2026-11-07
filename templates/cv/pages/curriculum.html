@@ -171,16 +171,16 @@
     </div>
     {% else %}
     <p id="contact-description">{{ translations.cv_curriculum.contact_description }}</p>
-    <button type="button" class="contact__open" popovertarget="contact-popover" popovertargetaction="show">
+    <button type="button" class="contact__open" command="show-modal" commandfor="contact-dialog">
       <svg aria-hidden="true" focusable="false">
         <use href="/assets/icons/cv/website/sprites.svg?v={{ asset_version }}#send" xlink:href="/assets/icons/cv/website/sprites.svg?v={{ asset_version }}#send" />
       </svg>
       {{ translations.cv_curriculum.contact_submit }}
     </button>
-    <div id="contact-popover" class="contact-form" popover aria-labelledby="contact-popover-heading">
+    <dialog id="contact-dialog" class="contact-form" closedby="any" aria-labelledby="contact-dialog-heading"{% if contact_form.feedback %} data-open-on-load{% endif %}>
       <div class="contact-form__header">
-        <h3 id="contact-popover-heading">{{ translations.cv_curriculum.contact_heading }}</h3>
-        <button type="button" class="contact-form__close" popovertarget="contact-popover" popovertargetaction="hide">
+        <h3 id="contact-dialog-heading">{{ translations.cv_curriculum.contact_heading }}</h3>
+        <button type="button" class="contact-form__close" command="close" commandfor="contact-dialog">
           <svg aria-hidden="true" focusable="false">
             <use href="/assets/icons/cv/website/sprites.svg?v={{ asset_version }}#close-menu" xlink:href="/assets/icons/cv/website/sprites.svg?v={{ asset_version }}#close-menu" />
           </svg>
@@ -222,7 +222,7 @@
           {{ translations.cv_curriculum.contact_submit }}
         </button>
       </form>
-    </div>
+    </dialog>
     {% endif %}
   </section>
   {% endif %}
