@@ -47,10 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  form.noValidate = true;
-
   const feedback = document.querySelector("[data-contact-feedback]");
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const fields = [
     {
       element: form.querySelector("#full-name"),
@@ -66,7 +63,6 @@ document.addEventListener("DOMContentLoaded", () => {
       element: form.querySelector("#email"),
       required: form.dataset.msgEmailRequired,
       invalid: form.dataset.msgEmail,
-      email: true,
     },
     {
       element: form.querySelector("#message"),
@@ -74,22 +70,6 @@ document.addEventListener("DOMContentLoaded", () => {
       invalid: form.dataset.msgMessageLength,
     },
   ].filter((field) => field.element);
-
-  const messageFor = (field) => {
-    const value = field.element.value.trim();
-    const min = Number(field.element.getAttribute("minlength")) || 0;
-    const max = Number(field.element.getAttribute("maxlength")) || Number.POSITIVE_INFINITY;
-    if (!value) {
-      return field.required || "";
-    }
-    if (value.length < min || value.length > max) {
-      return field.invalid || "";
-    }
-    if (field.email && !emailPattern.test(value)) {
-      return field.invalid || "";
-    }
-    return "";
-  };
 
   const describedBy = (field, invalid) => {
     const ids = [`${field.element.id}-hint`];
@@ -121,34 +101,46 @@ document.addEventListener("DOMContentLoaded", () => {
     describedBy(field, true);
   };
 
-  form.addEventListener("submit", (event) => {
-    let firstInvalid = null;
-    fields.forEach((field) => {
-      field.element.value = field.element.value.trim();
-      const message = messageFor(field);
-      if (message) {
-        markField(field, message);
-        firstInvalid ??= field.element;
-        return;
-      }
+  const applyI18nValidity = (field) => {
+    const el = field.element;
+    el.setCustomValidity("");
+    const { validity } = el;
+    if (validity.valueMissing) {
+      el.setCustomValidity(field.required || "");
+    } else if (validity.typeMismatch || validity.tooShort || validity.tooLong) {
+      el.setCustomValidity(field.invalid || "");
+    }
+  };
+
+  const syncFieldUi = (field) => {
+    applyI18nValidity(field);
+    if (field.element.validity.valid) {
       clearField(field);
-    });
-    if (!firstInvalid) {
       return;
     }
-    event.preventDefault();
+    markField(field, field.element.validationMessage);
+  };
+
+  const syncAllFieldUi = () => {
+    fields.forEach((field) => {
+      syncFieldUi(field);
+    });
     if (feedback) {
       feedback.hidden = true;
     }
-    firstInvalid.focus();
-  });
+  };
 
   fields.forEach((field) => {
+    field.element.addEventListener("invalid", () => {
+      syncAllFieldUi();
+    });
+
     field.element.addEventListener("input", () => {
+      field.element.setCustomValidity("");
       if (field.element.getAttribute("aria-invalid") !== "true") {
         return;
       }
-      if (messageFor(field)) {
+      if (!field.element.validity.valid) {
         return;
       }
       clearField(field);
@@ -156,5 +148,24 @@ document.addEventListener("DOMContentLoaded", () => {
         feedback.hidden = true;
       }
     });
+  });
+
+  form.addEventListener("submit", (event) => {
+    fields.forEach((field) => {
+      field.element.value = field.element.value.trim();
+      applyI18nValidity(field);
+    });
+
+    if (form.reportValidity()) {
+      fields.forEach((field) => {
+        clearField(field);
+      });
+      return;
+    }
+
+    event.preventDefault();
+    if (feedback) {
+      feedback.hidden = true;
+    }
   });
 });
