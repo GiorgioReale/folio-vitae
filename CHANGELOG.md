@@ -5,6 +5,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+## [0.1.17](https://github.com/GiorgioReale/folio-vitae/compare/v0.1.16...v0.1.17) - 2026-11-07
+
+- feat: replace theme/menu/language pages with header popovers ([#120](https://github.com/GiorgioReale/folio-vitae/pull/120)) by @GiorgioReale
+- perf: load contact-form.js only where the form exists ([#119](https://github.com/GiorgioReale/folio-vitae/pull/119)) by @GiorgioReale
+- perf: prefer variable fonts over redundant static faces ([#118](https://github.com/GiorgioReale/folio-vitae/pull/118)) by @GiorgioReale
+- perf: defer below-fold curriculum section rendering ([#117](https://github.com/GiorgioReale/folio-vitae/pull/117)) by @GiorgioReale
+- feat: nominate stable view-transition names for menu and title ([#116](https://github.com/GiorgioReale/folio-vitae/pull/116)) by @GiorgioReale
+- perf: prefetch typical next pages from the CV homepage ([#115](https://github.com/GiorgioReale/folio-vitae/pull/115)) by @GiorgioReale
+- chore: remove always-hidden more-information-online markup ([#114](https://github.com/GiorgioReale/folio-vitae/pull/114)) by @GiorgioReale
+- fix: use Constraint Validation API for contact form ([#113](https://github.com/GiorgioReale/folio-vitae/pull/113)) by @GiorgioReale
+- fix: align theme-color with light and dark backgrounds ([#112](https://github.com/GiorgioReale/folio-vitae/pull/112)) by @GiorgioReale
+- fix(a11y): show skill names with icons on curriculum and PDF ([#111](https://github.com/GiorgioReale/folio-vitae/pull/111)) by @GiorgioReale
+- fix(perf): raise CV homepage LCP image fetch and decode priority ([#110](https://github.com/GiorgioReale/folio-vitae/pull/110)) by @GiorgioReale
+- fix(a11y): restore sequential heading hierarchy on curriculum ([#109](https://github.com/GiorgioReale/folio-vitae/pull/109)) by @GiorgioReale
+- fix(a11y): replace contact popover with native modal dialog ([#107](https://github.com/GiorgioReale/folio-vitae/pull/107)) by @GiorgioReale
 ## [0.1.16](https://github.com/GiorgioReale/folio-vitae/compare/v0.1.15...v0.1.16) - 2026-11-02
 
 - feat: modernize cross-document view transitions and local site links ([#104](https://github.com/GiorgioReale/folio-vitae/pull/104)) by @GiorgioReale
