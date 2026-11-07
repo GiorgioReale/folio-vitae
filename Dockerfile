@@ -23,7 +23,7 @@ RUN --mount=type=cache,id=cargo-registry,target=/usr/local/cargo/registry,sharin
     cargo build --release --locked --all-features \
     && cp /src/target/release/folio-vitae /folio-vitae
 
-FROM alpine:3.24.3 AS runtime
+FROM alpine:3.24.4 AS runtime
 
 RUN apk add --no-cache ca-certificates \
     && addgroup -S -g 10001 app \
