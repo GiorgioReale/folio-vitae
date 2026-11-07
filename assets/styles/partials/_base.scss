@@ -242,7 +242,8 @@ html {
 
     > aside,
     > .hero-media {
-      flex: 2;
+      flex: 0 0 calc(100% * 2 / 7);
+      min-inline-size: 0;
       position: sticky;
       top: 0;
       height: 100vh;
@@ -261,7 +262,8 @@ html {
     > .page-shell {
       min-height: 100vh;
       min-height: 100dvh;
-      flex: 5;
+      flex: 1 1 auto;
+      min-inline-size: 0;
       display: flex;
       flex-direction: column;
       flex-wrap: nowrap;
@@ -389,12 +391,26 @@ html {
     }
   }
 
+  > body > aside + .page-shell,
+  > body > .hero-media + .page-shell {
+    flex: 0 0 calc(100% * 5 / 7);
+  }
+
   @media screen and (max-width: $breakpoint-lg) {
     > body {
       > aside,
       > .hero-media {
+        flex: none;
+        inline-size: auto;
         border-inline-end: none;
         border-bottom: 1px solid var(--color-text-primary);
+      }
+
+      > aside + .page-shell,
+      > .hero-media + .page-shell,
+      > .page-shell {
+        flex: none;
+        inline-size: auto;
       }
 
       > .page-shell {
