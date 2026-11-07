@@ -9,8 +9,24 @@ body#curriculum {
   align-items: flex-start;
 
   > aside {
+    // Query the sticky column width, not the viewport (split view / zoom / future chrome).
+    container: profile / inline-size;
+    display: grid;
+    // Two tracks always; children span full width until the column is wide enough.
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 1.5rem;
+    row-gap: 0.75rem;
+    align-content: safe center;
+    align-items: center;
+    justify-items: center;
+    justify-content: center;
     overflow-y: auto;
-    justify-content: safe center;
+
+    > picture,
+    > div,
+    > dl.profile-facts {
+      grid-column: 1 / -1;
+    }
 
     > picture {
       flex-shrink: 0;
@@ -87,6 +103,34 @@ body#curriculum {
         &:hover {
           fill: var(--color-buttons-primary-hover);
           background-color: var(--background-buttons-primary-hover);
+        }
+      }
+    }
+
+    // grass leaves bare Sass math inside @container; interpolate explicitly.
+    @container profile (min-width: #{$breakpoint-sm + 1px}) {
+      > picture {
+        grid-column: 1;
+        grid-row: 1;
+        align-self: end;
+        width: min(10.5rem, 78%);
+      }
+
+      > div {
+        grid-column: 1;
+        grid-row: 2;
+        align-self: start;
+        width: 100%;
+      }
+
+      > dl.profile-facts {
+        grid-column: 2;
+        grid-row: 1 / span 2;
+        align-self: center;
+        width: 100%;
+
+        > div > dd {
+          overflow-wrap: anywhere;
         }
       }
     }
@@ -582,43 +626,6 @@ body#curriculum {
           &.pdf-download {
             margin-inline: -1rem;
           }
-        }
-      }
-    }
-  }
-
-  @media screen and (max-width: $breakpoint-lg) and (min-width: ($breakpoint-sm + 1px)) {
-    > aside {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      column-gap: 1.5rem;
-      row-gap: 0.75rem;
-      align-items: center;
-      justify-items: center;
-      justify-content: center;
-
-      > picture {
-        grid-column: 1;
-        grid-row: 1;
-        align-self: end;
-        width: min(10.5rem, 78%);
-      }
-
-      > div {
-        grid-column: 1;
-        grid-row: 2;
-        align-self: start;
-        width: 100%;
-      }
-
-      > dl.profile-facts {
-        grid-column: 2;
-        grid-row: 1 / span 2;
-        align-self: center;
-        width: 100%;
-
-        > div > dd {
-          overflow-wrap: anywhere;
         }
       }
     }
