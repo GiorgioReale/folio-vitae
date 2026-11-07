@@ -26,8 +26,9 @@ use crate::{
     },
 };
 
-const CONTENT_SECURITY_POLICY_HTTPS: &str = "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data:; manifest-src 'self'; object-src 'none'; script-src 'self'; style-src 'self'; upgrade-insecure-requests";
-const CONTENT_SECURITY_POLICY_HTTP: &str = "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data:; manifest-src 'self'; object-src 'none'; script-src 'self'; style-src 'self'";
+const CONTENT_SECURITY_POLICY_HTTPS: &str = "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data:; manifest-src 'self'; object-src 'none'; script-src 'self' 'inline-speculation-rules'; style-src 'self'; upgrade-insecure-requests";
+const CONTENT_SECURITY_POLICY_HTTP: &str = "default-src 'self'; base-uri 'self'; connect-src 'self'; font-src 'self'; form-action 'self'; frame-ancestors 'none'; img-src 'self' data:; manifest-src 'self'; object-src 'none'; script-src 'self' 'inline-speculation-rules'; style-src 'self'";
+
 const HSTS: &str = "max-age=63072000; includeSubDomains; preload";
 const PERMISSIONS_POLICY: &str = "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()";
 const REFERRER_POLICY: &str = "no-referrer";
