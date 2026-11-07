@@ -22,14 +22,12 @@
     "theme_switch": "Hali ya Mwangaza/Giza",
     "language_selector_label": "Lugha",
     "current_language": "Lugha ya sasa",
-    "close_menu": "Funga menyu",
     "primary": "Tovuti",
     "theme_light": "Mandhari meupe",
     "theme_dark": "Mandhari meusi",
     "theme_auto": "Mandhari ya mfumo",
     "languages": "Lugha",
-    "change_language": "Badilisha lugha",
-    "close_languages": "Funga uteuzi wa lugha"
+    "change_language": "Badilisha lugha"
   },
   "main_page": {
     "websites": "Tovuti",

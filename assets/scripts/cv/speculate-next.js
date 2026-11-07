@@ -1,15 +1,12 @@
 /**
  * Speculative loading for the CV homepage's likely next navigations.
  *
- * Prefetches same-origin curriculum + menu destinations via Speculation Rules
+ * Prefetches same-origin curriculum destinations via Speculation Rules
  * when supported, with <link rel="prefetch"> as a progressive fallback.
  * Skipped when the user prefers reduced data (Save-Data / prefers-reduced-data).
  */
 (() => {
-  const TARGET_SELECTORS = [
-    "a.curriculum-cta",
-    'a[data-menu-control][data-menu-state="open"]',
-  ];
+  const TARGET_SELECTORS = ["a.curriculum-cta"];
 
   const prefersReducedData = () => {
     if (navigator.connection?.saveData === true) {

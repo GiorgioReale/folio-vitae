@@ -22,14 +22,12 @@
     "theme_switch": "وضع النهار/الليل",
     "language_selector_label": "اللغة",
     "current_language": "اللغة الحالية",
-    "close_menu": "إغلاق القائمة",
     "primary": "الموقع",
     "theme_light": "السمة الفاتحة",
     "theme_dark": "السمة الداكنة",
     "theme_auto": "سمة النظام",
     "languages": "اللغات",
-    "change_language": "تغيير اللغة",
-    "close_languages": "إغلاق اختيار اللغة"
+    "change_language": "تغيير اللغة"
   },
   "main_page": {
     "websites": "المواقع",

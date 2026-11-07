@@ -22,14 +22,12 @@
     "theme_switch": "Mode Terang/Gelap",
     "language_selector_label": "Bahasa",
     "current_language": "Bahasa saat ini",
-    "close_menu": "Tutup menu",
     "primary": "Situs",
     "theme_light": "Tema terang",
     "theme_dark": "Tema gelap",
     "theme_auto": "Tema sistem",
     "languages": "Bahasa",
-    "change_language": "Ubah bahasa",
-    "close_languages": "Tutup pilihan bahasa"
+    "change_language": "Ubah bahasa"
   },
   "main_page": {
     "websites": "Situs Web",

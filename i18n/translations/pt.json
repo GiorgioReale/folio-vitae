@@ -22,14 +22,12 @@
     "theme_switch": "Modo Claro/Escuro",
     "language_selector_label": "Idioma",
     "current_language": "Idioma atual",
-    "close_menu": "Fechar menu",
     "primary": "Site",
     "theme_light": "Tema claro",
     "theme_dark": "Tema escuro",
     "theme_auto": "Tema do sistema",
     "languages": "Idiomas",
-    "change_language": "Mudar idioma",
-    "close_languages": "Fechar seleção de idioma"
+    "change_language": "Mudar idioma"
   },
   "main_page": {
     "websites": "Websites",

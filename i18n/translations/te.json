@@ -22,14 +22,12 @@
     "theme_switch": "లైట్/డార్క్ మోడ్",
     "language_selector_label": "భాష",
     "current_language": "ప్రస్తుత భాష",
-    "close_menu": "మెనూను మూసివేయి",
     "primary": "సైట్",
     "theme_light": "లేత థీమ్",
     "theme_dark": "ముదురు థీమ్",
     "theme_auto": "సిస్టమ్ థీమ్",
     "languages": "Languages",
-    "change_language": "Change language",
-    "close_languages": "Close language selection"
+    "change_language": "Change language"
   },
   "main_page": {
     "websites": "వెబ్‌సైట్లు",

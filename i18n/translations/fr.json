@@ -22,14 +22,12 @@
     "theme_switch": "Mode clair/sombre",
     "language_selector_label": "Langue",
     "current_language": "Langue actuelle",
-    "close_menu": "Fermer le menu",
     "primary": "Site",
     "theme_light": "Thème clair",
     "theme_dark": "Thème sombre",
     "theme_auto": "Thème du système",
     "languages": "Langues",
-    "change_language": "Changer de langue",
-    "close_languages": "Fermer la sélection de langue"
+    "change_language": "Changer de langue"
   },
   "main_page": {
     "websites": "Sites web",

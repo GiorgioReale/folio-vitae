@@ -288,7 +288,7 @@ html {
           gap: 1rem;
           max-width: 100%;
 
-          > a.language-switcher {
+          > .site-popover > button.language-switcher {
             width: 2.25rem;
             height: 2.25rem;
             min-width: 2.25rem;
@@ -308,26 +308,25 @@ html {
             align-content: center;
             justify-content: center;
             align-items: center;
+            color: var(--color-links);
 
             &:hover {
               border-color: var(--color-links-hover);
+              color: var(--color-links-hover);
             }
 
-            &[aria-current='page'] {
+            &[aria-expanded='true'] {
               background-color: var(--color-links);
               color: var(--background-main);
             }
           }
 
-          > button {
+          > a,
+          > .site-popover > button {
             background: none;
             border: 0;
             padding: 0;
             cursor: pointer;
-          }
-
-          > a:not(.language-switcher),
-          > button {
             line-height: 0;
             min-width: 2.25rem;
             min-height: 2.25rem;
@@ -344,6 +343,13 @@ html {
                 fill: var(--color-links-hover);
               }
             }
+          }
+
+          > .site-popover {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
           }
         }
       }
@@ -409,6 +415,130 @@ html {
 
 }
 
+.site-popover__panel {
+  box-sizing: border-box;
+  min-inline-size: 12rem;
+  margin: 0;
+  padding: 0.35rem;
+  border: 1px solid var(--color-text-primary);
+  background-color: var(--background-main);
+  color: var(--color-text-primary);
+  inset: auto;
+  position-area: block-end span-inline-end;
+  margin-block-start: 0.5rem;
+
+  /* Class fallback when the Popover API is unavailable (JS toggles [hidden]). */
+  &.is-open {
+    display: block;
+    position: absolute;
+    inset: auto;
+    inset-block-start: calc(100% + 0.5rem);
+    inset-inline-end: 0;
+    z-index: 10;
+    margin-block-start: 0;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    &:is(:popover-open, .is-open) {
+      animation: folio-site-popover-in 0.18s ease-out;
+    }
+  }
+}
+
+.site-popover__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+
+  > li > a,
+  > li > button {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 0.65rem;
+    width: 100%;
+    min-height: 2.25rem;
+    padding: 0.35rem 0.6rem;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    text-align: start;
+    text-decoration: none;
+    color: var(--color-text-primary);
+    font-family: var(--font-family-display);
+    font-variation-settings: 'wght' 500;
+    font-weight: 500;
+    font-size: 0.9rem;
+    line-height: 1.2;
+
+    > .language-code {
+      font-family: var(--font-family-monospace);
+      font-variation-settings: 'wght' 700;
+      font-weight: 700;
+      text-transform: uppercase;
+      min-width: 2.25rem;
+      text-decoration: none;
+    }
+
+    > svg {
+      width: 1.25rem;
+      height: 1.25rem;
+      flex-shrink: 0;
+      fill: currentColor;
+    }
+
+    &:hover {
+      color: var(--color-links-hover);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--color-text-primary);
+      outline-offset: 2px;
+    }
+
+    &[aria-current='true'],
+    &[aria-pressed='true'] {
+      color: var(--color-links);
+
+      > span:not(.language-code) {
+        text-decoration: underline;
+        text-decoration-thickness: 0.1em;
+        text-underline-offset: 0.2em;
+      }
+    }
+  }
+}
+
+.site-popover__icon-open {
+  display: none;
+}
+
+.site-popover:has(> [popover]:popover-open) > button > .site-popover__icon-closed,
+.site-popover:has(> .site-popover__panel.is-open) > button > .site-popover__icon-closed {
+  display: none;
+}
+
+.site-popover:has(> [popover]:popover-open) > button > .site-popover__icon-open,
+.site-popover:has(> .site-popover__panel.is-open) > button > .site-popover__icon-open {
+  display: block;
+}
+
+@keyframes folio-site-popover-in {
+  from {
+    opacity: 0;
+    transform: translateY(-0.25rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 ::selection {
   background: var(--background-selection);
   color: var(--color-selection);
@@ -445,7 +575,7 @@ main :where(section, article) {
   }
 
   /* 1–2 stable names only: clearer MPA morphs without extra paint groups. */
-  .site-controls > a[data-menu-control] {
+  .site-controls > .site-popover[data-site-menu] {
     view-transition-name: folio-menu;
   }
 
