@@ -51,6 +51,8 @@ mod tests {
         assert!(css.contains("@view-transition"));
         assert!(css.contains("navigation: auto"));
         assert!(css.contains("folio-vt-fade-out"));
+        assert!(css.contains("view-transition-name: folio-menu"));
+        assert!(css.contains("view-transition-name: folio-page-title"));
         assert!(css.contains("prefers-reduced-motion: reduce"));
         assert!(css.contains("navigation: none"));
     }
