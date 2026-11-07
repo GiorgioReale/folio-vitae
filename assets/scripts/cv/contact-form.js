@@ -1,4 +1,47 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const dialog = document.querySelector("dialog.contact-form");
+
+  if (dialog instanceof HTMLDialogElement) {
+    if (!("commandForElement" in HTMLButtonElement.prototype)) {
+      document.querySelectorAll(`button[commandfor="${dialog.id}"]`).forEach((button) => {
+        button.addEventListener("click", () => {
+          const command = button.getAttribute("command");
+          if (command === "show-modal") {
+            dialog.showModal();
+          } else if (command === "close") {
+            dialog.close();
+          }
+        });
+      });
+    }
+
+    if (!("closedBy" in HTMLDialogElement.prototype) && dialog.getAttribute("closedby") === "any") {
+      const outside = (event, target) => {
+        const rect = target.getBoundingClientRect();
+        return (
+          event.clientX < rect.left ||
+          event.clientX > rect.right ||
+          event.clientY < rect.top ||
+          event.clientY > rect.bottom
+        );
+      };
+      let pressedOutside = false;
+      dialog.addEventListener("pointerdown", (event) => {
+        pressedOutside = outside(event, dialog);
+      });
+      dialog.addEventListener("pointerup", (event) => {
+        if (pressedOutside && outside(event, dialog)) {
+          dialog.close();
+        }
+      });
+    }
+
+    if (dialog.hasAttribute("data-open-on-load") && !dialog.open) {
+      dialog.showModal();
+      dialog.querySelector("[autofocus]")?.focus();
+    }
+  }
+
   const form = document.querySelector("[data-contact-form]");
   if (!form) {
     return;

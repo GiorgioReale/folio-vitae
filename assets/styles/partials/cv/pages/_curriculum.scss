@@ -266,7 +266,7 @@ body#curriculum {
       }
     }
 
-    .contact-form[popover] {
+    dialog.contact-form {
       box-sizing: border-box;
       width: min(40rem, calc(100vw - 2rem));
       max-height: calc(100dvh - 2rem);
@@ -283,7 +283,7 @@ body#curriculum {
       opacity: 0;
       transform: translateY(0.5rem) scale(0.98);
 
-      &:popover-open {
+      &[open] {
         display: flex;
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -303,7 +303,7 @@ body#curriculum {
           max(1.5rem, env(safe-area-inset-bottom, 0px))
           max(1.5rem, env(safe-area-inset-left, 0px));
 
-        &:popover-open {
+        &[open] {
           inset: 0;
         }
       }
@@ -312,9 +312,11 @@ body#curriculum {
         background-color: color-mix(in srgb, #000 50%, transparent);
         backdrop-filter: blur(5px);
         opacity: 0;
+        overflow: hidden;
+        overscroll-behavior: contain;
       }
 
-      &:popover-open::backdrop {
+      &[open]::backdrop {
         opacity: 1;
       }
 
@@ -334,12 +336,12 @@ body#curriculum {
         }
 
         @starting-style {
-          &:popover-open {
+          &[open] {
             opacity: 0;
             transform: translateY(0.5rem) scale(0.98);
           }
 
-          &:popover-open::backdrop {
+          &[open]::backdrop {
             opacity: 0;
           }
         }
@@ -584,17 +586,4 @@ body#curriculum {
     }
   }
 
-}
-
-html:has(.contact-form[popover]:popover-open) {
-  overflow: hidden;
-
-  body > .skip-link,
-  body > aside,
-  .page-shell > header,
-  .page-shell > footer,
-  #main-content > :not(.contact),
-  .contact > :not(.contact-form) {
-    pointer-events: none;
-  }
 }
