@@ -199,6 +199,8 @@ mod tests {
         assert!(tera.contains_component("chrome.skip_link"));
         assert!(tera.contains_component("chrome.site_header"));
         assert!(tera.contains_component("chrome.site_footer"));
+        assert!(tera.contains_component("chrome.site_head"));
+        assert!(tera.contains_component("chrome.site_head_assets"));
         assert!(tera.contains_template("main/pages/homepage.html"));
         assert!(tera.contains_template("cv/pages/curriculum.html"));
         assert!(tera.contains_template("errors/error.html"));
