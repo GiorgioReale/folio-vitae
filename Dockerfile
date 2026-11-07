@@ -25,7 +25,8 @@ RUN --mount=type=cache,id=cargo-registry,target=/usr/local/cargo/registry,sharin
 
 FROM alpine:3.24.4 AS runtime
 
-RUN apk add --no-cache ca-certificates \
+RUN apk upgrade --no-cache \
+    && apk add --no-cache ca-certificates \
     && addgroup -S -g 10001 app \
     && adduser -S -u 10001 -G app -h /app -s /sbin/nologin app
 
