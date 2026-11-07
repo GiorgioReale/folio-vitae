@@ -590,49 +590,72 @@ main :where(section, article) {
     navigation: auto;
   }
 
-  /* 1–2 stable names only: clearer MPA morphs without extra paint groups. */
-  .site-controls > .site-popover[data-site-menu] {
-    view-transition-name: folio-menu;
+  /* Few stable names: clearer MPA morphs without extra paint groups. */
+  nav.site-controls {
+    view-transition-name: folio-nav;
   }
 
-  /* Shared identity title on homepage ↔ curriculum (CTA path); skip sr-only/menu titles. */
+  /* Shared identity on homepage ↔ curriculum (CTA path); skip sr-only/menu titles. */
   body#homepage > .page-shell > main > h1,
   body#curriculum > aside.profile > div > h1 {
     view-transition-name: folio-page-title;
     width: fit-content;
   }
 
+  body#homepage > .page-shell > main > h2,
+  body#curriculum > aside.profile > div > h2 {
+    view-transition-name: folio-page-role;
+    width: fit-content;
+  }
+
   ::view-transition-group(root),
-  ::view-transition-group(folio-menu),
-  ::view-transition-group(folio-page-title) {
-    animation-duration: 0.24s;
+  ::view-transition-group(folio-nav),
+  ::view-transition-group(folio-page-title),
+  ::view-transition-group(folio-page-role) {
+    animation-duration: 0.48s;
     animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
   }
 
+  /* New page wipes over the old (no cross-fade blend). */
+  ::view-transition-image-pair(root) {
+    isolation: auto;
+  }
+
   ::view-transition-old(root) {
-    animation-name: folio-vt-fade-out;
-    animation-duration: 0.18s;
-    animation-timing-function: ease-out;
+    animation-name: folio-vt-retreat;
+    animation-duration: 0.48s;
+    animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     animation-fill-mode: both;
+    mix-blend-mode: normal;
+    z-index: 1;
   }
 
   ::view-transition-new(root) {
-    animation-name: folio-vt-fade-in;
-    animation-duration: 0.24s;
-    animation-timing-function: ease-out;
+    animation-name: folio-vt-open;
+    animation-duration: 0.48s;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
     animation-fill-mode: both;
+    mix-blend-mode: normal;
+    z-index: 2;
   }
 }
 
-@keyframes folio-vt-fade-out {
+/* Outgoing page settles back while the folio opens over it. */
+@keyframes folio-vt-retreat {
   to {
-    opacity: 0;
+    opacity: 0.55;
+    transform: scale(0.94);
   }
 }
 
-@keyframes folio-vt-fade-in {
+/* Incoming page opens from the center — a folio-page turn. */
+@keyframes folio-vt-open {
   from {
-    opacity: 0;
+    clip-path: inset(0 50%);
+  }
+
+  to {
+    clip-path: inset(0 0);
   }
 }
 
