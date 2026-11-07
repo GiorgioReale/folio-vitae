@@ -124,7 +124,7 @@ expression: cv_homepage
   
   <meta name="apple-mobile-web-app-title" content="Alex Carter | Curriculum Vitae" />
   
-  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#000000" />
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000" />
   <meta name="view-transition" content="same-origin" />
   <link rel="preload" href="/assets/styles/cv.css?v=ASSET_VERSION" as="style" />

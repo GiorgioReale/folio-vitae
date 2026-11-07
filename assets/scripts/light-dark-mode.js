@@ -30,6 +30,8 @@
     }
     return match.split("=")[1];
   };
+  const THEME_COLOR_LIGHT = "#ffffff";
+  const THEME_COLOR_DARK = "#000000";
   const getPreferredTheme = () =>
     window.matchMedia("(prefers-color-scheme: dark)").matches
       ? "dark"
@@ -47,10 +49,21 @@
     }
     return "auto";
   };
+  // Keep browser chrome (and PWA UI) aligned with the resolved data-theme,
+  // not only prefers-color-scheme — set both media metas so either match wins.
+  const syncThemeColor = (resolvedTheme) => {
+    const color =
+      resolvedTheme === "dark" ? THEME_COLOR_DARK : THEME_COLOR_LIGHT;
+    for (const meta of document.querySelectorAll('meta[name="theme-color"]')) {
+      meta.setAttribute("content", color);
+    }
+  };
 
   // Apply theme as early as possible to avoid a flash of the wrong palette.
   let currentTheme = getInitialTheme();
-  document.documentElement.setAttribute("data-theme", resolveTheme(currentTheme));
+  const initialResolvedTheme = resolveTheme(currentTheme);
+  document.documentElement.setAttribute("data-theme", initialResolvedTheme);
+  syncThemeColor(initialResolvedTheme);
 
   const setIcon = (icon, name) => {
     if (!icon) {
@@ -84,6 +97,7 @@
     }
   };
   const applyTheme = (theme, iconButtonThemeSwitch, button, announce) => {
+    const resolvedTheme = resolveTheme(theme);
     switch (theme) {
       case "dark":
         document.documentElement.setAttribute("data-theme", "dark");
@@ -94,10 +108,11 @@
         setIcon(iconButtonThemeSwitch, "sun");
         break;
       default: {
-        document.documentElement.setAttribute("data-theme", getPreferredTheme());
+        document.documentElement.setAttribute("data-theme", resolvedTheme);
         setIcon(iconButtonThemeSwitch, "moon-auto");
       }
     }
+    syncThemeColor(resolvedTheme);
     describeTheme(theme, button, announce);
   };
   const syncThemeWithCookie = (iconButtonThemeSwitch, button) => {
