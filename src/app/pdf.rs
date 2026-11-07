@@ -27,6 +27,8 @@ const PHOTO_PX: u32 = 320;
 const PHOTO_PT: f32 = 90.0;
 const SKILL_ICON_PX: u32 = 128;
 const SKILL_ICON_PT: f32 = 28.0;
+const SKILL_LABEL_SIZE: f32 = 7.5;
+const SKILL_LABEL_GAP: f32 = 3.0;
 const BLOCK_INDENT: f32 = 15.0;
 
 const TEXT: u8 = 0x44;
@@ -89,6 +91,7 @@ pub(crate) enum PdfBlock {
 }
 
 pub(crate) struct PdfSkill {
+    pub name: String,
     pub icon: String,
 }
 
@@ -332,7 +335,7 @@ impl Column {
                 PdfBlock::Paragraph(text) => {
                     self.write(text, FontRole::TextRegular, 10.0, TEXT, fonts, faces);
                 },
-                PdfBlock::Skills(skills) => self.draw_skills(skills),
+                PdfBlock::Skills(skills) => self.draw_skills(skills, fonts, faces),
                 PdfBlock::Group(group) => self.draw_group(group, fonts, faces),
                 PdfBlock::Entry(entry) => self.draw_indented(BLOCK_INDENT, |column| {
                     column.draw_entry(entry, fonts, faces);
@@ -382,22 +385,25 @@ impl Column {
         }
     }
 
-    fn draw_skills(&mut self, skills: &[PdfSkill]) {
+    fn draw_skills(&mut self, skills: &[PdfSkill], fonts: &FontIds, faces: &Faces) {
         if skills.is_empty() {
             return;
         }
 
         let gap = 14.0;
-        let min_item = SKILL_ICON_PT + 8.0;
+        let min_item = SKILL_ICON_PT + 14.0;
         let per_row = ((self.width + gap) / (min_item + gap)).floor().max(1.0) as usize;
 
         for row in skills.chunks(per_row) {
             let count = row.len() as f32;
             let item_width = (self.width - gap * (count - 1.0)) / count;
-            self.keep_together(SKILL_ICON_PT);
+            let label_height = skill_row_label_height(row, item_width, faces);
+            let row_height = SKILL_ICON_PT
+                + if label_height > 0.0 { SKILL_LABEL_GAP + label_height } else { 0.0 };
+            self.keep_together(row_height);
             let row_top = self.y;
 
-            for (index, _) in row.iter().enumerate() {
+            for (index, skill) in row.iter().enumerate() {
                 let item_x = self.x + (index as f32 * (item_width + gap));
                 if let Some(icon) = self.take_skill_icon() {
                     place_image(
@@ -409,9 +415,25 @@ impl Column {
                         SKILL_ICON_PX,
                     );
                 }
+                if !skill.name.trim().is_empty() {
+                    draw_centered_block(
+                        &mut self.pages[self.page],
+                        &skill.name,
+                        TextStyle {
+                            fonts,
+                            faces,
+                            role: FontRole::TextLight,
+                            size: SKILL_LABEL_SIZE,
+                            color: TEXT,
+                        },
+                        item_x,
+                        item_width,
+                        row_top + SKILL_ICON_PT + SKILL_LABEL_GAP,
+                    );
+                }
             }
 
-            self.y = row_top + SKILL_ICON_PT;
+            self.y = row_top + row_height;
         }
     }
 
@@ -488,7 +510,7 @@ impl Column {
             PdfBlock::Paragraph(text) => {
                 self.wrapped_height(text, FontRole::TextRegular, 10.0, faces, self.indent)
             },
-            PdfBlock::Skills(skills) => self.skills_height(skills),
+            PdfBlock::Skills(skills) => self.skills_height(skills, faces),
             PdfBlock::Group(group) => self.group_height(group, faces, self.indent + BLOCK_INDENT),
             PdfBlock::Entry(entry) => self.entry_height(entry, faces, self.indent + BLOCK_INDENT),
         }
@@ -532,14 +554,23 @@ impl Column {
         height
     }
 
-    fn skills_height(&self, skills: &[PdfSkill]) -> f32 {
+    fn skills_height(&self, skills: &[PdfSkill], faces: &Faces) -> f32 {
         if skills.is_empty() {
             return 0.0;
         }
         let gap = 14.0;
-        let min_item = SKILL_ICON_PT + 8.0;
+        let min_item = SKILL_ICON_PT + 14.0;
         let per_row = ((self.width + gap) / (min_item + gap)).floor().max(1.0) as usize;
-        skills.chunks(per_row).count() as f32 * SKILL_ICON_PT
+        skills
+            .chunks(per_row)
+            .map(|row| {
+                let count = row.len() as f32;
+                let item_width = (self.width - gap * (count - 1.0)) / count;
+                let label_height = skill_row_label_height(row, item_width, faces);
+                SKILL_ICON_PT
+                    + if label_height > 0.0 { SKILL_LABEL_GAP + label_height } else { 0.0 }
+            })
+            .sum()
     }
 
     fn wrapped_height(
@@ -599,6 +630,28 @@ fn place_image(ops: &mut Vec<Op>, id: XObjectId, left: f32, top: f32, size: f32,
             ..XObjectTransform::default()
         },
     });
+}
+
+fn skill_row_label_height(row: &[PdfSkill], item_width: f32, faces: &Faces) -> f32 {
+    row.iter()
+        .map(|skill| {
+            if skill.name.trim().is_empty() {
+                return 0.0;
+            }
+            wrap_text(face(faces, FontRole::TextLight), &skill.name, SKILL_LABEL_SIZE, item_width)
+                .into_iter()
+                .map(
+                    |line| {
+                        if line.is_empty() {
+                            SKILL_LABEL_SIZE * 0.4
+                        } else {
+                            SKILL_LABEL_SIZE * 1.25
+                        }
+                    },
+                )
+                .sum::<f32>()
+        })
+        .fold(0.0_f32, f32::max)
 }
 
 fn skill_icon_ids(document: &mut PdfDocument, sections: &[PdfSection]) -> Vec<Option<XObjectId>> {
@@ -1046,7 +1099,10 @@ mod tests {
                 },
                 PdfSection {
                     heading: "Skills".to_string(),
-                    blocks: vec![PdfBlock::Skills(vec![PdfSkill { icon: "rust".to_string() }])],
+                    blocks: vec![PdfBlock::Skills(vec![PdfSkill {
+                        name: "Rust".to_string(),
+                        icon: "rust".to_string(),
+                    }])],
                 },
             ],
             legal_notice: "Personal data notice.".to_string(),
@@ -1066,7 +1122,7 @@ mod tests {
         assert!(text.contains("BrightForge"), "{text}");
         assert!(text.contains("Experience"), "{text}");
         assert!(text.contains("Skills"), "{text}");
-        assert!(!text.contains("Rust"), "{text}");
+        assert!(text.contains("Rust"), "{text}");
         assert!(!text.contains("GitHub"), "{text}");
         assert!(
             bytes.windows(6).any(|window| window == b"/Image"),
