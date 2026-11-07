@@ -104,6 +104,30 @@ body#curriculum {
 
     > main {
       > section {
+        &:not(:first-of-type) {
+          content-visibility: auto;
+          contain-intrinsic-block-size: auto 24rem;
+
+          &.experience {
+            contain-intrinsic-block-size: auto 48rem;
+          }
+
+          &.skills {
+            contain-intrinsic-block-size: auto 12rem;
+          }
+
+          &.other-projects,
+          &.formation,
+          &.training-courses {
+            contain-intrinsic-block-size: auto 28rem;
+          }
+
+          &.pdf-download,
+          &.contact {
+            contain-intrinsic-block-size: auto 12rem;
+          }
+        }
+
         &:target {
           outline: 2px solid var(--color-border);
           outline-offset: 0.5rem;
@@ -597,6 +621,12 @@ body#curriculum {
           overflow-wrap: anywhere;
         }
       }
+    }
+  }
+
+  @media print {
+    > .page-shell > main > section:not(:first-of-type) {
+      content-visibility: visible;
     }
   }
 
