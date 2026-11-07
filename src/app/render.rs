@@ -1139,6 +1139,10 @@ mod tests {
         let cv_home = render_cv_homepage(&prepared.cv_state, &language, "/")
             .expect("cv homepage should render");
         assert!(cv_home.contains("skip-link"));
+        assert!(
+            cv_home.contains("speculate-next.js") || cv_home.contains("speculate-next.min.js"),
+            "cv homepage should load speculative navigation for typical next pages"
+        );
 
         let curriculum = render_cv_curriculum(&prepared.cv_state, None, &language, "/curriculum")
             .expect("curriculum should render");

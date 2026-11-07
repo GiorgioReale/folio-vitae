@@ -4,6 +4,13 @@
   <link rel="preload" as="image" href="/assets/images/cv/home-background/home-background-mobile.avif?v={{ asset_version }}" type="image/avif" media="(max-width: 992px)" fetchpriority="high" />
   <link rel="preload" as="image" href="/assets/images/cv/home-background/home-background.avif?v={{ asset_version }}" type="image/avif" media="(min-width: 993px)" fetchpriority="high" />
 {% endblock head_preload %}
+{% block page_scripts %}
+  {% if minify_assets %}
+  <script src="/assets/scripts/cv/speculate-next.min.js?v={{ asset_version }}" charset="utf-8" defer></script>
+  {% else %}
+  <script src="/assets/scripts/cv/speculate-next.js?v={{ asset_version }}" charset="utf-8" defer></script>
+  {% endif %}
+{% endblock page_scripts %}
 {% block aside %}
 <div class="hero-media" aria-hidden="true">
   <picture>
