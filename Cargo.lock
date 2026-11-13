@@ -980,9 +980,9 @@ checksum = "1c66915cc5391097de7a2b0b972e8505aa33c0df401fd3a6811dbdb32881ba48"
 
 [[package]]
 name = "flate2"
-version = "1.1.10"
+version = "1.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6e634e2e0ebac1ee034020da1ca582e17ffe4e0f5e985823721e168928136dcb"
+checksum = "626d4928326b646e70f65ed36fc7cf9f206bdb68a0019ee7c6b4709da4e084c4"
 dependencies = [
  "crc32fast",
  "miniz_oxide 0.9.1",
@@ -2979,9 +2979,9 @@ dependencies = [
 
 [[package]]
 name = "simpleicons-rs"
-version = "16.36.0"
+version = "16.37.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9b1c755181a33ecb137bd42139699ce2cd4679aba11284d79a0ef2ab453c5cf3"
+checksum = "478d1ea026d7cca6fedc500b985f59dda4d7e27d96176292df10adcd0089862c"
 dependencies = [
  "csscolorparser",
 ]
@@ -3886,11 +3886,11 @@ checksum = "3ad82d2a33cdc9674dc7465672f271e096168fcdbe0f799d9e6db8c5892679dc"
 
 [[package]]
 name = "wuff"
-version = "0.2.9"
+version = "0.2.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "200a7b806377b65f1ff9a985874332f15357c87e5dd7855f35f06dade95b8b3d"
+checksum = "f6a992b57b3d1ee972b2e3fd9225e44793104d49818836dd812d5459187712dd"
 dependencies = [
- "brotli-decompressor 5.0.3",
+ "brotli-decompressor 6.2.0",
  "bytes",
 ]
 
