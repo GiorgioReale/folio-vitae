@@ -25,8 +25,9 @@ RUN --mount=type=cache,id=cargo-registry,target=/usr/local/cargo/registry,sharin
 
 FROM alpine:3.24.4 AS runtime
 
+# Pin OpenSSL past 3.5.9-r0 (CVE-2026-107496/95691/95692 and related).
 RUN apk upgrade --no-cache \
-    && apk add --no-cache ca-certificates \
+    && apk add --no-cache ca-certificates "libssl3>=3.5.9-r1" "libcrypto3>=3.5.9-r1" \
     && addgroup -S -g 10001 app \
     && adduser -S -u 10001 -G app -h /app -s /sbin/nologin app
 
