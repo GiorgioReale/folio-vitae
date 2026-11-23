@@ -5,7 +5,7 @@
 # - revisit-by date inside the reason (re-evaluate on or before that date)
 # Do not leave permanent ignores without a revisit date.
 ignore = [
-    { id = "RUSTSEC-2024-0436", reason = "Transitive paste 1.x via image→exr/ravif (pulp, rav1e). Unmaintained proc-macro only (no runtime CVE surface). Clear by migrating upstream to pastey (or dropping image/exr paths). Revisit by 2027-04-01." },
+    { id = "RUSTSEC-2026-0543", reason = "chrono is unmaintained (info advisory, no CVE). Direct dep for NaiveDate / Utc in models, render, state. Clear by migrating dates to jiff (or time). Revisit by 2027-03-01." },
 ]
 unused-ignored-advisory = "deny"
 
