@@ -93,6 +93,8 @@ jobs:
           exit-code: "1"
           ignore-unfixed: true
           severity: ${{ env.TRIVY_SEVERITY }}
+          # SARIF mode unsets severity unless this is true (trivy-action default).
+          limit-severities-for-sarif: true
           vuln-type: os,library
           trivyignores: .trivyignore
 
